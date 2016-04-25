@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="5dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/profile_view_box_shape"
+        android:padding="@dimen/profile_view_border_indicator">
+
+        <RelativeLayout
+            android:background="@android:color/white"
+            android:id="@+id/user_profile_container"
+            android:layout_width="@dimen/profile_view_user_avatar_container_width"
+            android:layout_height="@dimen/profile_view_user_avatar_container_height"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true">
+
+            <ProgressBar
+                android:visibility="gone"
+                android:id="@+id/user_image_loader"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"/>
+
+            <ImageView
+                android:id="@+id/user_photo"
+                android:padding="10dp"
+                android:background="@drawable/user_avatar_shape"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/user_avatar"/>
+
+        </RelativeLayout>
+
+
+        <LinearLayout
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@+id/user_profile_container"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/profile_view_user_info_container_height"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/username_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/login_box_shape">
+
+                <ImageView
+                    android:background="@drawable/login_box_shape"
+                    android:padding="10dp"
+                    android:src="@drawable/user_avatar_thumnail"
+                    android:layout_width="70dp"
+                    android:layout_height="@dimen/login_input_text_height" />
+
+                <TextView
+                    android:padding="10dp"
+                    android:gravity="center_vertical"
+                    android:textColor="@android:color/black"
+                    android:id="@+id/username_input"
+                    android:textSize="18sp"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/login_input_text_height" />
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/lisense_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/login_box_shape">
+
+                <ImageView
+                    android:background="@drawable/login_box_shape"
+                    android:padding="10dp"
+                    android:src="@drawable/document_id_icon"
+                    android:layout_width="70dp"
+                    android:layout_height="@dimen/login_input_text_height" />
+
+                <TextView
+                    android:padding="10dp"
+                    android:gravity="center_vertical"
+                    android:textColor="@android:color/black"
+                    android:id="@+id/user_document_id"
+                    android:textSize="18sp"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/login_input_text_height" />
+
+            </LinearLayout>
+
+
+
+            <LinearLayout
+                android:id="@+id/school_bus_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/login_box_shape">
+
+                <ImageView
+                    android:background="@drawable/login_box_shape"
+                    android:padding="10dp"
+                    android:src="@drawable/business_icon"
+                    android:layout_width="70dp"
+                    android:layout_height="@dimen/login_input_text_height" />
+
+                <TextView
+                    android:padding="10dp"
+                    android:gravity="center_vertical"
+                    android:textColor="@android:color/black"
+                    android:id="@+id/user_business_name"
+                    android:textSize="18sp"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/login_input_text_height" />
+
+            </LinearLayout>
+
+
+
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:orientation="horizontal"
+            android:id="@+id/view_profile_footer_info_container"
+            android:layout_alignParentBottom="true"
+            android:layout_width="match_parent"
+            android:layout_height="100dp">
+
+            <Button
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:id="@+id/verify_biometric"
+                style="@style/Widget.AppCompat.Button"
+                android:layout_width="150dp"
+                android:layout_height="70dp"
+                android:text="@string/validate_biometric_button" />
+        </RelativeLayout>
+
+
+
+    </RelativeLayout>
+
+
+</LinearLayout>

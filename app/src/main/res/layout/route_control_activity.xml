@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <LinearLayout
+        android:id="@+id/route_panels_container"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_weight="50"
+            android:layout_width="0dp"
+            android:layout_height="match_parent">
+            <include layout="@layout/route_information_panel" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_weight="50"
+            android:layout_width="0dp"
+            android:layout_height="match_parent">
+            <include layout="@layout/route_map_panel" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</RelativeLayout>

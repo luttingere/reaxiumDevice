@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="40">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:id="@+id/user_search_container"
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+
+            <RelativeLayout
+                android:id="@+id/search_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/search_icon"
+                    style="@style/rectangle_small_images"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:src="@drawable/search_icon" />
+
+                <EditText
+                    android:id="@+id/user_search_text"
+                    android:layout_width="300dp"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:hint="Search a User..."
+                    android:paddingLeft="70dp" />
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:id="@+id/container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center">
+
+                <Button
+                    android:visibility="gone"
+                    android:layout_centerVertical="true"
+                    android:id="@+id/go_button"
+                    android:layout_alignParentRight="true"
+                    style="@style/Widget.AppCompat.Button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/search_user" />
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/user_search_container"
+            android:orientation="vertical">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/user_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:visibility="invisible"
+        android:id="@+id/user_security_info_container"
+        android:padding="20dp"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="60">
+
+        <RelativeLayout
+            android:id="@+id/photo_container"
+            android:layout_marginRight="5dp"
+            android:layout_alignParentTop="true"
+            android:layout_width="100dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_height="100dp">
+
+            <ProgressBar
+                android:layout_centerInParent="true"
+                android:id="@+id/user_photo_loader"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:layout_marginRight="5dp"/>
+
+            <com.makeramen.RoundedImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/user_photo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/user_avatar"
+                app:riv_border_width="1dip"
+                app:riv_corner_radius="30dip"
+                app:riv_oval="true" />
+
+        </RelativeLayout>
+
+
+        <LinearLayout
+            android:id="@+id/user_data_container"
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_toRightOf="@+id/photo_container">
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="50">
+
+                <TextView
+                    android:textColor="@android:color/black"
+                    android:id="@+id/user_full_name"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:text="Eduardo Jose Luttinger Mogollon" />
+
+                <TextView
+                    android:textSize="12sp"
+                    android:textColor="@android:color/black"
+                    android:id="@+id/user_id_number"
+                    android:layout_below="@+id/user_full_name"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="19044081" />
+
+                <TextView
+                    android:textSize="12sp"
+                    android:textColor="@android:color/black"
+                    android:id="@+id/user_type"
+                    android:layout_below="@+id/user_id_number"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Administrator" />
+
+                <TextView
+                    android:textSize="12sp"
+                    android:textColor="@android:color/black"
+                    android:id="@+id/user_business_name"
+                    android:layout_below="@+id/user_type"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="G6G Smart Technology LTD." />
+
+            </RelativeLayout>
+
+
+
+        </LinearLayout>
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tabs"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            style="@style/customTabLayout"
+            android:layout_below="@+id/photo_container"
+            android:background="@drawable/security_tab_shape"
+            app:tabBackground="@drawable/security_tab_shape"
+            app:tabGravity="fill"
+            app:tabTextColor="@android:color/black"
+            android:layout_gravity="center"
+            app:tabMode="fixed"
+            android:layout_marginTop="10dp"/>
+
+        <View
+            android:id="@+id/separator"
+            android:layout_below="@+id/tabs"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/black"></View>
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/user_security_info_pager"
+            android:layout_below="@+id/separator"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+
+    </RelativeLayout>
+
+</LinearLayout>

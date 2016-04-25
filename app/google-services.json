@@ -1,0 +1,43 @@
+{
+  "project_info": {
+    "project_id": "reaxiumdeviceapp",
+    "project_number": "226672995166",
+    "name": "ReaxiumDeviceApp"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:226672995166:android:b1336a339a7032ab",
+        "client_id": "android:ggsmarttechnologyltd.reaxium_access_control",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "ggsmarttechnologyltd.reaxium_access_control",
+          "certificate_hash": []
+        }
+      },
+      "oauth_client": [],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 2,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 1
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}

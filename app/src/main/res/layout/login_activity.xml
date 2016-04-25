@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="@dimen/login_container_padding"
+    android:paddingRight="@dimen/login_container_padding">
+
+    <LinearLayout
+        android:layout_marginTop="@dimen/login_top_and_bottom_margin"
+        android:id="@+id/login_title_container"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:gravity="center"
+            android:src="@drawable/logo_main_t4ss"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:gravity="center"
+        android:layout_centerInParent="true"
+        android:id="@+id/login_input_data_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/username_container"
+            android:layout_width="@dimen/login_input_container_width"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/login_box_shape">
+
+            <ImageView
+                android:background="@drawable/login_box_shape"
+                android:padding="10dp"
+                android:src="@drawable/userlogin"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/login_input_text_height" />
+
+            <EditText
+                android:singleLine="true"
+                android:imeOptions="actionNext"
+                android:textColorHint="@android:color/black"
+                android:id="@+id/username_input"
+                android:hint="@string/login_text_username"
+                android:text="reaxiumUser"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/login_input_text_height" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/password_container"
+            android:layout_width="@dimen/login_input_container_width"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/login_box_shape"
+            android:layout_below="@+id/username_container"
+            android:layout_marginTop="10dp">
+
+            <ImageView
+                android:background="@drawable/login_box_shape"
+                android:padding="10dp"
+                android:src="@drawable/passwordlogin"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/login_input_text_height" />
+
+            <EditText
+                android:imeOptions="actionDone"
+                android:textColorHint="@android:color/black"
+                android:id="@+id/password_input"
+                android:inputType="textPassword"
+                android:hint="@string/login_text_password"
+                android:text="reaxiumPassword"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/login_input_text_height" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+
+    <LinearLayout
+        android:layout_marginBottom="@dimen/login_top_and_bottom_margin"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:orientation="horizontal"
+        android:layout_width="@dimen/login_input_container_width"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/login_form_submit"
+            android:textColor="@android:color/white"
+            android:background="@color/colorPrimary"
+            android:text="@string/login_text_button"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/login_send_button_height" />
+
+    </LinearLayout>
+
+
+
+</RelativeLayout>

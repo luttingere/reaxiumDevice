@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="5dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/profile_view_box_shape"
+        android:padding="@dimen/profile_view_border_indicator">
+
+        <LinearLayout
+            android:id="@+id/user_profile_container"
+            android:layout_width="@dimen/profile_view_user_avatar_container_width"
+            android:layout_height="@dimen/profile_view_user_avatar_container_height"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true">
+
+            <ImageView
+                android:padding="10dp"
+                android:background="@drawable/user_avatar_shape"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/user_avatar"/>
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@+id/user_profile_container"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/profile_view_user_info_container_height"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:orientation="vertical">
+
+
+
+            <LinearLayout
+                android:id="@+id/username_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/login_box_shape">
+
+                <ImageView
+                    android:background="@drawable/login_box_shape"
+                    android:padding="10dp"
+                    android:src="@drawable/user_avatar_thumnail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/login_input_text_height" />
+
+                <TextView
+                    android:padding="5dp"
+                    android:gravity="center_vertical"
+                    android:textColor="@android:color/black"
+                    android:id="@+id/username_input"
+                    android:text="Driver's name"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/login_input_text_height" />
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/lisense_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/login_box_shape">
+
+                <ImageView
+                    android:background="@drawable/login_box_shape"
+                    android:padding="10dp"
+                    android:src="@drawable/licence_number"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/login_input_text_height" />
+
+                <TextView
+                    android:padding="5dp"
+                    android:gravity="center_vertical"
+                    android:textColor="@android:color/black"
+                    android:id="@+id/license_number_input"
+                    android:text="Driver's license number"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/login_input_text_height" />
+
+            </LinearLayout>
+
+
+
+            <LinearLayout
+                android:id="@+id/school_bus_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/login_box_shape">
+
+                <ImageView
+                    android:background="@drawable/login_box_shape"
+                    android:padding="10dp"
+                    android:src="@drawable/school_bus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/login_input_text_height" />
+
+                <TextView
+                    android:padding="5dp"
+                    android:gravity="center_vertical"
+                    android:textColor="@android:color/black"
+                    android:id="@+id/school_bus_number_input"
+                    android:text="School bus Number"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/login_input_text_height" />
+
+            </LinearLayout>
+
+
+
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:orientation="horizontal"
+            android:id="@+id/view_profile_footer_info_container"
+            android:layout_alignParentBottom="true"
+            android:layout_width="match_parent"
+            android:layout_height="100dp">
+
+
+
+            <ImageView
+                android:id="@+id/go_button"
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="20dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:src="@drawable/go_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+
+
+
+        </RelativeLayout>
+
+
+
+    </RelativeLayout>
+
+
+</LinearLayout>

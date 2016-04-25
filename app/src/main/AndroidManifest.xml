@@ -1,0 +1,58 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="ggsmarttechnologyltd.reaxium_access_control">
+
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.CALL_PHONE"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+
+    <application
+        android:name=".App"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme" >
+        <activity android:name=".splash.ReaxiumSplash"  android:screenOrientation="landscape">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".login.activity.LoginActivity" android:screenOrientation="landscape" android:windowSoftInputMode="adjustPan"  />
+        <activity android:name=".viewprofile.activity.UserViewProfileActivity" android:screenOrientation="landscape" android:windowSoftInputMode="adjustPan"  />
+        <activity android:name=".routecontrol.activity.RouteControlActivity" android:screenOrientation="landscape" />
+        <activity android:name=".admin.activity.AdminActivity" android:windowSoftInputMode="adjustPan" android:screenOrientation="landscape" />
+        <activity android:name="com.soundcloud.android.crop.CropImageActivity" android:screenOrientation="landscape"/>
+
+        <!-- Services -->
+        <!--<service-->
+            <!--android:name=".service.SendLocationService"-->
+            <!--android:enabled="true"-->
+            <!--android:exported="true">-->
+        <!--</service>-->
+
+        <service
+            android:name=".service.BiometricScannerService"
+            android:enabled="true"
+            android:exported="true">
+        </service>
+
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyBM3TRRm-CwW8BpX3Y4VV9OJe5dwHl7iJM"/>
+
+    </application>
+
+
+</manifest>

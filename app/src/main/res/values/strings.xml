@@ -1,0 +1,67 @@
+<resources>
+
+    <!-- Applications name-->
+    <string name="app_name">ReaxiumDevice</string>
+    <string name="app_title">Reaxium</string>
+    <string name="app_description">Access Control</string>
+
+
+    <!-- Functional Messages-->
+    <string name="progress_dialog_message">Please Wait...</string>
+    <string name="progress_login_dialog_message">Login to Reaxium Device...</string>
+    <string name="configure_device_progress_message">Download the configuration...</string>
+    <string name="synchronize_device_progress_message">Synchronizing...</string>
+    <string name="synchronize_device_users_progress_message">Synchronizing Users...</string>
+    <string name="synchronize_device_biometrics_progress_message">Synchronizing Biometrics...</string>
+
+
+    <!-- Exception Messages-->
+    <string name="no_main_layout_exception">There is not main layout configured in the activity.</string>
+    <string name="simple_exception_message">An error has occurred, try again later.</string>
+    <string name="no_network_available">Wi-Fi and mobile data are unavailable.</string>
+
+    <!-- Login data-->
+    <string name="login_text_username">Username</string>
+    <string name="login_text_password">Password</string>
+    <string name="login_text_button">Login</string>
+
+    <!-- Menu Drawer-->
+    <string name="menu_drawer_configure_device">Configure Device</string>
+    <string name="menu_drawer_add_user">Add a User</string>
+    <string name="menu_drawer_add_security">Add User Access</string>
+    <string name="menu_drawer_verify_biometric">Verify User Access</string>
+    <string name="menu_drawer_logout">Log Out</string>
+
+
+    <!-- Admin Screens-->
+    <string name="admin_fragment_title">Reaxium Admin Console</string>
+
+    <!-- User Security Panel-->
+    <string name="user_security_panel_title">User Security Panel</string>
+    <string name="user_security_panel_tab_fingerprint">Biometric</string>
+    <string name="user_security_panel_tab_rfid">RFID</string>
+    <string name="search_user">Find</string>
+
+    <!-- device configuration-->
+    <string name="empty_device_id">Please type a device id</string>
+    <string name="device_configuration_device_id">Place A Device ID...</string>
+    <string name="device_configuration_button_name">Configure</string>
+    <string name="synchronize_device">Synchronize Device</string>
+    <string name="reaxium_device_name">Device Name:</string>
+    <string name="reaxium_device_Description">Device Description:</string>
+    <string name="reaxium_device_app_name">Application Name:</string>
+    <string name="reaxium_device_app_version">Application Version:</string>
+    <string name="reaxium_device_status">Device Status:</string>
+    <string name="reaxium_device_last_sync">Last Synchronization:</string>
+
+    <!-- Validate biometric fragment-->
+    <string name="validate_biometric_button">Scann Fingerprint</string>
+
+    <!-- add a user fragment-->
+    <string name="save_user">Save User</string>
+    <string name="add_user_title">Add a User</string>
+
+
+
+
+</resources>

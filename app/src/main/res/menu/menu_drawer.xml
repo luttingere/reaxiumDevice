@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <group
+        android:menuCategory="container"
+        android:id="@+id/nav_search"
+        app:itemBackground="@android:color/black"
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/action_configure_device"
+            android:icon="@drawable/configure_device"
+            android:title="@string/menu_drawer_configure_device"/>
+
+        <item
+            android:id="@+id/action_add_user"
+            android:icon="@drawable/add_user_icon"
+            android:title="@string/menu_drawer_add_user"/>
+
+        <item
+            android:id="@+id/action_add_security_to_user"
+            android:icon="@drawable/user_security_icon"
+            android:title="@string/menu_drawer_add_security"/>
+
+        <item
+            android:id="@+id/action_verify_biometric"
+            android:icon="@drawable/verify_user"
+            android:title="@string/menu_drawer_verify_biometric"/>
+
+        <item
+            android:id="@+id/action_logout"
+            android:icon="@drawable/logout_icon"
+            android:title="@string/menu_drawer_logout"/>
+
+
+    </group>
+
+
+</menu>
