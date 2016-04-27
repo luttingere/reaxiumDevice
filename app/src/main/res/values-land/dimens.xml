@@ -17,9 +17,9 @@
     <dimen name="route_panel_info_text_textSize">20sp</dimen>
 
     <!-- View profile sizes-->
-    <dimen name="profile_view_border_indicator">55dp</dimen>
-    <dimen name="profile_view_user_avatar_container_width">280dp</dimen>
-    <dimen name="profile_view_user_avatar_container_height">210dp</dimen>
+    <dimen name="profile_view_border_indicator">50dp</dimen>
+    <dimen name="profile_view_user_avatar_container_width">350dp</dimen>
+    <dimen name="profile_view_user_avatar_container_height">300dp</dimen>
     <dimen name="profile_view_user_info_container_width">300dp</dimen>
     <dimen name="profile_view_user_info_container_height">220dp</dimen>
 

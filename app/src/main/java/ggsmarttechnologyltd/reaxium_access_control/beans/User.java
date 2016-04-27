@@ -1,11 +1,15 @@
 package ggsmarttechnologyltd.reaxium_access_control.beans;
 
+import android.util.Log;
+
 import com.google.gson.annotations.SerializedName;
+
+import java.util.Comparator;
 
 /**
  * Created by Eduardo Luttinger on 19/04/2016.
  */
-public class User extends AppBean {
+public class User extends AppBean implements Comparable{
 
     @SerializedName("user_id")
     private Long userId;
@@ -34,6 +38,9 @@ public class User extends AppBean {
     @SerializedName("birthdate")
     private String birthDate;
 
+    @SerializedName("email")
+    private String email;
+
     @SerializedName("status")
     private Status status;
 
@@ -42,6 +49,8 @@ public class User extends AppBean {
 
     @SerializedName("busines")
     private Business business;
+
+    private String accessTime;
 
 
     public Long getUserId() {
@@ -69,6 +78,9 @@ public class User extends AppBean {
     }
 
     public String getSecondName() {
+        if(secondName == null){
+            secondName = "";
+        }
         return secondName;
     }
 
@@ -85,6 +97,9 @@ public class User extends AppBean {
     }
 
     public String getSecondLastName() {
+        if(secondLastName == null){
+            secondLastName = "";
+        }
         return secondLastName;
     }
 
@@ -139,5 +154,59 @@ public class User extends AppBean {
 
     public void setBusiness(Business business) {
         this.business = business;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getAccessTime() {
+        if(accessTime == null){
+            accessTime = "";
+        }
+        return accessTime;
+    }
+
+    public void setAccessTime(String accessTime) {
+        this.accessTime = accessTime;
+    }
+
+    @Override
+    public int hashCode() {
+        return getUserId().intValue();
+    }
+
+    @Override
+    public boolean equals(Object another) {
+        Boolean equals = Boolean.FALSE;
+        if(another instanceof User){
+            Log.i("REAXIUM_DEVICE","Probando usuarioId: "+((User) another).getUserId());
+            Log.i("REAXIUM_DEVICE","Contra  usuarioId: " + getUserId());
+            if(((User) another).getUserId().intValue() == getUserId().intValue()){
+                equals = Boolean.TRUE;
+            }
+        }
+        return equals;
+    }
+
+    @Override
+    public int compareTo(Object another) {
+        int comparation = 0;
+        if(another instanceof User){
+            if(another != null){
+                if(((User) another).getUserId().intValue() > getUserId().intValue()){
+                    comparation = 1;
+                }else if(((User) another).getUserId().intValue() < getUserId().intValue()){
+                    comparation = -1;
+                }else{
+                    comparation = 0;
+                }
+            }
+        }
+        return comparation;
     }
 }

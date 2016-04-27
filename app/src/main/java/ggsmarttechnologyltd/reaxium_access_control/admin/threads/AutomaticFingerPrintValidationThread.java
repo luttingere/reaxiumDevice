@@ -10,7 +10,10 @@ import cn.com.aratek.fp.FingerprintImage;
 import cn.com.aratek.fp.FingerprintScanner;
 import cn.com.aratek.util.Result;
 import ggsmarttechnologyltd.reaxium_access_control.App;
+import ggsmarttechnologyltd.reaxium_access_control.admin.activity.AdminActivity;
 import ggsmarttechnologyltd.reaxium_access_control.database.ReaxiumUsersDAO;
+import ggsmarttechnologyltd.reaxium_access_control.util.FailureAccessPlayerSingleton;
+import ggsmarttechnologyltd.reaxium_access_control.util.SuccessfulAccessPlayerSingleton;
 
 /**
  * Created by Eduardo Luttinger on 20/04/2016.
@@ -26,6 +29,7 @@ public class AutomaticFingerPrintValidationThread extends Thread {
     private byte[] fingerPrintFeat;
     private List<Integer> listOfUsersRegistered;
     private Context mContext;
+    private Boolean capturedSuccessFully = Boolean.FALSE;
 
     public AutomaticFingerPrintValidationThread(FingerprintScanner fingerprintScanner, FingerPrintHandler fingerPrintHandler, Context context) {
         this.fingerprintScanner = fingerprintScanner;
@@ -38,6 +42,10 @@ public class AutomaticFingerPrintValidationThread extends Thread {
     public void run() {
         while (!stop) {
             try {
+                if(capturedSuccessFully){
+                    sleep(1000);
+                    capturedSuccessFully = Boolean.FALSE;
+                }
                 //validate if there is a finger in the hole
                 fingerCaptureResult = fingerprintScanner.hasFinger();
 
@@ -49,6 +57,8 @@ public class AutomaticFingerPrintValidationThread extends Thread {
 
                     //is every thing ok? Come on!!
                     if(fingerCaptureResult.error == FingerprintScanner.RESULT_OK){
+
+                        showProgressDialog();
 
                         // withdraw the bytes of the captured image
                         fingerprintImage = (FingerprintImage) fingerCaptureResult.data;
@@ -84,29 +94,61 @@ public class AutomaticFingerPrintValidationThread extends Thread {
                                 }
                                 //if the user id is zero means that the validation not found any biometric that matched with the just captured
                                 if (userId != 0) {
+
+                                    capturedSuccessFully = Boolean.TRUE;
+
+                                    dismissProgressDialog();
+
+                                    SuccessfulAccessPlayerSingleton.getInstance(mContext).initRingTone();
                                     //save biometric in the server
                                     fingerPrintHandler.sendMessage(fingerPrintHandler.obtainMessage(FingerPrintHandler.VALIDATE_FINGER_PRINT, userId));
 
                                 } else {
+                                    dismissProgressDialog();
+                                    FailureAccessPlayerSingleton.getInstance(mContext).initRingTone();
                                     fingerPrintHandler.sendMessage(fingerPrintHandler.obtainMessage(FingerPrintHandler.ERROR_ROUTINE, "No user found."));
                                 }
                             } else {
-                                fingerPrintHandler.sendMessage(fingerPrintHandler.obtainMessage(FingerPrintHandler.ERROR_ROUTINE, "No users registered in this device."));
+                                dismissProgressDialog();
+                                 FailureAccessPlayerSingleton.getInstance(mContext).initRingTone();
+                              //  fingerPrintHandler.sendMessage(fingerPrintHandler.obtainMessage(FingerPrintHandler.ERROR_ROUTINE, "No users registered in this device."));
                             }
                         } else {
-                            fingerPrintHandler.sendMessage(fingerPrintHandler.obtainMessage(FingerPrintHandler.ERROR_ROUTINE, "Error with the image captured, error code" + fingerCaptureResult.error));
+                            dismissProgressDialog();
+                            //FailureAccessPlayerSingleton.getInstance(mContext).initRingTone();
+                            //fingerPrintHandler.sendMessage(fingerPrintHandler.obtainMessage(FingerPrintHandler.ERROR_ROUTINE, "Error with the image captured, error code" + fingerCaptureResult.error));
                         }
                     }else{
+                        dismissProgressDialog();
+                        ((AdminActivity)mContext).dismissProgressDialog();
                         Log.i(TAG,"validate whats happened if the biometric miss the finger after validate one on the hole");
                     }
                 }
             } catch (Exception e) {
+                dismissProgressDialog();
                 stop = true;
                 Log.i(TAG, "Error checking the biometric", e);
                 fingerPrintHandler.sendMessage(fingerPrintHandler.obtainMessage(FingerPrintHandler.ERROR_ROUTINE, "Internal Error, Contact Reaxium Support"));
             }
         }
         Log.i(TAG, "The fingerprint capture proccess has ended");
+    }
+
+    private void showProgressDialog(){
+        ((AdminActivity)mContext).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ((AdminActivity) mContext).showProgressDialog("Processing Fingerprint");
+            }
+        });
+    }
+    private void dismissProgressDialog(){
+        ((AdminActivity)mContext).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ((AdminActivity) mContext).dismissProgressDialog();
+            }
+        });
     }
 
     public static void stopScanner() {

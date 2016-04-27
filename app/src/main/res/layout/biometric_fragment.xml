@@ -32,11 +32,16 @@
 
 
 
-        <ImageView
+        <Button
             android:id="@+id/capture_fingerprint"
             android:layout_centerInParent="true"
             android:layout_width="150dp"
             android:layout_height="150dp"
+            android:text="Scan"
+            android:textAllCaps="true"
+            android:textColor="@android:color/white"
+            android:background="@color/colorPrimary"
+            android:textSize="20sp"
             android:src="@drawable/send_finger_print" />
 
 

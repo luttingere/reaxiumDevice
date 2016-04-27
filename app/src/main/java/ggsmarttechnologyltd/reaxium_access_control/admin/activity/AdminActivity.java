@@ -16,11 +16,14 @@ import android.widget.TextView;
 import ggsmarttechnologyltd.reaxium_access_control.GGMainActivity;
 import ggsmarttechnologyltd.reaxium_access_control.GGMainFragment;
 import ggsmarttechnologyltd.reaxium_access_control.R;
+import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.AccessControlFragment;
 import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.AddUserFragment;
 import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.AdminFragment;
 import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.ConfigureDeviceFragment;
+import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.UserPanelFragment;
 import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.UserSecurityFragment;
 import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.VerifyBiometricFragment;
+import ggsmarttechnologyltd.reaxium_access_control.admin.threads.AutomaticFingerPrintValidationThread;
 import ggsmarttechnologyltd.reaxium_access_control.global.GGGlobalValues;
 import ggsmarttechnologyltd.reaxium_access_control.login.activity.LoginActivity;
 import ggsmarttechnologyltd.reaxium_access_control.util.GGUtil;
@@ -145,7 +148,7 @@ public class AdminActivity extends GGMainActivity {
                     break;
                 case R.id.action_add_user:
                     mMenuDrawer.getMenu().findItem(menuItem.getItemId()).setChecked(Boolean.TRUE);
-                    runMyFragment(new AddUserFragment(), null);
+                    runMyFragment(new UserPanelFragment(), null);
                     mDrawerLayout.closeDrawer(GravityCompat.END);
                     break;
                 case R.id.action_configure_device:
@@ -158,7 +161,13 @@ public class AdminActivity extends GGMainActivity {
                     runMyFragment(new VerifyBiometricFragment(), null);
                     mDrawerLayout.closeDrawer(GravityCompat.END);
                     break;
+                case R.id.action_access_control:
+                    mMenuDrawer.getMenu().findItem(menuItem.getItemId()).setChecked(Boolean.TRUE);
+                    runMyFragment(new AccessControlFragment(), null);
+                    mDrawerLayout.closeDrawer(GravityCompat.END);
+                    break;
                 case R.id.action_logout:
+                    AutomaticFingerPrintValidationThread.stopScanner();
                     sharedPreferenceUtil.removeValue(GGGlobalValues.USER_ID_IN_SESSION);
                     sharedPreferenceUtil.removeValue(GGGlobalValues.USER_FULL_NAME_IN_SESSION);
                     sharedPreferenceUtil.removeValue(GGGlobalValues.USER_FULL_TYPE_IN_SESSION);

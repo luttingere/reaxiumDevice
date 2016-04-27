@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/add_or_edit_user_container"
+    android:visibility="gone"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/white"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <ScrollView
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -15,18 +15,27 @@
             android:background="@android:color/white">
 
             <RelativeLayout
-                android:layout_marginTop="5dp"
                 android:id="@+id/add_an_user_image_container"
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
+                android:layout_marginTop="5dp"
                 android:clickable="true">
 
+                <ProgressBar
+                    android:visibility="gone"
+                    android:layout_centerInParent="true"
+                    android:id="@+id/user_photo_loader"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:layout_gravity="center"
+                    android:layout_marginRight="5dp"/>
+
                 <com.makeramen.RoundedImageView xmlns:app="http://schemas.android.com/apk/res-auto"
-                    android:clickable="true"
                     android:id="@+id/user_photo"
                     android:layout_width="150dp"
                     android:layout_height="150dp"
                     android:layout_centerInParent="true"
+                    android:clickable="true"
                     android:scaleType="centerCrop"
                     android:src="@drawable/user_avatar"
                     app:riv_border_width="1dip"
@@ -46,49 +55,83 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="45dp"
+                    android:layout_height="85dp"
                     android:layout_marginBottom="10dp"
                     android:orientation="horizontal">
 
-                    <EditText
-                        android:id="@+id/user_document_id"
-                        style="@style/userAddTextStyle"
+                    <RelativeLayout
+                        android:layout_height="match_parent"
                         android:layout_width="0dp"
-                        android:layout_weight="35"
-                        android:hint="Document ID"
-                        android:inputType="textPersonName" />
+                        android:layout_weight="35">
+
+                        <TextView
+                            android:textSize="20sp"
+                            android:layout_alignParentTop="true"
+                            android:id="@+id/document_id_label"
+                            android:text="* Document ID:"
+                            android:textStyle="bold"
+                            android:textColor="@color/colorPrimary"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+
+                        <EditText
+                            android:layout_alignParentBottom="true"
+                            android:id="@+id/user_document_id"
+                            style="@style/userAddTextStyle"
+                            android:layout_width="match_parent"
+                            android:hint="Document ID"
+                            android:inputType="textPersonName" />
+
+                    </RelativeLayout>
 
                     <View
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="5" />
-                    
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:layout_weight="35"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent">
 
-                        <EditText
-                            android:enabled="false"
-                            android:id="@+id/user_birth_date"
-                            style="@style/userAddTextStyle2"
-                            android:layout_width="0dp"
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="35"
+                        android:orientation="horizontal">
+
+                        <RelativeLayout
                             android:layout_height="match_parent"
-                            android:layout_weight="70"
-                            android:hint="Birth Date"
-                            android:inputType="textPersonName" />
+                            android:layout_width="0dp"
+                            android:layout_weight="70">
+
+                            <TextView
+                                android:textSize="20sp"
+                                android:text="Birth Date:"
+                                android:textStyle="bold"
+                                android:textColor="@color/colorPrimary"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent" />
+
+                            <EditText
+                                android:layout_alignParentBottom="true"
+                                android:id="@+id/user_birth_date"
+                                style="@style/userAddTextStyle"
+                                android:layout_width="match_parent"
+                                android:layout_height="45dp"
+                                android:enabled="false"
+                                android:hint="Birth Date"
+                                android:inputType="textPersonName" />
+
+                        </RelativeLayout>
 
                         <Button
+                            android:layout_marginTop="10dp"
+                            android:layout_gravity="center_vertical"
                             android:id="@+id/show_calendar_picker"
                             style="@style/Widget.AppCompat.Button"
-                            android:background="@color/colorPrimary"
-                            android:layout_marginLeft="5dp"
-                            android:textColor="@android:color/white"
                             android:layout_width="0dp"
+                            android:layout_height="45dp"
+                            android:layout_marginLeft="5dp"
+                            android:layout_weight="20"
+                            android:background="@color/colorPrimary"
                             android:text="Add"
-                            android:layout_height="match_parent"
-                            android:layout_weight="20"/>
+                            android:textColor="@android:color/white" />
 
                     </LinearLayout>
 
@@ -97,116 +140,217 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="45dp"
+                    android:layout_height="85dp"
                     android:layout_marginBottom="10dp"
                     android:orientation="horizontal">
 
-                    <EditText
-                        android:id="@+id/user_first_name"
-                        style="@style/userAddTextStyle"
+
+
+                    <RelativeLayout
+                        android:layout_height="match_parent"
                         android:layout_width="0dp"
-                        android:layout_weight="35"
-                        android:hint="Name"
-                        android:inputType="textPersonName" />
+                        android:layout_weight="35">
+
+                        <TextView
+                            android:textSize="20sp"
+                            android:layout_alignParentTop="true"
+                            android:text="* Name:"
+                            android:textStyle="bold"
+                            android:textColor="@color/colorPrimary"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+
+                        <EditText
+                            android:layout_alignParentBottom="true"
+                            android:id="@+id/user_first_name"
+                            style="@style/userAddTextStyle"
+                            android:layout_width="match_parent"
+                            android:hint="Name"
+                            android:inputType="textPersonName" />
+
+                    </RelativeLayout>
+
+
+
+
+
+
+
 
                     <View
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="5" />
 
-                    <EditText
-                        android:id="@+id/user_second_name"
-                        style="@style/userAddTextStyle"
+
+
+                    <RelativeLayout
+                        android:layout_height="match_parent"
                         android:layout_width="0dp"
-                        android:layout_weight="35"
-                        android:hint="Second Name"
-                        android:inputType="textPersonName" />
+                        android:layout_weight="35">
+
+                        <TextView
+                            android:textSize="20sp"
+                            android:layout_alignParentTop="true"
+                            android:text="Second Name:"
+                            android:textStyle="bold"
+                            android:textColor="@color/colorPrimary"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+
+                        <EditText
+                            android:layout_alignParentBottom="true"
+                            android:id="@+id/user_second_name"
+                            style="@style/userAddTextStyle"
+                            android:layout_width="match_parent"
+                            android:hint="Second Name"
+                            android:inputType="textPersonName" />
+
+                    </RelativeLayout>
+
+
 
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="45dp"
+                    android:layout_height="85dp"
                     android:layout_marginBottom="10dp"
                     android:orientation="horizontal">
 
-                    <EditText
-                        android:id="@+id/user_last_name"
-                        style="@style/userAddTextStyle"
+                    <RelativeLayout
+                        android:layout_height="match_parent"
                         android:layout_width="0dp"
-                        android:layout_weight="35"
-                        android:hint="Last Name"
-                        android:inputType="textPersonName" />
+                        android:layout_weight="35">
+
+                        <TextView
+                            android:textSize="20sp"
+                            android:layout_alignParentTop="true"
+                            android:text="* Last Name:"
+                            android:textStyle="bold"
+                            android:textColor="@color/colorPrimary"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+
+                        <EditText
+                            android:layout_alignParentBottom="true"
+                            android:id="@+id/user_last_name"
+                            style="@style/userAddTextStyle"
+                            android:layout_width="match_parent"
+                            android:hint="Last Name"
+                            android:inputType="textPersonName" />
+
+                    </RelativeLayout>
+
+
 
                     <View
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="5" />
 
-                    <EditText
-                        android:id="@+id/user_second_last_name"
-                        style="@style/userAddTextStyle"
+
+                    <RelativeLayout
+                        android:layout_height="match_parent"
                         android:layout_width="0dp"
-                        android:layout_weight="35"
-                        android:hint="Second Last Name"
-                        android:inputType="textPersonName" />
+                        android:layout_weight="35">
+
+                        <TextView
+                            android:textSize="20sp"
+                            android:layout_alignParentTop="true"
+                            android:text="Second Last Name:"
+                            android:textStyle="bold"
+                            android:textColor="@color/colorPrimary"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+
+                        <EditText
+                            android:layout_alignParentBottom="true"
+                            android:id="@+id/user_second_last_name"
+                            style="@style/userAddTextStyle"
+                            android:layout_width="match_parent"
+                            android:hint="Second Last Name"
+                            android:inputType="textPersonName" />
+
+                    </RelativeLayout>
+
 
                 </LinearLayout>
 
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="45dp"
+                    android:layout_height="85dp"
                     android:layout_marginBottom="10dp"
                     android:orientation="horizontal">
 
-                    <EditText
-                        android:id="@+id/user_email"
-                        style="@style/userAddTextStyle"
+                    <RelativeLayout
+                        android:layout_height="match_parent"
                         android:layout_width="0dp"
-                        android:layout_weight="35"
-                        android:hint="Email"
-                        android:inputType="textPersonName" />
+                        android:layout_weight="35">
+
+                        <TextView
+                            android:textSize="20sp"
+                            android:layout_alignParentTop="true"
+                            android:text="Email:"
+                            android:textStyle="bold"
+                            android:textColor="@color/colorPrimary"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+
+                        <EditText
+                            android:layout_alignParentBottom="true"
+                            android:id="@+id/user_email"
+                            style="@style/userAddTextStyle"
+                            android:layout_width="match_parent"
+                            android:hint="Email"
+                            android:inputType="textPersonName" />
+
+                    </RelativeLayout>
 
                     <View
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="5" />
 
-                    <EditText
-                        android:id="@+id/user_phone"
-                        style="@style/userAddTextStyle"
+                    <RelativeLayout
+                        android:layout_marginBottom="5dp"
+                        android:layout_gravity="bottom"
                         android:layout_width="0dp"
                         android:layout_weight="35"
-                        android:hint="Second Last Name"
-                        android:inputType="textPersonName"
-                        android:visibility="invisible" />
+                        android:layout_height="45dp">
+
+                        <Button
+                            android:visibility="gone"
+                            android:id="@+id/edit_user_button"
+                            style="@style/Widget.AppCompat.Button"
+                            android:layout_width="100dp"
+                            android:layout_height="match_parent"
+                            android:layout_alignParentRight="true"
+                            android:background="@color/colorPrimary"
+                            android:text="Edit User"
+                            android:textColor="@android:color/white" />
+
+                        <Button
+                            android:id="@+id/save_user_button"
+                            style="@style/Widget.AppCompat.Button"
+                            android:layout_width="100dp"
+                            android:layout_height="match_parent"
+                            android:layout_alignParentRight="true"
+                            android:background="@color/colorPrimary"
+                            android:text="Save User"
+                            android:textColor="@android:color/white" />
+
+
+                    </RelativeLayout>
+
 
                 </LinearLayout>
 
             </LinearLayout>
         </RelativeLayout>
-    </ScrollView>
 
-    <RelativeLayout
-        android:layout_marginRight="25dp"
-        android:layout_marginBottom="25dp"
-        android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:layout_alignParentBottom="true">
-
-        <Button
-            android:layout_alignParentRight="true"
-            android:id="@+id/save_user_button"
-            style="@style/Widget.AppCompat.Button"
-            android:background="@color/colorPrimary"
-            android:textColor="@android:color/white"
-            android:layout_width="100dp"
-            android:text="Save"
-            android:layout_height="match_parent" />
 
 
     </RelativeLayout>
-
-
-</RelativeLayout>
+</ScrollView>

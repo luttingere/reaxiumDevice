@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
@@ -53,7 +54,7 @@ public class BiometricCaptureFragment extends GGMainFragment {
 
 
     private static ImageView mFingerPrint;
-    private ImageView mCaptureFingerprint;
+    private Button mCaptureFingerprint;
     private static User mUserSelected;
     private Boolean isScanning = Boolean.FALSE;
     private static ImageLoader mImageLoader;
@@ -97,7 +98,7 @@ public class BiometricCaptureFragment extends GGMainFragment {
 
     @Override
     protected void setViews(View view) {
-        mCaptureFingerprint = (ImageView) view.findViewById(R.id.capture_fingerprint);
+        mCaptureFingerprint = (Button) view.findViewById(R.id.capture_fingerprint);
         mFingerPrint = (ImageView) view.findViewById(R.id.fingerprint);
         mImageLoader = MySingletonUtil.getInstance(getActivity()).getImageLoader();
         mProgressBar = (ProgressBar) view.findViewById(R.id.fingerprint_loader);
@@ -225,17 +226,18 @@ public class BiometricCaptureFragment extends GGMainFragment {
 
         @Override
         protected void saveFingerPrint(final FingerPrint fingerPrint) {
+            hideProgressDialog();
             AlertDialog deviceAssociationDialog = new AlertDialog.Builder(getActivity(), R.style.MyDialogTheme)
             .setTitle("Device Access Association")
-            .setMessage("Do you want to associate this user to the Device?")
-            .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
+            .setMessage("The system will save the biometric information in the server, do you wanna also associate this user fingerprint to this device?")
+            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     associateBiometricToAUser(fingerPrint, getSharedPreferences().getLong(GGGlobalValues.DEVICE_ID));
                     dialog.dismiss();
                 }
             })
-            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            .setNegativeButton("No", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     associateBiometricToAUser(fingerPrint, null);
@@ -251,6 +253,7 @@ public class BiometricCaptureFragment extends GGMainFragment {
 
         @Override
         protected void errorRoutine(String message) {
+            hideProgressDialog();
             GGUtil.showAToast(getActivity(), message);
         }
     }

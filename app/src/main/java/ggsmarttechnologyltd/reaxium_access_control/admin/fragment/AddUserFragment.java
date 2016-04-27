@@ -17,16 +17,29 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.google.gson.reflect.TypeToken;
 import com.makeramen.RoundedImageView;
 import com.soundcloud.android.crop.Crop;
 
 import org.joda.time.DateTime;
+import org.json.JSONObject;
 
 import java.io.File;
+import java.lang.reflect.Type;
 
 import ggsmarttechnologyltd.reaxium_access_control.GGMainFragment;
 import ggsmarttechnologyltd.reaxium_access_control.R;
+import ggsmarttechnologyltd.reaxium_access_control.beans.ApiResponse;
+import ggsmarttechnologyltd.reaxium_access_control.beans.User;
+import ggsmarttechnologyltd.reaxium_access_control.global.APPEnvironment;
+import ggsmarttechnologyltd.reaxium_access_control.global.GGGlobalValues;
 import ggsmarttechnologyltd.reaxium_access_control.util.GGUtil;
+import ggsmarttechnologyltd.reaxium_access_control.util.JsonObjectRequestUtil;
+import ggsmarttechnologyltd.reaxium_access_control.util.JsonUtil;
+import ggsmarttechnologyltd.reaxium_access_control.util.MySingletonUtil;
 import ggsmarttechnologyltd.reaxium_access_control.util.TakeImagesUtil;
 
 /**
@@ -97,8 +110,7 @@ public class AddUserFragment extends GGMainFragment {
             @Override
             public void onClick(View v) {
                 if (isAValidForm()) {
-
-
+                    saveUser();
                 }
             }
         });
@@ -147,6 +159,66 @@ public class AddUserFragment extends GGMainFragment {
             Log.e("TEST", "Error haciendo el crop de la imagen");
         }
     }
+
+    private void saveUser(){
+        if(GGUtil.isNetworkAvailable(getActivity())){
+            showProgressDialog("Saving the user...");
+            Response.Listener<JSONObject> responseListener = new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    hideProgressDialog();
+                    Type responseType = new TypeToken<ApiResponse<User>>() {}.getType();
+                    ApiResponse<User> apiResponse = JsonUtil.getEntityFromJSON(response, responseType);
+                    if (apiResponse.getReaxiumResponse().getCode() == GGGlobalValues.SUCCESSFUL_API_RESPONSE_CODE) {
+                        GGUtil.showAToast(getActivity(),  apiResponse.getReaxiumResponse().getMessage());
+                    } else {
+                        GGUtil.showAToast(getActivity(), apiResponse.getReaxiumResponse().getMessage());
+                    }
+                }
+            };
+            Response.ErrorListener errorListener = new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    hideProgressDialog();
+                    if (error.networkResponse != null && error.networkResponse.statusCode != 500) {
+                        Log.e(TAG, "Network Error Response", error);
+                        GGUtil.showAToast(getActivity(), R.string.simple_exception_message);
+                    }
+                }
+            };
+            JSONObject parameters = new JSONObject();
+            try {
+                if(userPhotoBitmap != null){
+                    parameters.put("userPhoto", TakeImagesUtil.getStringBase64Image(userPhotoBitmap));
+                }
+                if(!"".equals(userSecondName.getText().toString().trim())){
+                    parameters.put("userSecondName", userSecondName.getText().toString().trim());
+                }
+                if(!"".equals(userSecondLastName.getText().toString().trim())){
+                    parameters.put("userSecondLastName", userSecondLastName.getText().toString().trim());
+                }
+                if(!"".equals(userEmail.getText().toString().trim())){
+                    parameters.put("userEmail", userEmail.getText().toString().trim());
+                }
+                if(!"".equals(userBirthDate.getText().toString().trim())){
+                    parameters.put("userBirthDate", userBirthDate.getText().toString().trim());
+                }
+                parameters.put("userName", userName.getText().toString().trim());
+                parameters.put("userLastName", userLastName.getText().toString().trim());
+                parameters.put("userDocumentId", userDocumentId.getText().toString().trim());
+
+            } catch (Exception e) {
+                Log.e(TAG,"Error loading paremeters",e);
+            }
+            JsonObjectRequestUtil jsonObjectRequest = new JsonObjectRequestUtil(Request.Method.POST, APPEnvironment.createURL(GGGlobalValues.SAVE_A_USER), parameters, responseListener, errorListener);
+            jsonObjectRequest.setShouldCache(false);
+            MySingletonUtil.getInstance(getActivity()).addToRequestQueue(jsonObjectRequest);
+
+        }else{
+            GGUtil.showAToast(getActivity(), R.string.no_network_available);
+        }
+    }
+
 
     private void beginCrop(Intent data,int resultCode) {
         Uri source = TakeImagesUtil.getImageUriFromResult(getActivity(),resultCode,data);

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ggsmarttechnologyltd.reaxium_access_control.R;
+import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.AccessControlFragment;
 import ggsmarttechnologyltd.reaxium_access_control.admin.holder.UserHolder;
 import ggsmarttechnologyltd.reaxium_access_control.admin.listeners.OnUserClickListener;
 import ggsmarttechnologyltd.reaxium_access_control.beans.User;
@@ -28,18 +29,31 @@ public class UsersListAdapter extends RecyclerView.Adapter<UserHolder> {
     private List<User> mListOfUsers = new ArrayList<>();
     private OnUserClickListener onUserClickListener;
     private ImageLoader mImageLoader;
+    private String name = "";
 
 
-    public UsersListAdapter(Context mContext,OnUserClickListener onUserClickListener ,List<User> mListOfUsers) {
+    public UsersListAdapter(Context mContext,OnUserClickListener onUserClickListener ,List<User> mListOfUsers, String listName) {
         this.mContext = mContext;
         this.onUserClickListener = onUserClickListener;
         this.mListOfUsers = mListOfUsers == null?this.mListOfUsers:mListOfUsers;
         mImageLoader = MySingletonUtil.getInstance(mContext).getImageLoader();
+        this.name = listName;
     }
 
     @Override
     public UserHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemLayoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.user_list_item, null);
+        View itemLayoutView = null;
+        switch (this.name){
+            case AccessControlFragment.LIST_IN_NAME:
+                itemLayoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.user_in_list_item, null);
+                break;
+            case AccessControlFragment.LIST_OUT_NAME:
+                itemLayoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.user_out_list_item, null);
+                break;
+            default:
+                itemLayoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.user_list_item, null);
+                break;
+        }
         return new UserHolder(itemLayoutView);
     }
 
@@ -53,9 +67,16 @@ public class UsersListAdapter extends RecyclerView.Adapter<UserHolder> {
             holder.mUserInfoContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    onUserClickListener.onUserClicked(actualPosition);
+                    if (!"".equals(name)) {
+                        onUserClickListener.onUserClicked(actualPosition, name);
+                    } else {
+                        onUserClickListener.onUserClicked(actualPosition);
+                    }
                 }
             });
+            if(holder.accessTime != null){
+                holder.accessTime.setText(user.getAccessTime());
+            }
             if(user.getPhoto() != null && !"".equals(user.getPhoto())){
                 mImageLoader.get(user.getPhoto(), new ImageLoader.ImageListener() {
                     @Override

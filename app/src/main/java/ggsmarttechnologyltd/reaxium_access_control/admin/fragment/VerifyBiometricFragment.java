@@ -23,8 +23,10 @@ import ggsmarttechnologyltd.reaxium_access_control.admin.threads.VerifyFingerPri
 import ggsmarttechnologyltd.reaxium_access_control.beans.FingerPrint;
 import ggsmarttechnologyltd.reaxium_access_control.beans.User;
 import ggsmarttechnologyltd.reaxium_access_control.database.ReaxiumUsersDAO;
+import ggsmarttechnologyltd.reaxium_access_control.util.FailureAccessPlayerSingleton;
 import ggsmarttechnologyltd.reaxium_access_control.util.GGUtil;
 import ggsmarttechnologyltd.reaxium_access_control.util.MySingletonUtil;
+import ggsmarttechnologyltd.reaxium_access_control.util.SuccessfulAccessPlayerSingleton;
 
 /**
  * Created by Eduardo Luttinger on 21/04/2016.
@@ -36,7 +38,6 @@ public class VerifyBiometricFragment extends GGMainFragment {
     private TextView userBusinessName;
     private ProgressBar userPhotoLoader;
     private ImageView userPhoto;
-    private Button validateFingerPrintButton;
     private Boolean isScanning = Boolean.FALSE;
     private ImageLoader mImageLoader;
 
@@ -62,31 +63,23 @@ public class VerifyBiometricFragment extends GGMainFragment {
 
     @Override
     protected void setViews(View view) {
+
         if(App.fingerprintScanner == null){
             App.fingerprintScanner = FingerprintScanner.getInstance();
        }
         userName = (TextView) view.findViewById(R.id.username_input);
         userDocumentId = (TextView) view.findViewById(R.id.user_document_id);
         userBusinessName = (TextView) view.findViewById(R.id.user_business_name);
-        validateFingerPrintButton = (Button) view.findViewById(R.id.verify_biometric);
-        validateFingerPrintButton.setEnabled(Boolean.FALSE);
         userPhotoLoader = (ProgressBar) view.findViewById(R.id.user_image_loader);
         userPhoto = (ImageView)view.findViewById(R.id.user_photo);
         userPhotoLoader.getIndeterminateDrawable().setColorFilter(getResources().getColor(R.color.colorPrimary), android.graphics.PorterDuff.Mode.SRC_ATOP);
         mImageLoader = MySingletonUtil.getInstance(getActivity()).getImageLoader();
 
-
-
     }
 
     @Override
     protected void setViewsEvents() {
-        validateFingerPrintButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                validateFingerPrint();
-            }
-        });
+
     }
 
     @Override
@@ -106,10 +99,10 @@ public class VerifyBiometricFragment extends GGMainFragment {
 
     @Override
     public void onPause() {
+        AutomaticFingerPrintValidationThread.stopScanner();
         if (!isScanning) {
             App.fingerprintScanner.powerOff();
-            Log.i(TAG,"Automatic detection of a fingerprint was stoped");
-            AutomaticFingerPrintValidationThread.stopScanner();
+            Log.i(TAG, "Automatic detection of a fingerprint was stoped");
         }
         super.onPause();
     }
@@ -148,16 +141,17 @@ public class VerifyBiometricFragment extends GGMainFragment {
         @Override
         protected void validateFingerPrint(Integer userId) {
             User user = ReaxiumUsersDAO.getInstance(getActivity()).getUserById(""+userId);
-            isScanning = Boolean.FALSE;
             hideProgressDialog();
             if(user !=null){
-                userName.setText(user.getFirstName()+" "+user.getSecondName()+" "+user.getFirstLastName()+" "+user.getSecondLastName());
+                userName.setText(user.getFirstName() + " " + user.getSecondName() + " " + user.getFirstLastName() + " " + user.getSecondLastName());
                 userDocumentId.setText(user.getDocumentId());
                 if(user.getBusiness() != null){
                     userBusinessName.setText(user.getBusiness().getBusinessName());
                 }
                 setUserPhoto(user);
+                //SuccessfulAccessPlayerSingleton.getInstance(getActivity()).stopRingTone();
             }else{
+                FailureAccessPlayerSingleton.getInstance(getActivity()).initRingTone();
                 GGUtil.showAToast(getActivity(), "Invalid user, not registered: "+userId);
             }
         }
@@ -171,8 +165,9 @@ public class VerifyBiometricFragment extends GGMainFragment {
     }
 
     private void setUserPhoto(User user) {
+        userPhoto.setImageResource(R.drawable.user_avatar);
+        userPhotoLoader.setVisibility(View.VISIBLE);
         if (user.getPhoto() != null && !"".equals(user.getPhoto())) {
-            userPhotoLoader.setVisibility(View.VISIBLE);
             mImageLoader.get(user.getPhoto(), new ImageLoader.ImageListener() {
                 @Override
                 public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
@@ -187,6 +182,8 @@ public class VerifyBiometricFragment extends GGMainFragment {
                     userPhotoLoader.setVisibility(View.GONE);
                 }
             });
+        }else{
+            userPhotoLoader.setVisibility(View.INVISIBLE);
         }
     }
 

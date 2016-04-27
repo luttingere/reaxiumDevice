@@ -2,6 +2,7 @@ package ggsmarttechnologyltd.reaxium_access_control.admin.fragment;
 
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
+import android.graphics.PorterDuff;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -70,7 +71,7 @@ public class UserSecurityFragment extends GGMainFragment implements OnUserClickL
     private ImageView mUserPhoto;
     private ProgressBar mUserPhotoLoader;
     private static ImageLoader mImageLoader;
-
+    private ImageView deleteTextButton;
 
 
 
@@ -101,13 +102,15 @@ public class UserSecurityFragment extends GGMainFragment implements OnUserClickL
         mSearchField = (EditText) view.findViewById(R.id.user_search_text);
         mSearchIcon = (ImageView) view.findViewById(R.id.search_icon);
         mGoButton = (Button) view.findViewById(R.id.go_button);
+        mGoButton.getBackground().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
+        deleteTextButton = (ImageView)view.findViewById(R.id.delete_text);
 
 
         //User list container
         mUserRecyclerList = (RecyclerView) view.findViewById(R.id.user_list);
         mLinearLayoutManager = new LinearLayoutManager(getContext());
         mUserRecyclerList.setLayoutManager(mLinearLayoutManager);
-        mUsersListAdapter = new UsersListAdapter(getContext(),this,null);
+        mUsersListAdapter = new UsersListAdapter(getContext(),this,null,"");
         mUserRecyclerList.setAdapter(mUsersListAdapter);
 
 
@@ -150,6 +153,15 @@ public class UserSecurityFragment extends GGMainFragment implements OnUserClickL
             @Override
             public void onClick(View v) {
                 searchUsers();
+            }
+        });
+
+        deleteTextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSearchField.setText("");
+                clearUserList();
+                mUserSecurityInfoContainer.setVisibility(View.INVISIBLE);
             }
         });
 
@@ -237,9 +249,7 @@ public class UserSecurityFragment extends GGMainFragment implements OnUserClickL
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     hideProgressDialog();
-                    if (error.networkResponse != null && error.networkResponse.statusCode != 500) {
-                        GGUtil.showAToast(getActivity(), R.string.simple_exception_message);
-                    }
+                    GGUtil.showAToast(getActivity(), R.string.bad_connection_message);
                 }
             };
 
@@ -281,5 +291,10 @@ public class UserSecurityFragment extends GGMainFragment implements OnUserClickL
         mUserIDNumber.setText(user.getDocumentId());
         loadFingerPrintImage(user);
         BiometricCaptureFragment.setUserSelected(user);
+    }
+
+    @Override
+    public void onUserClicked(int position, String listName) {
+
     }
 }

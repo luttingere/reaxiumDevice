@@ -14,6 +14,7 @@ import ggsmarttechnologyltd.reaxium_access_control.beans.Business;
 import ggsmarttechnologyltd.reaxium_access_control.beans.User;
 import ggsmarttechnologyltd.reaxium_access_control.beans.UserAccessControl;
 import ggsmarttechnologyltd.reaxium_access_control.beans.UserAccessData;
+import ggsmarttechnologyltd.reaxium_access_control.global.GGGlobalValues;
 
 /**
  * Created by Eduardo Luttinger on 21/04/2016.
@@ -70,7 +71,11 @@ public class ReaxiumUsersDAO {
                 insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_PHOTO, userAccessControl.getUserAccessData().getUser().getPhoto());
                 insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_DOCUMENT_ID, userAccessControl.getUserAccessData().getUser().getDocumentId());
                 insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_STATUS, userAccessControl.getUserAccessData().getUser().getStatus().getStatusName());
-                insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_TYPE, userAccessControl.getUserAccessData().getUser().getUserType().getUserTypeName());
+                if(userAccessControl.getUserAccessData().getUser().getUserType() == null){
+                    insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_TYPE, GGGlobalValues.DEFAULT_USER_TYPE);
+                }else{
+                    insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_TYPE, userAccessControl.getUserAccessData().getUser().getUserType().getUserTypeName());
+                }
                 insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_BIOMETRIC_CODE, userAccessControl.getUserAccessData().getBiometricCode());
                 insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_RFID_CODE, userAccessControl.getUserAccessData().getRfidCode());
                 insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_FINGERPRINT, userAccessControl.getUserAccessData().getUser().getFingerprint());
@@ -130,6 +135,55 @@ public class ReaxiumUsersDAO {
     /**
      * @return biometric data
      */
+    public List<User> getAllUsersRegisteredInTheDevice() {
+        List<User> userList = null;
+        User user = null;
+        Cursor resultSet = null;
+        try {
+            database = dbHelper.getReadableDatabase();
+            String[] projection = {
+                    ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_ID,
+                    ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_DOCUMENT_ID,
+                    ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_NAME,
+                    ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_SECOND_NAME,
+                    ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_LAST_NAME,
+                    ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_SECOND_LAST_NAME,
+                    ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_PHOTO
+            };
+            String selection = ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_ACCESS_TYPE + "=?";
+            String[] seelcctionArgs = {"Biometric"};
+            resultSet = database.query(ReaxiumUsersContract.ReaxiumUsers.TABLE_NAME, projection, selection, seelcctionArgs, null, null, null);
+            if (resultSet.moveToFirst()) {
+                userList = new ArrayList<>();
+                Log.i(TAG, "Biometric data found in database");
+                while (resultSet.isAfterLast() == false) {
+                    user = new User();
+                    user.setUserId(resultSet.getLong(resultSet.getColumnIndex(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_ID)));
+                    user.setFirstName(resultSet.getString(resultSet.getColumnIndex(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_NAME)));
+                    user.setSecondName(resultSet.getString(resultSet.getColumnIndex(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_SECOND_NAME)));
+                    user.setFirstLastName(resultSet.getString(resultSet.getColumnIndex(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_LAST_NAME)));
+                    user.setSecondLastName(resultSet.getString(resultSet.getColumnIndex(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_SECOND_LAST_NAME)));
+                    user.setPhoto(resultSet.getString(resultSet.getColumnIndex(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_PHOTO)));
+                    user.setDocumentId(resultSet.getString(resultSet.getColumnIndex(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_DOCUMENT_ID)));
+                    userList.add(user);
+                    resultSet.moveToNext();
+                }
+            }
+        }catch (Exception e){
+            Log.e(TAG, "Error retrieving the biometric information data from device db", e);
+        }finally {
+            if(resultSet != null){
+                if(!resultSet.isClosed()){
+                    resultSet.close();
+                }
+            }
+        }
+        return userList;
+    }
+
+    /**
+     * @return biometric data
+     */
     public List<Integer> getUsersWithBiometric() {
         List<Integer> userIdList = null;
         Integer userId = 0;
@@ -170,6 +224,7 @@ public class ReaxiumUsersDAO {
         try {
             database = dbHelper.getReadableDatabase();
             String[] projection = {
+                    ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_ID,
                     ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_NAME,
                     ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_SECOND_NAME,
                     ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_LAST_NAME,
@@ -183,6 +238,7 @@ public class ReaxiumUsersDAO {
             resultSet = database.query(ReaxiumUsersContract.ReaxiumUsers.TABLE_NAME, projection, selection, seelcctionArgs, null, null, null);
             if (resultSet.moveToFirst()) {
                 user = new User();
+                user.setUserId(resultSet.getLong(resultSet.getColumnIndex(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_ID)));
                 user.setFirstName(resultSet.getString(resultSet.getColumnIndex(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_NAME)));
                 user.setSecondName(resultSet.getString(resultSet.getColumnIndex(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_SECOND_NAME)));
                 user.setFirstLastName(resultSet.getString(resultSet.getColumnIndex(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_LAST_NAME)));

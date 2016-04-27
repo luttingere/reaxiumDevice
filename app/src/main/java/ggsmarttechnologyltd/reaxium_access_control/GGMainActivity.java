@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import ggsmarttechnologyltd.reaxium_access_control.admin.threads.AutomaticFingerPrintValidationThread;
 import ggsmarttechnologyltd.reaxium_access_control.exceptions.NoMainLayoutException;
 import ggsmarttechnologyltd.reaxium_access_control.global.GGGlobalValues;
 import ggsmarttechnologyltd.reaxium_access_control.util.GGUtil;
@@ -171,6 +172,7 @@ public abstract class GGMainActivity extends AppCompatActivity {
      */
     protected void runMyFragment(GGMainFragment fragment, Bundle params) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        AutomaticFingerPrintValidationThread.stopScanner();
         fragment.setArguments(params);
         setToolBarTitle(fragment.getToolbarTitle());
         transaction.replace(GGGlobalValues.FRAGMENT_CONTAINER, fragment).addToBackStack(null).commit();

@@ -58,6 +58,8 @@ public class LoginActivity extends GGMainActivity {
         mUserNameInput = (EditText) findViewById(R.id.username_input);
         mPasswordInput = (EditText) findViewById(R.id.password_input);
         mLoginFormSubmit = (Button) findViewById(R.id.login_form_submit);
+        mLoginFormSubmit.requestFocus();
+        GGUtil.hideKeyboard(this);
     }
 
     @Override
@@ -104,9 +106,7 @@ public class LoginActivity extends GGMainActivity {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         dismissProgressDialog();
-                        if (error.networkResponse != null && error.networkResponse.statusCode != 500) {
-                            GGUtil.showAToast(LoginActivity.this, R.string.simple_exception_message);
-                        }
+                        GGUtil.showAToast(LoginActivity.this, R.string.bad_connection_message);
                     }
                 };
                 JsonObjectRequestUtil jsonObjectRequest = new JsonObjectRequestUtil(Request.Method.POST, APPEnvironment.createURL(GGGlobalValues.VALIDATE_ACCESS), loadLoginParameters(), responseListener, errorListener);

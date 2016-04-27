@@ -18,6 +18,7 @@
     <!-- Exception Messages-->
     <string name="no_main_layout_exception">There is not main layout configured in the activity.</string>
     <string name="simple_exception_message">An error has occurred, try again later.</string>
+    <string name="bad_connection_message">Bad Connection, try it again.</string>
     <string name="no_network_available">Wi-Fi and mobile data are unavailable.</string>
 
     <!-- Login data-->
@@ -27,9 +28,10 @@
 
     <!-- Menu Drawer-->
     <string name="menu_drawer_configure_device">Configure Device</string>
-    <string name="menu_drawer_add_user">Add a User</string>
+    <string name="menu_drawer_add_user">Add or Edit a User</string>
     <string name="menu_drawer_add_security">Add User Access</string>
     <string name="menu_drawer_verify_biometric">Verify User Access</string>
+    <string name="menu_drawer_access_control">Access Control</string>
     <string name="menu_drawer_logout">Log Out</string>
 
 
@@ -37,7 +39,8 @@
     <string name="admin_fragment_title">Reaxium Admin Console</string>
 
     <!-- User Security Panel-->
-    <string name="user_security_panel_title">User Security Panel</string>
+    <string name="user_security_panel_title">User Access Configuration</string>
+    <string name="add_or_edit_a_user_title">Add or Edit a User</string>
     <string name="user_security_panel_tab_fingerprint">Biometric</string>
     <string name="user_security_panel_tab_rfid">RFID</string>
     <string name="search_user">Find</string>
@@ -60,6 +63,10 @@
     <!-- add a user fragment-->
     <string name="save_user">Save User</string>
     <string name="add_user_title">Add a User</string>
+
+
+    <!--Access control-->
+    <string name="access_control_title">Access Control</string>
 
 
 

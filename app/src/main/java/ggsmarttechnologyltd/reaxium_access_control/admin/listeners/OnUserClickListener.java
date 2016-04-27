@@ -7,4 +7,6 @@ public interface OnUserClickListener {
 
     void onUserClicked(int position);
 
+    void onUserClicked(int position, String listName);
+
 }
