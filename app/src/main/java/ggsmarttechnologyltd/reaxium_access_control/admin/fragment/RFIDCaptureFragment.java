@@ -17,7 +17,7 @@ public class RFIDCaptureFragment extends GGMainFragment {
     }
 
     @Override
-    protected Integer getToolbarTitle() {
+    public Integer getToolbarTitle() {
         return null;
     }
 

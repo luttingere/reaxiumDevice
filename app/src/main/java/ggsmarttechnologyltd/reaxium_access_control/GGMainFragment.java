@@ -39,7 +39,7 @@ public abstract class GGMainFragment extends Fragment implements Serializable {
      *
      * @return Ej: null or R.string.my_toolbar_title
      */
-    abstract protected Integer getToolbarTitle();
+    abstract public Integer getToolbarTitle();
 
     /**
      * Mandatory

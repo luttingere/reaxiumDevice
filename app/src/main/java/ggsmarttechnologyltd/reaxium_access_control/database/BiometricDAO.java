@@ -7,6 +7,7 @@ import java.util.List;
 import cn.com.aratek.util.Result;
 import ggsmarttechnologyltd.reaxium_access_control.App;
 import ggsmarttechnologyltd.reaxium_access_control.beans.BiometricData;
+import ggsmarttechnologyltd.reaxium_access_control.global.GGGlobalValues;
 import ggsmarttechnologyltd.reaxium_access_control.util.GGUtil;
 
 /**
@@ -14,7 +15,7 @@ import ggsmarttechnologyltd.reaxium_access_control.util.GGUtil;
  */
 public class BiometricDAO {
 
-    public static final String TAG  = "BiometricDAO";
+    public static final String TAG  = GGGlobalValues.TRACE_ID;
 
     public static Boolean storeBiometrics(List<BiometricData> biometricData){
         Log.i(TAG,"prepared to enroll biometrics in system");

@@ -7,6 +7,12 @@
         android:checkableBehavior="single"
         android:menuCategory="container"
         app:itemBackground="@android:color/black">
+
+        <item
+            android:id="@+id/action_menu_home"
+            android:icon="@drawable/home_icon"
+            android:title="@string/menu_drawer_home" />
+
         <item
             android:id="@+id/action_configure_device"
             android:icon="@drawable/configure_device"

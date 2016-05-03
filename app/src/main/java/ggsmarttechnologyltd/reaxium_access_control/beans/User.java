@@ -52,6 +52,8 @@ public class User extends AppBean implements Comparable{
 
     private String accessTime;
 
+    private String lastAccess;
+
 
     public Long getUserId() {
         return userId;
@@ -169,6 +171,14 @@ public class User extends AppBean implements Comparable{
             accessTime = "";
         }
         return accessTime;
+    }
+
+    public String getLastAccess() {
+        return lastAccess;
+    }
+
+    public void setLastAccess(String lastAccess) {
+        this.lastAccess = lastAccess;
     }
 
     public void setAccessTime(String accessTime) {

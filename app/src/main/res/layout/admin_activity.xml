@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/admin_menu_drawer"
-    android:orientation="vertical" android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_height="match_parent">
+    android:id="@+id/admin_menu_drawer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -14,20 +15,42 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:background="@color/colorPrimary">
-            <RelativeLayout
-                android:gravity="center_vertical"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+            android:background="@color/colorPrimaryDark">
 
-                <ggsmarttechnologyltd.reaxium_access_control.utilityViews.NormalCustomTextView
-                    android:id="@+id/toolbar_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical">
+
+                <LinearLayout
+                    android:clickable="true"
+                    android:id="@+id/navigation_back"
+                    android:layout_width="100dp"
                     android:gravity="center"
-                    android:textSize="20sp"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:src="@drawable/left_arrow" />
+
+                </LinearLayout>
+
+
+                <TextView
+                    android:id="@+id/toolbar_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_centerInParent="true"
+                    android:gravity="center"
+                    android:text="Reaxium Device Administrator"
                     android:textAllCaps="true"
-                    android:text="Reaxium Device Administrator"/>
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
             </RelativeLayout>
         </android.support.v7.widget.Toolbar>
@@ -35,7 +58,7 @@
         <FrameLayout
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent" />
 
 
     </LinearLayout>
@@ -46,8 +69,8 @@
         android:layout_height="match_parent"
         android:layout_gravity="right"
         app:itemTextAppearance="@style/AppTheme"
-        app:theme="@style/NavigationDrawerStyle"
-        app:menu="@menu/menu_drawer" />
+        app:menu="@menu/menu_drawer"
+        app:theme="@style/NavigationDrawerStyle" />
 
 
 </android.support.v4.widget.DrawerLayout>

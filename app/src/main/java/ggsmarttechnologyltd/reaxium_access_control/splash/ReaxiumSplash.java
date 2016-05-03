@@ -18,6 +18,7 @@ import ggsmarttechnologyltd.reaxium_access_control.App;
 import ggsmarttechnologyltd.reaxium_access_control.GGMainActivity;
 import ggsmarttechnologyltd.reaxium_access_control.GGMainFragment;
 import ggsmarttechnologyltd.reaxium_access_control.R;
+import ggsmarttechnologyltd.reaxium_access_control.admin.threads.FingerPrintHandler;
 import ggsmarttechnologyltd.reaxium_access_control.global.GGGlobalValues;
 import ggsmarttechnologyltd.reaxium_access_control.login.activity.LoginActivity;
 import ggsmarttechnologyltd.reaxium_access_control.util.GGUtil;
@@ -48,7 +49,8 @@ public class ReaxiumSplash extends GGMainActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        startFingerScannerService();
+        iniFingerPrintAlgorith();
+        finishTheSplash();
     }
 
     @Override
@@ -70,6 +72,16 @@ public class ReaxiumSplash extends GGMainActivity {
         }
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+    }
+
+    private void iniFingerPrintAlgorith(){
+        int error =0;
+        if((error = App.bione.initialize(this, GGGlobalValues.BION_DB_PATH)) == Bione.RESULT_OK){
+            Log.i(TAG, "Bione version: "+Integer.toHexString(Bione.getVersion()));
+        }else{
+            Log.e(TAG, "Error initializing Bion algorith error code: " + error);
+        }
     }
 
 
@@ -85,32 +97,4 @@ public class ReaxiumSplash extends GGMainActivity {
         timer.schedule(task, SPLASH_SCREEN_DELAY);
     }
 
-    /**
-     * Init the finger scanner
-     */
-    private void startFingerScannerService(){
-        App.fingerprintScanner = FingerprintScanner.getInstance();
-        App.fingerprintScanner.unInitialize();
-        int error;
-        if ((error = App.fingerprintScanner.initialize()) == FingerprintScanner.RESULT_OK) {
-            Log.i(TAG,"FingerPrint Prepare code: "+App.fingerprintScanner.prepare());
-            Log.i(TAG, "Inicializacion del FingerPrint Correcta");
-            Result res = App.fingerprintScanner.getSN();
-
-            Log.i(TAG, "FingerPrint Serial Number: " + (String) res.data);
-
-            res = App.fingerprintScanner.getFirmwareVersion();
-            Log.i(TAG, "FingerPrint Firmware Number: " + (String) res.data);
-
-            Log.i(TAG, "FingerPrint SDK Number: " + Terminal.getSdkVersion());
-        }else{
-            Log.e(TAG,"***[*.*]*** Error initializing FingerPrint Scanner error code: "+error);
-        }
-        if((error = App.bione.initialize(this, GGGlobalValues.BION_DB_PATH)) == Bione.RESULT_OK){
-            Log.i(TAG, "Bione version: "+Integer.toHexString(Bione.getVersion()));
-        }else{
-            Log.e(TAG,"Error initializing Bion algorith error code: "+error);
-        }
-        finishTheSplash();
-    }
 }

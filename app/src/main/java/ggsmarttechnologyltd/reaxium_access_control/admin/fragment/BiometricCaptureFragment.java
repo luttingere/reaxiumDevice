@@ -36,6 +36,7 @@ import ggsmarttechnologyltd.reaxium_access_control.GGMainFragment;
 import ggsmarttechnologyltd.reaxium_access_control.R;
 import ggsmarttechnologyltd.reaxium_access_control.admin.threads.CaptureFingerPrintThread;
 import ggsmarttechnologyltd.reaxium_access_control.admin.threads.FingerPrintHandler;
+import ggsmarttechnologyltd.reaxium_access_control.admin.threads.InitSimpleFingerPrintThread;
 import ggsmarttechnologyltd.reaxium_access_control.beans.ApiResponse;
 import ggsmarttechnologyltd.reaxium_access_control.beans.FingerPrint;
 import ggsmarttechnologyltd.reaxium_access_control.beans.User;
@@ -56,11 +57,9 @@ public class BiometricCaptureFragment extends GGMainFragment {
     private static ImageView mFingerPrint;
     private Button mCaptureFingerprint;
     private static User mUserSelected;
-    private Boolean isScanning = Boolean.FALSE;
     private static ImageLoader mImageLoader;
     private static ProgressBar mProgressBar;
-
-    private Boolean addToDevice = Boolean.FALSE;
+    BiometricCaptureHandler handler;
 
     @Override
     public String getMyTag() {
@@ -68,7 +67,7 @@ public class BiometricCaptureFragment extends GGMainFragment {
     }
 
     @Override
-    protected Integer getToolbarTitle() {
+    public Integer getToolbarTitle() {
         return null;
     }
 
@@ -84,14 +83,16 @@ public class BiometricCaptureFragment extends GGMainFragment {
 
     @Override
     public void onResume() {
+        handler = new BiometricCaptureHandler();
+        InitSimpleFingerPrintThread initSimpleFingerPrintThread = new InitSimpleFingerPrintThread(getActivity(),handler);
+        initSimpleFingerPrintThread.start();
         super.onResume();
     }
 
     @Override
     public void onPause() {
-        if (!isScanning) {
-            App.fingerprintScanner.powerOff();
-        }
+        GGUtil.closeFingerPrint();
+        Log.i(TAG,"fingerprint scanner has ben stopped");
         super.onPause();
     }
 
@@ -103,11 +104,6 @@ public class BiometricCaptureFragment extends GGMainFragment {
         mImageLoader = MySingletonUtil.getInstance(getActivity()).getImageLoader();
         mProgressBar = (ProgressBar) view.findViewById(R.id.fingerprint_loader);
         mProgressBar.getIndeterminateDrawable().setColorFilter(getResources().getColor(R.color.colorPrimary), android.graphics.PorterDuff.Mode.SRC_ATOP);
-        if (App.fingerprintScanner == null) {
-            App.fingerprintScanner = FingerprintScanner.getInstance();
-            App.fingerprintScanner.prepare();
-        }
-
     }
 
     @Override
@@ -115,13 +111,6 @@ public class BiometricCaptureFragment extends GGMainFragment {
         mCaptureFingerprint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    App.fingerprintScanner.powerOn();
-                } catch (Exception e) {
-                    Log.e(TAG, "", e);
-                }
-                isScanning = Boolean.TRUE;
-                BiometricCaptureHandler handler = new BiometricCaptureHandler();
                 CaptureFingerPrintThread captureFingerPrintThread = new CaptureFingerPrintThread(App.fingerprintScanner, handler);
                 showProgressDialog("Capturing Fingerprint...");
                 captureFingerPrintThread.start();
@@ -221,13 +210,12 @@ public class BiometricCaptureFragment extends GGMainFragment {
             } else {
                 mFingerPrint.setImageResource(R.drawable.nofinger);
             }
-            isScanning = Boolean.FALSE;
         }
 
         @Override
         protected void saveFingerPrint(final FingerPrint fingerPrint) {
             hideProgressDialog();
-            AlertDialog deviceAssociationDialog = new AlertDialog.Builder(getActivity(), R.style.MyDialogTheme)
+            new AlertDialog.Builder(getActivity(), R.style.MyDialogTheme)
             .setTitle("Device Access Association")
             .setMessage("The system will save the biometric information in the server, do you wanna also associate this user fingerprint to this device?")
             .setPositiveButton("Ok", new DialogInterface.OnClickListener() {

@@ -170,9 +170,8 @@ public abstract class GGMainActivity extends AppCompatActivity {
      *
      * @param fragment
      */
-    protected void runMyFragment(GGMainFragment fragment, Bundle params) {
+    public void runMyFragment(GGMainFragment fragment, Bundle params) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        AutomaticFingerPrintValidationThread.stopScanner();
         fragment.setArguments(params);
         setToolBarTitle(fragment.getToolbarTitle());
         transaction.replace(GGGlobalValues.FRAGMENT_CONTAINER, fragment).addToBackStack(null).commit();

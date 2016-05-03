@@ -28,7 +28,7 @@
             android:clickable="true"
             android:scaleType="centerCrop"
             android:padding="10dp"
-            android:src="@drawable/user_avatar"
+            android:src="@drawable/white_user_avatar_thumnail"
             app:riv_border_width="1dip"
             app:riv_corner_radius="30dip"
             app:riv_oval="true" />

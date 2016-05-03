@@ -10,129 +10,142 @@
         android:layout_height="match_parent"
         android:padding="@dimen/profile_view_border_indicator">
 
-        <RelativeLayout
-            android:background="@android:color/white"
-            android:id="@+id/user_profile_container"
-            android:layout_width="@dimen/profile_view_user_avatar_container_width"
-            android:layout_height="@dimen/profile_view_user_avatar_container_height"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true">
-
-            <ProgressBar
-                android:visibility="gone"
-                android:id="@+id/user_image_loader"
-                style="?android:attr/progressBarStyle"
-                android:layout_width="150dp"
-                android:layout_height="150dp"
-                android:layout_centerInParent="true"/>
-
-            <com.makeramen.RoundedImageView xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/user_photo"
-                android:layout_width="350dp"
-                android:layout_height="350dp"
-                android:layout_centerInParent="true"
-                android:clickable="true"
-                android:scaleType="centerCrop"
-                android:padding="10dp"
-                android:src="@drawable/user_avatar"
-                app:riv_border_width="1dip"
-                app:riv_corner_radius="30dip"
-                app:riv_oval="true" />
-
-
-        </RelativeLayout>
-
-
-        <LinearLayout
-            android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@+id/user_profile_container"
-            android:layout_width="@dimen/profile_view_user_avatar_container_width"
-            android:layout_height="@dimen/profile_view_user_avatar_container_height"
-            android:layout_alignParentRight="true"
+        <TextView
+            android:id="@+id/info_text"
             android:gravity="center"
-            android:orientation="vertical">
+            android:layout_centerInParent="true"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="25sp"
+            android:text="Place your Finger or your RFID card on the scanner please."
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
+        <RelativeLayout
+            android:visibility="gone"
+            android:id="@+id/user_info_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <RelativeLayout
+                android:background="@android:color/white"
+                android:id="@+id/user_profile_container"
+                android:layout_width="@dimen/profile_view_user_avatar_container_width"
+                android:layout_height="@dimen/profile_view_user_avatar_container_height"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true">
+
+                <ProgressBar
+                    android:visibility="gone"
+                    android:id="@+id/user_image_loader"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:layout_centerInParent="true"/>
+
+                <com.makeramen.RoundedImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/user_photo"
+                    android:layout_width="350dp"
+                    android:layout_height="350dp"
+                    android:layout_centerInParent="true"
+                    android:clickable="true"
+                    android:scaleType="centerCrop"
+                    android:padding="10dp"
+                    android:src="@drawable/user_avatar"
+                    app:riv_border_width="1dip"
+                    app:riv_corner_radius="30dip"
+                    app:riv_oval="true" />
+
+
+            </RelativeLayout>
             <LinearLayout
-                android:id="@+id/username_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="@drawable/login_box_shape">
+                android:layout_marginLeft="10dp"
+                android:layout_toRightOf="@+id/user_profile_container"
+                android:layout_width="@dimen/profile_view_user_avatar_container_width"
+                android:layout_height="@dimen/profile_view_user_avatar_container_height"
+                android:layout_alignParentRight="true"
+                android:gravity="center"
+                android:orientation="vertical">
 
-                <ImageView
-                    android:background="@drawable/login_box_shape"
-                    android:padding="10dp"
-                    android:src="@drawable/user_avatar_thumnail"
-                    android:layout_width="70dp"
-                    android:layout_height="@dimen/login_input_text_height" />
-
-                <TextView
-                    android:padding="10dp"
-                    android:gravity="center_vertical"
-                    android:textColor="@android:color/black"
-                    android:id="@+id/username_input"
-                    android:textSize="18sp"
+                <LinearLayout
+                    android:id="@+id/username_container"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/login_input_text_height" />
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:background="@drawable/login_box_shape">
+
+                    <ImageView
+                        android:background="@drawable/login_box_shape"
+                        android:padding="10dp"
+                        android:src="@drawable/user_avatar_thumnail"
+                        android:layout_width="70dp"
+                        android:layout_height="@dimen/login_input_text_height" />
+
+                    <TextView
+                        android:padding="10dp"
+                        android:gravity="center_vertical"
+                        android:textColor="@android:color/black"
+                        android:id="@+id/username_input"
+                        android:textSize="18sp"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/login_input_text_height" />
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:id="@+id/lisense_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:background="@drawable/login_box_shape">
+
+                    <ImageView
+                        android:background="@drawable/login_box_shape"
+                        android:padding="10dp"
+                        android:src="@drawable/document_id_icon"
+                        android:layout_width="70dp"
+                        android:layout_height="@dimen/login_input_text_height" />
+
+                    <TextView
+                        android:padding="10dp"
+                        android:gravity="center_vertical"
+                        android:textColor="@android:color/black"
+                        android:id="@+id/user_document_id"
+                        android:textSize="18sp"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/login_input_text_height" />
+
+                </LinearLayout>
+
+
+
+                <LinearLayout
+                    android:id="@+id/school_bus_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:background="@drawable/login_box_shape">
+
+                    <ImageView
+                        android:background="@drawable/login_box_shape"
+                        android:padding="10dp"
+                        android:src="@drawable/business_icon"
+                        android:layout_width="70dp"
+                        android:layout_height="@dimen/login_input_text_height" />
+
+                    <TextView
+                        android:padding="10dp"
+                        android:gravity="center_vertical"
+                        android:textColor="@android:color/black"
+                        android:id="@+id/user_business_name"
+                        android:textSize="18sp"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/login_input_text_height" />
+
+                </LinearLayout>
+
 
             </LinearLayout>
-
-
-            <LinearLayout
-                android:id="@+id/lisense_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="@drawable/login_box_shape">
-
-                <ImageView
-                    android:background="@drawable/login_box_shape"
-                    android:padding="10dp"
-                    android:src="@drawable/document_id_icon"
-                    android:layout_width="70dp"
-                    android:layout_height="@dimen/login_input_text_height" />
-
-                <TextView
-                    android:padding="10dp"
-                    android:gravity="center_vertical"
-                    android:textColor="@android:color/black"
-                    android:id="@+id/user_document_id"
-                    android:textSize="18sp"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/login_input_text_height" />
-
-            </LinearLayout>
-
-
-
-            <LinearLayout
-                android:id="@+id/school_bus_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="@drawable/login_box_shape">
-
-                <ImageView
-                    android:background="@drawable/login_box_shape"
-                    android:padding="10dp"
-                    android:src="@drawable/business_icon"
-                    android:layout_width="70dp"
-                    android:layout_height="@dimen/login_input_text_height" />
-
-                <TextView
-                    android:padding="10dp"
-                    android:gravity="center_vertical"
-                    android:textColor="@android:color/black"
-                    android:id="@+id/user_business_name"
-                    android:textSize="18sp"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/login_input_text_height" />
-
-            </LinearLayout>
-
-
-        </LinearLayout>
-
+        </RelativeLayout>
 
     </RelativeLayout>
 

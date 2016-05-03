@@ -27,6 +27,8 @@ public class CaptureFingerPrintThread extends Thread {
     public CaptureFingerPrintThread(FingerprintScanner fingerprintScanner, FingerPrintHandler fingerPrintHandler) {
         this.fingerprintScanner = fingerprintScanner;
         this.fingerPrintHandler = fingerPrintHandler;
+        stop = Boolean.FALSE;
+        captured = Boolean.FALSE;
     }
 
     @Override
@@ -76,6 +78,7 @@ public class CaptureFingerPrintThread extends Thread {
                 }
             } else {
                 stop = true;
+                Log.i(TAG,"Error: "+fingerCaptureResult.error);
                 fingerPrintHandler.sendMessage(fingerPrintHandler.obtainMessage(FingerPrintHandler.ERROR_ROUTINE, "Please, put your finger on the scanner"));
             }
 

@@ -1,8 +1,10 @@
 package ggsmarttechnologyltd.reaxium_access_control.admin.activity;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
@@ -11,6 +13,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import ggsmarttechnologyltd.reaxium_access_control.GGMainActivity;
@@ -48,6 +52,11 @@ public class AdminActivity extends GGMainActivity {
      */
     private GGMainFragment mFragmentInScreen;
 
+    /**
+     * back button
+     */
+    private LinearLayout navigationBack;
+
     private SharedPreferenceUtil sharedPreferenceUtil;
 
     @Override
@@ -58,6 +67,7 @@ public class AdminActivity extends GGMainActivity {
     @Override
     protected void setViews() {
         sharedPreferenceUtil = SharedPreferenceUtil.getInstance(this);
+        navigationBack = (LinearLayout) findViewById(R.id.navigation_back);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.admin_menu_drawer);
         mMenuDrawer = (NavigationView) findViewById(R.id.nvView);
         View header = getLayoutInflater().inflate(R.layout.admin_menu_drawer_header, null);
@@ -94,6 +104,24 @@ public class AdminActivity extends GGMainActivity {
                 }
             }
         });
+
+        navigationBack.setVisibility(View.INVISIBLE);
+        navigationBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (getMainFragment() != null) {
+                    Log.i(TAG, "back button pressed");
+                    getMainFragment().onBackPressed();
+                }
+            }
+        });
+    }
+
+    public void hideBackButton(){
+        navigationBack.setVisibility(View.INVISIBLE);
+    }
+    public void showBackButton(){
+        navigationBack.setVisibility(View.VISIBLE);
     }
 
 
@@ -103,6 +131,15 @@ public class AdminActivity extends GGMainActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(menuToUse, menu);
         return super.onCreateOptionsMenu(menu);
+    }
+
+    public void runMyFragment(GGMainFragment fragment, Bundle params,int drawerId) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        AutomaticFingerPrintValidationThread.stopScanner();
+        fragment.setArguments(params);
+        setToolBarTitle(fragment.getToolbarTitle());
+        mMenuDrawer.getMenu().findItem(drawerId).setChecked(Boolean.TRUE);
+        transaction.replace(GGGlobalValues.FRAGMENT_CONTAINER, fragment).addToBackStack(null).commit();
     }
 
 
@@ -124,7 +161,10 @@ public class AdminActivity extends GGMainActivity {
 
     @Override
     protected GGMainFragment getMainFragment() {
-        mFragmentInScreen = new AdminFragment();
+        mFragmentInScreen = (GGMainFragment)getSupportFragmentManager().findFragmentById(GGGlobalValues.FRAGMENT_CONTAINER);
+        if(mFragmentInScreen == null){
+            mFragmentInScreen =new AdminFragment();
+        }
         return mFragmentInScreen;
     }
 
@@ -141,29 +181,28 @@ public class AdminActivity extends GGMainActivity {
     private void selectDrawerItem(MenuItem menuItem) {
         if (!menuItem.isChecked()) {
             switch (menuItem.getItemId()) {
+                case R.id.action_menu_home:
+                    runMyFragment(new AdminFragment(), null, menuItem.getItemId());
+                    mDrawerLayout.closeDrawer(GravityCompat.END);
+                    break;
                 case R.id.action_add_security_to_user:
-                    mMenuDrawer.getMenu().findItem(menuItem.getItemId()).setChecked(Boolean.TRUE);
-                    runMyFragment(new UserSecurityFragment(), null);
+                    runMyFragment(new UserSecurityFragment(), null,menuItem.getItemId());
                     mDrawerLayout.closeDrawer(GravityCompat.END);
                     break;
                 case R.id.action_add_user:
-                    mMenuDrawer.getMenu().findItem(menuItem.getItemId()).setChecked(Boolean.TRUE);
-                    runMyFragment(new UserPanelFragment(), null);
+                    runMyFragment(new UserPanelFragment(), null,menuItem.getItemId());
                     mDrawerLayout.closeDrawer(GravityCompat.END);
                     break;
                 case R.id.action_configure_device:
-                    mMenuDrawer.getMenu().findItem(menuItem.getItemId()).setChecked(Boolean.TRUE);
-                    runMyFragment(new ConfigureDeviceFragment(), null);
+                    runMyFragment(new ConfigureDeviceFragment(), null,menuItem.getItemId());
                     mDrawerLayout.closeDrawer(GravityCompat.END);
                     break;
                 case R.id.action_verify_biometric:
-                    mMenuDrawer.getMenu().findItem(menuItem.getItemId()).setChecked(Boolean.TRUE);
-                    runMyFragment(new VerifyBiometricFragment(), null);
+                    runMyFragment(new VerifyBiometricFragment(), null,menuItem.getItemId());
                     mDrawerLayout.closeDrawer(GravityCompat.END);
                     break;
                 case R.id.action_access_control:
-                    mMenuDrawer.getMenu().findItem(menuItem.getItemId()).setChecked(Boolean.TRUE);
-                    runMyFragment(new AccessControlFragment(), null);
+                    runMyFragment(new AccessControlFragment(), null,menuItem.getItemId());
                     mDrawerLayout.closeDrawer(GravityCompat.END);
                     break;
                 case R.id.action_logout:

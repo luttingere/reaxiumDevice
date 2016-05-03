@@ -42,6 +42,7 @@ import java.util.List;
 
 import ggsmarttechnologyltd.reaxium_access_control.GGMainFragment;
 import ggsmarttechnologyltd.reaxium_access_control.R;
+import ggsmarttechnologyltd.reaxium_access_control.admin.activity.AdminActivity;
 import ggsmarttechnologyltd.reaxium_access_control.admin.adapter.UserSecurityTabsAdapter;
 import ggsmarttechnologyltd.reaxium_access_control.admin.adapter.UsersListAdapter;
 import ggsmarttechnologyltd.reaxium_access_control.admin.listeners.OnUserClickListener;
@@ -103,7 +104,7 @@ public class UserPanelFragment extends GGMainFragment implements OnUserClickList
     }
 
     @Override
-    protected Integer getToolbarTitle() {
+    public Integer getToolbarTitle() {
         return R.string.add_or_edit_a_user_title;
     }
 
@@ -116,12 +117,16 @@ public class UserPanelFragment extends GGMainFragment implements OnUserClickList
     public Boolean onBackPressed() {
         if(searchUserContainer.getVisibility() != View.VISIBLE){
             hideAddUserContainer();
+        }else{
+            ((AdminActivity)getActivity()).runMyFragment(new AdminFragment(),null,R.id.action_menu_home);
         }
         return Boolean.TRUE;
     }
 
     @Override
     protected void setViews(View view) {
+
+        ((AdminActivity)getActivity()).showBackButton();
 
         //FloatingActionButton
         addUserButton = (FloatingActionButton) view.findViewById(R.id.add_user_button);

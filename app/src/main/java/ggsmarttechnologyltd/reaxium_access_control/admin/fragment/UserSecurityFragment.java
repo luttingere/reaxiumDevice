@@ -32,6 +32,7 @@ import java.util.List;
 
 import ggsmarttechnologyltd.reaxium_access_control.GGMainFragment;
 import ggsmarttechnologyltd.reaxium_access_control.R;
+import ggsmarttechnologyltd.reaxium_access_control.admin.activity.AdminActivity;
 import ggsmarttechnologyltd.reaxium_access_control.admin.adapter.UserSecurityTabsAdapter;
 import ggsmarttechnologyltd.reaxium_access_control.admin.adapter.UsersListAdapter;
 import ggsmarttechnologyltd.reaxium_access_control.admin.listeners.OnUserClickListener;
@@ -81,7 +82,7 @@ public class UserSecurityFragment extends GGMainFragment implements OnUserClickL
     }
 
     @Override
-    protected Integer getToolbarTitle() {
+    public Integer getToolbarTitle() {
         return R.string.user_security_panel_title;
     }
 
@@ -92,11 +93,14 @@ public class UserSecurityFragment extends GGMainFragment implements OnUserClickL
 
     @Override
     public Boolean onBackPressed() {
+        ((AdminActivity)getActivity()).runMyFragment(new AdminFragment(),null,R.id.action_menu_home);
         return Boolean.TRUE;
     }
 
     @Override
     protected void setViews(View view) {
+
+        ((AdminActivity)getActivity()).showBackButton();
 
         //User search container
         mSearchField = (EditText) view.findViewById(R.id.user_search_text);

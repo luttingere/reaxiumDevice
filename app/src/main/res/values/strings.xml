@@ -27,6 +27,7 @@
     <string name="login_text_button">Login</string>
 
     <!-- Menu Drawer-->
+    <string name="menu_drawer_home">Home</string>
     <string name="menu_drawer_configure_device">Configure Device</string>
     <string name="menu_drawer_add_user">Add or Edit a User</string>
     <string name="menu_drawer_add_security">Add User Access</string>
@@ -39,8 +40,8 @@
     <string name="admin_fragment_title">Reaxium Admin Console</string>
 
     <!-- User Security Panel-->
-    <string name="user_security_panel_title">User Access Configuration</string>
-    <string name="add_or_edit_a_user_title">Add or Edit a User</string>
+    <string name="user_security_panel_title">Add User Access</string>
+    <string name="add_or_edit_a_user_title">Add or Edit Users</string>
     <string name="user_security_panel_tab_fingerprint">Biometric</string>
     <string name="user_security_panel_tab_rfid">RFID</string>
     <string name="search_user">Find</string>

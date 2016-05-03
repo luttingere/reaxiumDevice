@@ -23,6 +23,7 @@ import java.util.List;
 
 import ggsmarttechnologyltd.reaxium_access_control.GGMainFragment;
 import ggsmarttechnologyltd.reaxium_access_control.R;
+import ggsmarttechnologyltd.reaxium_access_control.admin.activity.AdminActivity;
 import ggsmarttechnologyltd.reaxium_access_control.beans.ApiResponse;
 import ggsmarttechnologyltd.reaxium_access_control.beans.BiometricData;
 import ggsmarttechnologyltd.reaxium_access_control.beans.ReaxiumDevice;
@@ -63,7 +64,7 @@ public class ConfigureDeviceFragment extends GGMainFragment {
     }
 
     @Override
-    protected Integer getToolbarTitle() {
+    public Integer getToolbarTitle() {
         return R.string.menu_drawer_configure_device;
     }
 
@@ -74,11 +75,13 @@ public class ConfigureDeviceFragment extends GGMainFragment {
 
     @Override
     public Boolean onBackPressed() {
+        ((AdminActivity)getActivity()).runMyFragment(new AdminFragment(),null,R.id.action_menu_home);
         return Boolean.TRUE;
     }
 
     @Override
     protected void setViews(View view) {
+        ((AdminActivity)getActivity()).showBackButton();
         mDeviceIdInput = (EditText) view.findViewById(R.id.device_id_input);
         mConfigureDeviceButton = (Button) view.findViewById(R.id.configure_deice_button);
         mLockConfiguration = (ImageButton) view.findViewById(R.id.unlock_configuration);
@@ -146,6 +149,7 @@ public class ConfigureDeviceFragment extends GGMainFragment {
                     if (apiResponse.getReaxiumResponse().getCode() == GGGlobalValues.SUCCESSFUL_API_RESPONSE_CODE) {
 
                         if(apiResponse.getReaxiumResponse().getObject() != null){
+
                             ReaxiumUsersDAO dao = ReaxiumUsersDAO.getInstance(getActivity());
 
                             Log.i(TAG,"prepared to clear all values from the reaxium users");
@@ -271,6 +275,7 @@ public class ConfigureDeviceFragment extends GGMainFragment {
                         }.getType();
                         ApiResponse<ReaxiumDevice> apiResponse = JsonUtil.getEntityFromJSON(response, responseType);
                         if (apiResponse.getReaxiumResponse().getCode() == GGGlobalValues.SUCCESSFUL_API_RESPONSE_CODE) {
+                            mLockConfiguration.setImageResource(R.drawable.passwordlogin);
                             ReaxiumDevice device = apiResponse.getReaxiumResponse().getObject().get(0);
                             saveDeviceData(device);
                             GGUtil.showAToast(getActivity(), apiResponse.getReaxiumResponse().getMessage());

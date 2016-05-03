@@ -1,8 +1,10 @@
 package ggsmarttechnologyltd.reaxium_access_control;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.multidex.MultiDexApplication;
 import android.util.Log;
 
@@ -17,7 +19,7 @@ import ggsmarttechnologyltd.reaxium_access_control.service.BiometricScannerServi
 /**
  * Created by Eduardo Lutttinger on 11/04/2016.
  */
-public class App extends MultiDexApplication {
+public class App extends MultiDexApplication implements Application.ActivityLifecycleCallbacks {
 
     private static final String TAG  = "ReaxiumDeviceApp";
     private static Context mContext;
@@ -36,6 +38,38 @@ public class App extends MultiDexApplication {
     }
 
 
+    @Override
+    public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
 
+    }
 
+    @Override
+    public void onActivityStarted(Activity activity) {
+
+    }
+
+    @Override
+    public void onActivityResumed(Activity activity) {
+
+    }
+
+    @Override
+    public void onActivityPaused(Activity activity) {
+
+    }
+
+    @Override
+    public void onActivityStopped(Activity activity) {
+
+    }
+
+    @Override
+    public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+
+    }
+
+    @Override
+    public void onActivityDestroyed(Activity activity) {
+
+    }
 }

@@ -68,7 +68,7 @@ public class AddUserFragment extends GGMainFragment {
     }
 
     @Override
-    protected Integer getToolbarTitle() {
+    public Integer getToolbarTitle() {
         return R.string.add_user_title;
     }
 

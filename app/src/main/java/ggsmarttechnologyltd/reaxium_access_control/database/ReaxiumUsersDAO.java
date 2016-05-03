@@ -13,7 +13,6 @@ import ggsmarttechnologyltd.reaxium_access_control.beans.BiometricData;
 import ggsmarttechnologyltd.reaxium_access_control.beans.Business;
 import ggsmarttechnologyltd.reaxium_access_control.beans.User;
 import ggsmarttechnologyltd.reaxium_access_control.beans.UserAccessControl;
-import ggsmarttechnologyltd.reaxium_access_control.beans.UserAccessData;
 import ggsmarttechnologyltd.reaxium_access_control.global.GGGlobalValues;
 
 /**
@@ -23,14 +22,14 @@ import ggsmarttechnologyltd.reaxium_access_control.global.GGGlobalValues;
  */
 public class ReaxiumUsersDAO {
 
-    public static final String TAG = "ReaxiumUsersDAO";
-    private static SQLiteDatabase database;
-    private static ReaxiumUsersDbHelper dbHelper;
+    public static final String TAG = GGGlobalValues.TRACE_ID;
+    private SQLiteDatabase database;
+    private ReaxiumDbHelper dbHelper;
     private static ReaxiumUsersDAO reaxiumUsersDAO;
     private ContentValues insertValues;
 
     private ReaxiumUsersDAO(Context context) {
-        dbHelper = new ReaxiumUsersDbHelper(context);
+        dbHelper = new ReaxiumDbHelper(context);
     }
 
     public static ReaxiumUsersDAO getInstance(Context context) {

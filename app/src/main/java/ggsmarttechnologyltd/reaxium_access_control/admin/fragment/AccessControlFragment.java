@@ -18,14 +18,19 @@ import cn.com.aratek.fp.FingerprintScanner;
 import ggsmarttechnologyltd.reaxium_access_control.App;
 import ggsmarttechnologyltd.reaxium_access_control.GGMainFragment;
 import ggsmarttechnologyltd.reaxium_access_control.R;
+import ggsmarttechnologyltd.reaxium_access_control.admin.activity.AdminActivity;
 import ggsmarttechnologyltd.reaxium_access_control.admin.adapter.UsersListAdapter;
 import ggsmarttechnologyltd.reaxium_access_control.admin.dialog.UserINFoundDialog;
+import ggsmarttechnologyltd.reaxium_access_control.admin.dialog.UserINOUTInfoDialog;
 import ggsmarttechnologyltd.reaxium_access_control.admin.dialog.UserOUTFoundDialog;
 import ggsmarttechnologyltd.reaxium_access_control.admin.listeners.OnUserClickListener;
 import ggsmarttechnologyltd.reaxium_access_control.admin.threads.AutomaticFingerPrintValidationThread;
 import ggsmarttechnologyltd.reaxium_access_control.admin.threads.FingerPrintHandler;
+import ggsmarttechnologyltd.reaxium_access_control.admin.threads.InitFingerPrintThread;
+import ggsmarttechnologyltd.reaxium_access_control.beans.AccessControl;
 import ggsmarttechnologyltd.reaxium_access_control.beans.FingerPrint;
 import ggsmarttechnologyltd.reaxium_access_control.beans.User;
+import ggsmarttechnologyltd.reaxium_access_control.database.AccessControlDAO;
 import ggsmarttechnologyltd.reaxium_access_control.database.ReaxiumUsersDAO;
 import ggsmarttechnologyltd.reaxium_access_control.util.FailureAccessPlayerSingleton;
 import ggsmarttechnologyltd.reaxium_access_control.util.GGUtil;
@@ -48,8 +53,9 @@ public class AccessControlFragment extends GGMainFragment implements OnUserClick
     private UserINFoundDialog userINFoundDialog;
     private UserOUTFoundDialog userOUTFoundDialog;
     private SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a");
-    private AutomaticFingerPrintValidationThread automaticFingerPrintValidationThread;
+    UserINOUTInfoDialog userINOUTInfoDialog;
     private AccessControlHandler handler;
+    AccessControlDAO accessControlDAO;
 
     @Override
     public String getMyTag() {
@@ -57,7 +63,7 @@ public class AccessControlFragment extends GGMainFragment implements OnUserClick
     }
 
     @Override
-    protected Integer getToolbarTitle() {
+    public Integer getToolbarTitle() {
         return R.string.access_control_title;
     }
 
@@ -68,14 +74,13 @@ public class AccessControlFragment extends GGMainFragment implements OnUserClick
 
     @Override
     public Boolean onBackPressed() {
+        ((AdminActivity) getActivity()).runMyFragment(new AdminFragment(), null, R.id.action_menu_home);
         return Boolean.TRUE;
     }
 
     @Override
     protected void setViews(View view) {
-        if (App.fingerprintScanner == null) {
-            App.fingerprintScanner = FingerprintScanner.getInstance();
-        }
+        setRetainInstance(Boolean.TRUE);
         fillUserListINAndOutData();
         userINList = (RecyclerView) view.findViewById(R.id.user_in_list);
         linearINLayoutManager = new LinearLayoutManager(getActivity());
@@ -88,41 +93,51 @@ public class AccessControlFragment extends GGMainFragment implements OnUserClick
         userOUTList.setLayoutManager(linearOUTLayoutManager);
         adapterOUT = new UsersListAdapter(getActivity(), this, listOUT, LIST_OUT_NAME);
         userOUTList.setAdapter(adapterOUT);
+        ((AdminActivity) getActivity()).showBackButton();
     }
 
 
     @Override
     public void onResume() {
         super.onResume();
-        try {
-            App.fingerprintScanner.powerOn();
-        } catch (Exception e) {
-            Log.i(TAG, "", e);
-        }
         handler = new AccessControlHandler();
-        automaticFingerPrintValidationThread = new AutomaticFingerPrintValidationThread(App.fingerprintScanner, handler, getActivity());
-        automaticFingerPrintValidationThread.start();
+        InitFingerPrintThread initFingerPrintThread = new InitFingerPrintThread(getActivity(),handler);
+        initFingerPrintThread.start();
+        Log.i(TAG, "automatic detection of fingerprint has started");
     }
 
     @Override
     public void onPause() {
-        automaticFingerPrintValidationThread.stopScanner();
+        AutomaticFingerPrintValidationThread.stopScanner();
+        GGUtil.closeFingerPrint();
         Log.i(TAG, "the access control finger print process has ended");
-        try {
-            App.fingerprintScanner.powerOff();
-        } catch (Exception e) {
-            Log.i(TAG, "", e);
-        }
-        Log.i(TAG, "Automatic detection of a fingerprint was stoped");
         super.onPause();
     }
-
 
     private void fillUserListINAndOutData() {
         ReaxiumUsersDAO dao = ReaxiumUsersDAO.getInstance(getActivity());
         List<User> listOfUserAssociated = dao.getAllUsersRegisteredInTheDevice();
-        listOUT = listOfUserAssociated;
-        Collections.sort(listOUT);
+        accessControlDAO = AccessControlDAO.getInstance(getActivity());
+        AccessControl accessControl = null;
+        if (listOfUserAssociated != null) {
+            for (User user : listOfUserAssociated) {
+                accessControl = accessControlDAO.getLastAccess("" + user.getUserId());
+                Log.i(TAG, "AccessControl: " + accessControl + " for user id: " + user.getUserId());
+                if (accessControl != null) {
+                    user.setAccessTime(timeFormat.format(new Date(accessControl.getAccessDate())));
+                    if (accessControl.getAccessType().equals(LIST_IN_NAME)) {
+                        listIN.add(user);
+                    } else if (accessControl.getAccessType().equals(LIST_OUT_NAME)) {
+                        listOUT.add(user);
+                    }
+                } else {
+                    listOUT.add(user);
+                }
+            }
+            Collections.sort(listIN);
+            Collections.sort(listOUT);
+        }
+
     }
 
     @Override
@@ -148,7 +163,9 @@ public class AccessControlFragment extends GGMainFragment implements OnUserClick
         } else if (listName.equals(LIST_OUT_NAME)) {
             user = listOUT.get(position);
         }
-        //TODO: show user information
+        userINOUTInfoDialog = new UserINOUTInfoDialog(getActivity(), android.R.style.Theme_NoTitleBar_Fullscreen);
+        userINOUTInfoDialog.updateUserInfo(user);
+        userINOUTInfoDialog.show();
     }
 
     public void delayedUserInDialogDismiss() {
@@ -207,7 +224,7 @@ public class AccessControlFragment extends GGMainFragment implements OnUserClick
         int position = 0;
         Boolean found = Boolean.FALSE;
         for (User user : usersList) {
-            Log.i(TAG, "comparando id:" + userToFindAndRemove.getUserId()+" con: "+user.getUserId());
+            Log.i(TAG, "comparando id:" + userToFindAndRemove.getUserId() + " con: " + user.getUserId());
             if (userToFindAndRemove.getUserId().intValue() == user.getUserId().intValue()) {
                 Log.i(TAG, "removing user: " + userToFindAndRemove.getUserId());
                 usersList.remove(position);
@@ -239,6 +256,7 @@ public class AccessControlFragment extends GGMainFragment implements OnUserClick
             if (user != null) {
                 user.setAccessTime(timeFormat.format(new Date()));
                 if (findAndRemoveUserFromList(listIN, user)) {
+                    accessControlDAO.insertUserAccess(user.getUserId(), "BIOMETRIC", LIST_OUT_NAME);
                     userOUTFoundDialog = new UserOUTFoundDialog(getActivity(), android.R.style.Theme_NoTitleBar_Fullscreen);
                     userOUTFoundDialog.updateUserInfo(user);
                     userOUTFoundDialog.show();
@@ -246,6 +264,7 @@ public class AccessControlFragment extends GGMainFragment implements OnUserClick
                     listOUT.add(user);
                     Collections.sort(listOUT);
                 } else if (findAndRemoveUserFromList(listOUT, user)) {
+                    accessControlDAO.insertUserAccess(user.getUserId(), "BIOMETRIC", LIST_IN_NAME);
                     userINFoundDialog = new UserINFoundDialog(getActivity(), android.R.style.Theme_NoTitleBar_Fullscreen);
                     userINFoundDialog.updateUserInfo(user);
                     userINFoundDialog.show();

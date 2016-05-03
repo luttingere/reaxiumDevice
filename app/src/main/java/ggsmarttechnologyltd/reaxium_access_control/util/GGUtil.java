@@ -11,14 +11,23 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import java.util.Arrays;
 
+import cn.com.aratek.dev.Terminal;
+import cn.com.aratek.fp.Bione;
 import cn.com.aratek.fp.FingerprintImage;
+import cn.com.aratek.fp.FingerprintScanner;
+import cn.com.aratek.util.Result;
+import ggsmarttechnologyltd.reaxium_access_control.App;
+import ggsmarttechnologyltd.reaxium_access_control.GGMainActivity;
 import ggsmarttechnologyltd.reaxium_access_control.R;
+import ggsmarttechnologyltd.reaxium_access_control.admin.threads.FingerPrintHandler;
+import ggsmarttechnologyltd.reaxium_access_control.global.GGGlobalValues;
 
 /**
  * Created by Eduardo Luttinger at G&G on 13/04/2016.
@@ -26,6 +35,8 @@ import ggsmarttechnologyltd.reaxium_access_control.R;
  * Utility methods for all android applications
  */
 public class GGUtil {
+
+    private static final String TAG = GGGlobalValues.TRACE_ID;
 
     /**
      * Navigate to any screen in the app
@@ -40,6 +51,56 @@ public class GGUtil {
             goToTheMain.putExtras(arguments);
         }
         context.startActivity(goToTheMain);
+    }
+
+
+    /**
+     * Init the finger scanner
+     */
+    public static Boolean startFingerScannerService(Context context,FingerPrintHandler fingerPrintHandler){
+        Boolean success = Boolean.FALSE;
+        App.fingerprintScanner = FingerprintScanner.getInstance();
+        int error;
+        if ((error = App.fingerprintScanner.initialize()) == FingerprintScanner.RESULT_OK) {
+            Log.i(TAG, "FingerPrint Prepare code: " + App.fingerprintScanner.prepare());
+            Log.i(TAG, "Inicializacion del FingerPrint Correcta");
+            Result res = App.fingerprintScanner.getSN();
+
+            Log.i(TAG, "FingerPrint Serial Number: " + (String) res.data);
+
+            res = App.fingerprintScanner.getFirmwareVersion();
+            Log.i(TAG, "FingerPrint Firmware Number: " + (String) res.data);
+
+            Log.i(TAG, "FingerPrint SDK Number: " + Terminal.getSdkVersion());
+            App.fingerprintScanner.powerOn();
+            success = Boolean.TRUE;
+        }else{
+            fingerPrintHandler.sendMessage(fingerPrintHandler.obtainMessage(FingerPrintHandler.ERROR_ROUTINE, "Error initializing finger scanner, reset device"));
+            Log.e(TAG, "***[*.*]*** Error initializing FingerPrint Scanner error code: " + error);
+        }
+        return success;
+    }
+
+    /**
+     * Close fingerprint
+     */
+    public static void closeFingerPrint(){
+        App.fingerprintScanner.powerOff();
+        App.fingerprintScanner.unInitialize();
+        App.fingerprintScanner = null;
+    }
+
+    /**
+     * validate if a number is even
+     * @param number
+     * @return
+     */
+    public static Boolean isEven(int number){
+        Boolean isEven = Boolean.FALSE;
+        if((number % 2) == 0){
+            isEven = Boolean.TRUE;
+        }
+        return isEven;
     }
 
 

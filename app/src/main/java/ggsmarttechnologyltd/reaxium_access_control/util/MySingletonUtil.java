@@ -123,23 +123,16 @@ public class MySingletonUtil {
     }
 
     public ImageLoader getImageLoader() {
-        getRequestQueue();
         if (mImageLoader == null) {
-            mImageLoader = new ImageLoader(mRequestQueue,
-                    new ImageLoader.ImageCache() {
-                        private final LruCache<String, Bitmap>
-                                cache = new LruCache<String, Bitmap>(20);
+            mImageLoader = new ImageLoader(getRequestQueue(), new ImageLoader.ImageCache() {
+                @Override
+                public void putBitmap(String key, Bitmap value) { }
 
-                        @Override
-                        public Bitmap getBitmap(String url) {
-                            return cache.get(url);
-                        }
-
-                        @Override
-                        public void putBitmap(String url, Bitmap bitmap) {
-                            cache.put(url, bitmap);
-                        }
-                    });
+                @Override
+                public Bitmap getBitmap(String key) {
+                    return null;
+                }
+            });
         }
         return this.mImageLoader;
     }

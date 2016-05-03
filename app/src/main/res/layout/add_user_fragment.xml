@@ -328,7 +328,7 @@
                             android:layout_height="match_parent"
                             android:layout_alignParentRight="true"
                             android:background="@color/colorPrimary"
-                            android:text="Edit User"
+                            android:text="ACCEPT"
                             android:textColor="@android:color/white" />
 
                         <Button
@@ -338,7 +338,7 @@
                             android:layout_height="match_parent"
                             android:layout_alignParentRight="true"
                             android:background="@color/colorPrimary"
-                            android:text="Save User"
+                            android:text="ACCEPT"
                             android:textColor="@android:color/white" />
 
 
