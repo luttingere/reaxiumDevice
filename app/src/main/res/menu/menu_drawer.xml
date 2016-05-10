@@ -74,5 +74,18 @@
 
     </group>
 
+    <group
+        android:id="@+id/nav_test"
+        android:checkableBehavior="single"
+        android:menuCategory="container"
+        app:itemBackground="@android:color/black">
+
+        <item
+            android:id="@+id/show_map"
+            android:icon="@drawable/test"
+            android:title="@string/menu_drawer_show_map" />
+
+    </group>
+
 
 </menu>

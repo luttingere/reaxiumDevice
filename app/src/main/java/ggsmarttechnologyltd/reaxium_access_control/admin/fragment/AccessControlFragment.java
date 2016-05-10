@@ -5,6 +5,14 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.google.gson.reflect.TypeToken;
+
+import org.json.JSONObject;
+
+import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,8 +22,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import cn.com.aratek.fp.FingerprintImage;
-import cn.com.aratek.fp.FingerprintScanner;
-import ggsmarttechnologyltd.reaxium_access_control.App;
 import ggsmarttechnologyltd.reaxium_access_control.GGMainFragment;
 import ggsmarttechnologyltd.reaxium_access_control.R;
 import ggsmarttechnologyltd.reaxium_access_control.admin.activity.AdminActivity;
@@ -24,16 +30,26 @@ import ggsmarttechnologyltd.reaxium_access_control.admin.dialog.UserINFoundDialo
 import ggsmarttechnologyltd.reaxium_access_control.admin.dialog.UserINOUTInfoDialog;
 import ggsmarttechnologyltd.reaxium_access_control.admin.dialog.UserOUTFoundDialog;
 import ggsmarttechnologyltd.reaxium_access_control.admin.listeners.OnUserClickListener;
+import ggsmarttechnologyltd.reaxium_access_control.admin.threads.AutomaticCardValidationThread;
 import ggsmarttechnologyltd.reaxium_access_control.admin.threads.AutomaticFingerPrintValidationThread;
-import ggsmarttechnologyltd.reaxium_access_control.admin.threads.FingerPrintHandler;
+import ggsmarttechnologyltd.reaxium_access_control.admin.threads.InitScannersInAutoModeThread;
+import ggsmarttechnologyltd.reaxium_access_control.admin.threads.ScannersActivityHandler;
 import ggsmarttechnologyltd.reaxium_access_control.admin.threads.InitFingerPrintThread;
 import ggsmarttechnologyltd.reaxium_access_control.beans.AccessControl;
+import ggsmarttechnologyltd.reaxium_access_control.beans.ApiResponse;
+import ggsmarttechnologyltd.reaxium_access_control.beans.AppBean;
 import ggsmarttechnologyltd.reaxium_access_control.beans.FingerPrint;
+import ggsmarttechnologyltd.reaxium_access_control.beans.SecurityObject;
 import ggsmarttechnologyltd.reaxium_access_control.beans.User;
 import ggsmarttechnologyltd.reaxium_access_control.database.AccessControlDAO;
 import ggsmarttechnologyltd.reaxium_access_control.database.ReaxiumUsersDAO;
+import ggsmarttechnologyltd.reaxium_access_control.global.APPEnvironment;
+import ggsmarttechnologyltd.reaxium_access_control.global.GGGlobalValues;
 import ggsmarttechnologyltd.reaxium_access_control.util.FailureAccessPlayerSingleton;
 import ggsmarttechnologyltd.reaxium_access_control.util.GGUtil;
+import ggsmarttechnologyltd.reaxium_access_control.util.JsonObjectRequestUtil;
+import ggsmarttechnologyltd.reaxium_access_control.util.JsonUtil;
+import ggsmarttechnologyltd.reaxium_access_control.util.MySingletonUtil;
 
 /**
  * Created by Eduardo Luttinger on 26/04/2016.
@@ -55,7 +71,8 @@ public class AccessControlFragment extends GGMainFragment implements OnUserClick
     private SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a");
     UserINOUTInfoDialog userINOUTInfoDialog;
     private AccessControlHandler handler;
-    AccessControlDAO accessControlDAO;
+    private AccessControlDAO accessControlDAO;
+    private ReaxiumUsersDAO reaxiumUsersDAO;
 
     @Override
     public String getMyTag() {
@@ -94,6 +111,7 @@ public class AccessControlFragment extends GGMainFragment implements OnUserClick
         adapterOUT = new UsersListAdapter(getActivity(), this, listOUT, LIST_OUT_NAME);
         userOUTList.setAdapter(adapterOUT);
         ((AdminActivity) getActivity()).showBackButton();
+        accessControlDAO = AccessControlDAO.getInstance(getActivity());
     }
 
 
@@ -101,16 +119,18 @@ public class AccessControlFragment extends GGMainFragment implements OnUserClick
     public void onResume() {
         super.onResume();
         handler = new AccessControlHandler();
-        InitFingerPrintThread initFingerPrintThread = new InitFingerPrintThread(getActivity(),handler);
-        initFingerPrintThread.start();
-        Log.i(TAG, "automatic detection of fingerprint has started");
+        InitScannersInAutoModeThread initScannersInAutoModeThread = new InitScannersInAutoModeThread(getActivity(), handler);
+        initScannersInAutoModeThread.start();
+        Log.i(TAG, "automatic detection has started");
     }
 
     @Override
     public void onPause() {
+        //AutomaticCardValidationThread.stopScanner();
         AutomaticFingerPrintValidationThread.stopScanner();
         GGUtil.closeFingerPrint();
-        Log.i(TAG, "the access control finger print process has ended");
+        //GGUtil.closeCardReader(getActivity(),handler);
+        Log.i(TAG, "the scanners han bean turned off successfully");
         super.onPause();
     }
 
@@ -201,24 +221,6 @@ public class AccessControlFragment extends GGMainFragment implements OnUserClick
         timer.schedule(task, userOUTFoundDialog.SLEEP_TIME);
     }
 
-    /**
-     * remove from a list an object
-     *
-     * @param usersList
-     * @param userToRemove
-     */
-    public void removeUserFromList(List<User> usersList, User userToRemove) {
-        int position = 0;
-        for (User user : usersList) {
-            if (userToRemove.getUserId() == user.getUserId()) {
-                Log.i(TAG, "removing user: " + user.getUserId());
-                usersList.remove(position);
-                Collections.sort(usersList);
-                break;
-            }
-            position++;
-        }
-    }
 
     public Boolean findAndRemoveUserFromList(List<User> usersList, User userToFindAndRemove) {
         int position = 0;
@@ -237,7 +239,60 @@ public class AccessControlFragment extends GGMainFragment implements OnUserClick
         return found;
     }
 
-    private class AccessControlHandler extends FingerPrintHandler {
+    /**
+     *
+     */
+    private void saveAccessInServer(final Long lastInsertedId,Long userId, String trafficType, Long deviceId, String accessType, String trafficInfo) {
+        if (GGUtil.isNetworkAvailable(getActivity())) {
+            Response.Listener<JSONObject> responseListener = new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    Type responseType = new TypeToken<ApiResponse<Object>>() {}.getType();
+                    ApiResponse<Object> apiResponse = JsonUtil.getEntityFromJSON(response, responseType);
+                    if (apiResponse.getReaxiumResponse().getCode() == GGGlobalValues.SUCCESSFUL_API_RESPONSE_CODE) {
+                        Integer result = accessControlDAO.markAsRegisteredInCloud(lastInsertedId);
+                        Log.i(TAG,"Mark as registered result: "+result);
+                        GGUtil.showAToast(getActivity(), "user access registered in cloud successfully");
+                    } else {
+                        GGUtil.showAToast(getActivity(), apiResponse.getReaxiumResponse().getMessage());
+                    }
+                }
+            };
+            Response.ErrorListener errorListener = new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    GGUtil.showAToast(getActivity(), "There was an error saving the access in the cloud");
+                }
+            };
+            JSONObject parameters = loadRequestParameters(userId,trafficType,deviceId,accessType,trafficInfo);
+            JsonObjectRequestUtil jsonObjectRequest = new JsonObjectRequestUtil(Request.Method.POST, APPEnvironment.createURL(GGGlobalValues.SAVE_ACCESS_IN_SERVER), parameters, responseListener, errorListener);
+            jsonObjectRequest.setShouldCache(false);
+            MySingletonUtil.getInstance(getActivity()).addToRequestQueue(jsonObjectRequest);
+
+        } else {
+            GGUtil.showAToast(getActivity(), "No internet connection, remember synchronize the device for send access record to the cloud");
+        }
+    }
+
+    private JSONObject loadRequestParameters(Long userId, String trafficType, Long deviceId, String accessType, String trafficInfo) {
+        JSONObject requestObject = new JSONObject();
+        try {
+            JSONObject reaxiumParameters = new JSONObject();
+            JSONObject usersAccess = new JSONObject();
+            usersAccess.put("user_id", userId);
+            usersAccess.put("traffic_type", trafficType);
+            usersAccess.put("device_id", deviceId);
+            usersAccess.put("access_type", accessType);
+            usersAccess.put("traffic_info", trafficInfo);
+            reaxiumParameters.put("UserAccess", usersAccess);
+            requestObject.put("ReaxiumParameters", reaxiumParameters);
+        } catch (Exception e) {
+            Log.e(TAG, "", e);
+        }
+        return requestObject;
+    }
+
+    private class AccessControlHandler extends ScannersActivityHandler {
 
 
         @Override
@@ -251,12 +306,21 @@ public class AccessControlFragment extends GGMainFragment implements OnUserClick
         }
 
         @Override
-        protected void validateFingerPrint(Integer userId) {
-            User user = ReaxiumUsersDAO.getInstance(getActivity()).getUserById("" + userId);
+        protected void validateScannerResult(AppBean bean) {
+            SecurityObject securityObject = (SecurityObject) bean;
+            User user = null;
+            if(securityObject.getCardId() == null){
+                user =reaxiumUsersDAO.getUserById("" + securityObject.getUserId());
+            }else{
+                user =reaxiumUsersDAO.getUserByIdAndRfidCode("" + securityObject.getUserId(),""+securityObject.getCardId());
+            }
             if (user != null) {
                 user.setAccessTime(timeFormat.format(new Date()));
+                Long lastInsertedId = null;
+                String trafficTypeId = "1";
                 if (findAndRemoveUserFromList(listIN, user)) {
-                    accessControlDAO.insertUserAccess(user.getUserId(), "BIOMETRIC", LIST_OUT_NAME);
+                    trafficTypeId = "2";
+                    lastInsertedId = accessControlDAO.insertUserAccess(user.getUserId(), "BIOMETRIC", LIST_OUT_NAME);
                     userOUTFoundDialog = new UserOUTFoundDialog(getActivity(), android.R.style.Theme_NoTitleBar_Fullscreen);
                     userOUTFoundDialog.updateUserInfo(user);
                     userOUTFoundDialog.show();
@@ -264,7 +328,8 @@ public class AccessControlFragment extends GGMainFragment implements OnUserClick
                     listOUT.add(user);
                     Collections.sort(listOUT);
                 } else if (findAndRemoveUserFromList(listOUT, user)) {
-                    accessControlDAO.insertUserAccess(user.getUserId(), "BIOMETRIC", LIST_IN_NAME);
+                    trafficTypeId = "1";
+                    lastInsertedId = accessControlDAO.insertUserAccess(user.getUserId(), "BIOMETRIC", LIST_IN_NAME);
                     userINFoundDialog = new UserINFoundDialog(getActivity(), android.R.style.Theme_NoTitleBar_Fullscreen);
                     userINFoundDialog.updateUserInfo(user);
                     userINFoundDialog.show();
@@ -274,9 +339,10 @@ public class AccessControlFragment extends GGMainFragment implements OnUserClick
                 }
                 adapterIN.refreshList(listIN);
                 adapterOUT.refreshList(listOUT);
+                saveAccessInServer(lastInsertedId,user.getUserId(),trafficTypeId,getSharedPreferences().getLong(GGGlobalValues.DEVICE_ID),"2","");
             } else {
                 FailureAccessPlayerSingleton.getInstance(getActivity()).initRingTone();
-                GGUtil.showAToast(getActivity(), "Invalid user, not registered: " + userId);
+                GGUtil.showAToast(getActivity(), "Invalid user, not registered: " + securityObject.getUserId());
             }
         }
 

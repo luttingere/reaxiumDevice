@@ -24,6 +24,7 @@ import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.AccessControlF
 import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.AddUserFragment;
 import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.AdminFragment;
 import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.ConfigureDeviceFragment;
+import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.ShowMapFragment;
 import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.UserPanelFragment;
 import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.UserSecurityFragment;
 import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.VerifyBiometricFragment;
@@ -214,6 +215,10 @@ public class AdminActivity extends GGMainActivity {
                     Intent goToLoginPage = new Intent(this, LoginActivity.class);
                     startActivity(goToLoginPage);
                     finish();
+                case R.id.show_map:
+                    runMyFragment(new ShowMapFragment(), null,menuItem.getItemId());
+                    mDrawerLayout.closeDrawer(GravityCompat.END);
+                    break;
                 default:
                     break;
             }

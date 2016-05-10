@@ -2,7 +2,6 @@ package ggsmarttechnologyltd.reaxium_access_control.admin.threads;
 
 import android.content.Context;
 
-import ggsmarttechnologyltd.reaxium_access_control.App;
 import ggsmarttechnologyltd.reaxium_access_control.GGMainActivity;
 import ggsmarttechnologyltd.reaxium_access_control.global.GGGlobalValues;
 import ggsmarttechnologyltd.reaxium_access_control.util.GGUtil;
@@ -10,25 +9,24 @@ import ggsmarttechnologyltd.reaxium_access_control.util.GGUtil;
 /**
  * Created by Eduardo Luttinger on 20/04/2016.
  */
-public class InitFingerPrintThread extends Thread {
+public class InitScannersThread extends Thread {
 
     private static final String TAG = GGGlobalValues.TRACE_ID;
     private Context mContext;
-    private ScannersActivityHandler scannersActivityHandler;
-    private AutomaticFingerPrintValidationThread automaticFingerPrintValidationThread;
+    private ScannersActivityHandler biometricHandler;
+    private ScannersActivityHandler rfidHandler;
 
-    public InitFingerPrintThread(Context context,ScannersActivityHandler scannersActivityHandler) {
+    public InitScannersThread(Context context, ScannersActivityHandler biometricHandler, ScannersActivityHandler rfidHandler) {
         this.mContext = context;
-        this.scannersActivityHandler = scannersActivityHandler;
+        this.biometricHandler = biometricHandler;
+        this.rfidHandler = rfidHandler;
     }
 
     @Override
     public void run() {
         showProgressDialog();
-        if(GGUtil.startFingerScannerService(mContext, scannersActivityHandler)){
-            automaticFingerPrintValidationThread = new AutomaticFingerPrintValidationThread(App.fingerprintScanner, scannersActivityHandler,mContext);
-            automaticFingerPrintValidationThread.start();
-        }
+        GGUtil.startFingerScannerService(mContext, biometricHandler);
+        //GGUtil.openCardReader(mContext,rfidHandler);
         dismissProgressDialog();
     }
 
@@ -36,7 +34,7 @@ public class InitFingerPrintThread extends Thread {
         ((GGMainActivity)mContext).runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                ((GGMainActivity) mContext).showProgressDialog("Initializing FingerPrint Scanner...");
+                ((GGMainActivity) mContext).showProgressDialog("Initializing Scanners...");
             }
         });
     }

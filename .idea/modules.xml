@@ -3,7 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/reaxium_access_control.iml" filepath="$PROJECT_DIR$/reaxium_access_control.iml" />
+      <module fileurl="file://$PROJECT_DIR$/reaxiumDevice.iml" filepath="$PROJECT_DIR$/reaxiumDevice.iml" />
     </modules>
   </component>
 </project>
+

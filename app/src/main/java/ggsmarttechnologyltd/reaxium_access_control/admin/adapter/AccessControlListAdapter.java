@@ -70,6 +70,11 @@ public class AccessControlListAdapter extends RecyclerView.Adapter<AccessControl
     public void onBindViewHolder(final AccessControlHolder holder, int position) {
         accessControl = accessControlList.get(position);
         holder.accessDateTime.setText(timeFormat.format(new Date(accessControl.getAccessDate())));
+        if(!accessControl.isOnTheCloud()){
+            holder.outOfSyncMark.setVisibility(View.VISIBLE);
+        }else{
+            holder.outOfSyncMark.setVisibility(View.GONE);
+        }
     }
 
     @Override

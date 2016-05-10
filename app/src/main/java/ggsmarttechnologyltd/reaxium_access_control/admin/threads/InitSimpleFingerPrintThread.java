@@ -2,7 +2,6 @@ package ggsmarttechnologyltd.reaxium_access_control.admin.threads;
 
 import android.content.Context;
 
-import ggsmarttechnologyltd.reaxium_access_control.App;
 import ggsmarttechnologyltd.reaxium_access_control.GGMainActivity;
 import ggsmarttechnologyltd.reaxium_access_control.global.GGGlobalValues;
 import ggsmarttechnologyltd.reaxium_access_control.util.GGUtil;
@@ -14,17 +13,17 @@ public class InitSimpleFingerPrintThread extends Thread {
 
     private static final String TAG = GGGlobalValues.TRACE_ID;
     private Context mContext;
-    private FingerPrintHandler fingerPrintHandler;
+    private ScannersActivityHandler scannersActivityHandler;
 
-    public InitSimpleFingerPrintThread(Context context, FingerPrintHandler fingerPrintHandler) {
+    public InitSimpleFingerPrintThread(Context context, ScannersActivityHandler scannersActivityHandler) {
         this.mContext = context;
-        this.fingerPrintHandler = fingerPrintHandler;
+        this.scannersActivityHandler = scannersActivityHandler;
     }
 
     @Override
     public void run() {
         showProgressDialog();
-        GGUtil.startFingerScannerService(mContext, fingerPrintHandler);
+        GGUtil.startFingerScannerService(mContext, scannersActivityHandler);
         dismissProgressDialog();
     }
 

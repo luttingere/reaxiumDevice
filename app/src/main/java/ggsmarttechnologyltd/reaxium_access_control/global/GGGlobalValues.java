@@ -32,14 +32,21 @@ public class GGGlobalValues {
     public static final String DEFAULT_USER_TYPE = "Student";
 
 
+    //RFID
+    public static final int BYTE_SIZE = 16;
+    public static final int BYTE_BLOCK = 4;
+
+
 
     //Service Names
     public static final String SEARCH_USERS_BY_FILTER = "Users/allUsersWithFilter";
     public static final String LOAD_USER_BIOMETRIC_INFO = "Biometric/biometricAccess";
+    public static final String LOAD_USER_RFID_INFO = "RFID/saveRFIDInformation";
     public static final String CONFIGURE_DEVICE = "Device/configureDevice";
     public static final String SYNCHRONIZE_DEVICE = "Device/synchronizeDeviceAccess";
     public static final String VALIDATE_ACCESS = "Access/checkUserAccess";
     public static final String SAVE_A_USER = "Users/saveUserFromDevice";
+    public static final String SAVE_ACCESS_IN_SERVER = "UserAccess/executeAnAccessOfAUser";
     public static final String EDIT_A_USER = "Users/editUserFromDevice";
 
 }

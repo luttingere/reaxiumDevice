@@ -23,6 +23,7 @@ public final class AccessControlContract {
                     AccessControlTable.COLUMN_NAME_USER_ID + INTEGER_TYPE + COMMA_SEP +
                     AccessControlTable.COLUMN_NAME_USER_ACCESS_TYPE + TEXT_TYPE + COMMA_SEP +
                     AccessControlTable.COLUMN_NAME_USER_ACCESS_DATE + INTEGER_TYPE + COMMA_SEP +
+                    AccessControlTable.COLUMN_REGISTERED_IN_CLOUD + INTEGER_TYPE + COMMA_SEP +
                     AccessControlTable.COLUMN_NAME_ACCESS_TYPE + TEXT_TYPE  + " )";
 
     /**
@@ -46,6 +47,7 @@ public final class AccessControlContract {
         public static final String COLUMN_NAME_USER_ACCESS_TYPE = "user_access_type";
         public static final String COLUMN_NAME_USER_ACCESS_DATE = "access_date";
         public static final String COLUMN_NAME_ACCESS_TYPE = "access_type";    //----> IN OR OUT
+        public static final String COLUMN_REGISTERED_IN_CLOUD = "registered_in_cloud"; //--->TRUE = 1 ----FALSE =0
     }
 }
 

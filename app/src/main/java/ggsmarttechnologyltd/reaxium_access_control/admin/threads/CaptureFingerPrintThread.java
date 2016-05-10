@@ -20,13 +20,13 @@ public class CaptureFingerPrintThread extends Thread {
     private static Boolean stop = Boolean.FALSE;
     private Result fingerCaptureResult;
     private FingerprintImage fingerprintImage;
-    private FingerPrintHandler fingerPrintHandler;
+    private ScannersActivityHandler scannersActivityHandler;
     private byte[] fingerPrintFeat;
     private FingerPrint fingerPrint;
 
-    public CaptureFingerPrintThread(FingerprintScanner fingerprintScanner, FingerPrintHandler fingerPrintHandler) {
+    public CaptureFingerPrintThread(FingerprintScanner fingerprintScanner, ScannersActivityHandler scannersActivityHandler) {
         this.fingerprintScanner = fingerprintScanner;
-        this.fingerPrintHandler = fingerPrintHandler;
+        this.scannersActivityHandler = scannersActivityHandler;
         stop = Boolean.FALSE;
         captured = Boolean.FALSE;
     }
@@ -34,7 +34,7 @@ public class CaptureFingerPrintThread extends Thread {
     @Override
     public void run() {
         while (!captured && !stop) {
-            fingerCaptureResult = fingerprintScanner.hasFinger();
+            fingerCaptureResult =  fingerprintScanner.hasFinger();
             if (fingerCaptureResult.error == FingerprintScanner.RESULT_OK) {
                 fingerCaptureResult = fingerprintScanner.capture();
                 if (fingerCaptureResult.error == FingerprintScanner.RESULT_OK) {
@@ -42,7 +42,7 @@ public class CaptureFingerPrintThread extends Thread {
                         captured = Boolean.TRUE;
                         // Capture fingerprint process
                         fingerprintImage = (FingerprintImage) fingerCaptureResult.data;
-                        fingerPrintHandler.sendMessage(fingerPrintHandler.obtainMessage(FingerPrintHandler.UPDATE_FINGER_PRINT_IMAGE, fingerprintImage));
+                        scannersActivityHandler.sendMessage(scannersActivityHandler.obtainMessage(ScannersActivityHandler.UPDATE_FINGER_PRINT_IMAGE, fingerprintImage));
 
                         //get the byte information of the biometric
                         fingerCaptureResult = App.bione.extractFeature(fingerprintImage);
@@ -60,26 +60,26 @@ public class CaptureFingerPrintThread extends Thread {
                             fingerPrint.setFingerPrintImage(GGUtil.fingerPrintImageToBitmap(fingerprintImage));
 
                             //save biometric in the server
-                            fingerPrintHandler.sendMessage(fingerPrintHandler.obtainMessage(FingerPrintHandler.SAVE_FINGER_PRINT, fingerPrint));
+                            scannersActivityHandler.sendMessage(scannersActivityHandler.obtainMessage(ScannersActivityHandler.SAVE_FINGER_PRINT, fingerPrint));
 
                         } else {
-                            fingerPrintHandler.sendMessage(fingerPrintHandler.obtainMessage(FingerPrintHandler.ERROR_ROUTINE, "Error saving the fingerprint, error code: " + fingerCaptureResult.error));
+                            scannersActivityHandler.sendMessage(scannersActivityHandler.obtainMessage(ScannersActivityHandler.ERROR_ROUTINE, "Error saving the fingerprint, error code: " + fingerCaptureResult.error));
                             stop = true;
                         }
                     } catch (Exception e) {
-                        fingerPrintHandler.sendMessage(fingerPrintHandler.obtainMessage(FingerPrintHandler.ERROR_ROUTINE, "Error scanning the fingerprint"));
+                        scannersActivityHandler.sendMessage(scannersActivityHandler.obtainMessage(ScannersActivityHandler.ERROR_ROUTINE, "Error scanning the fingerprint"));
                         stop = true;
                         Log.e(TAG, "Error loading a biometric to user", e);
                     }
                 } else {
                     stop = true;
-                    fingerPrintHandler.sendMessage(fingerPrintHandler.obtainMessage(FingerPrintHandler.ERROR_ROUTINE, "Error scanning the fingerprint"));
+                    scannersActivityHandler.sendMessage(scannersActivityHandler.obtainMessage(ScannersActivityHandler.ERROR_ROUTINE, "Error scanning the fingerprint"));
                     Log.i(TAG, "There was an error scanning the fingerprint");
                 }
             } else {
                 stop = true;
                 Log.i(TAG,"Error: "+fingerCaptureResult.error);
-                fingerPrintHandler.sendMessage(fingerPrintHandler.obtainMessage(FingerPrintHandler.ERROR_ROUTINE, "Please, put your finger on the scanner"));
+                scannersActivityHandler.sendMessage(scannersActivityHandler.obtainMessage(ScannersActivityHandler.ERROR_ROUTINE, "Please, put your finger on the scanner"));
             }
 
         }

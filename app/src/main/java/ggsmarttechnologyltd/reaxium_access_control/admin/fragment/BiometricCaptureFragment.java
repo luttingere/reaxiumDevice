@@ -2,15 +2,10 @@ package ggsmarttechnologyltd.reaxium_access_control.admin.fragment;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -20,24 +15,20 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.StringRequest;
 import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONObject;
 
 import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.Map;
 
 import cn.com.aratek.fp.FingerprintImage;
-import cn.com.aratek.fp.FingerprintScanner;
 import ggsmarttechnologyltd.reaxium_access_control.App;
 import ggsmarttechnologyltd.reaxium_access_control.GGMainFragment;
 import ggsmarttechnologyltd.reaxium_access_control.R;
 import ggsmarttechnologyltd.reaxium_access_control.admin.threads.CaptureFingerPrintThread;
-import ggsmarttechnologyltd.reaxium_access_control.admin.threads.FingerPrintHandler;
-import ggsmarttechnologyltd.reaxium_access_control.admin.threads.InitSimpleFingerPrintThread;
+import ggsmarttechnologyltd.reaxium_access_control.admin.threads.ScannersActivityHandler;
 import ggsmarttechnologyltd.reaxium_access_control.beans.ApiResponse;
+import ggsmarttechnologyltd.reaxium_access_control.beans.AppBean;
 import ggsmarttechnologyltd.reaxium_access_control.beans.FingerPrint;
 import ggsmarttechnologyltd.reaxium_access_control.beans.User;
 import ggsmarttechnologyltd.reaxium_access_control.global.APPEnvironment;
@@ -59,7 +50,7 @@ public class BiometricCaptureFragment extends GGMainFragment {
     private static User mUserSelected;
     private static ImageLoader mImageLoader;
     private static ProgressBar mProgressBar;
-    BiometricCaptureHandler handler;
+    public static BiometricCaptureHandler handler;
 
     @Override
     public String getMyTag() {
@@ -81,21 +72,6 @@ public class BiometricCaptureFragment extends GGMainFragment {
         return Boolean.TRUE;
     }
 
-    @Override
-    public void onResume() {
-        handler = new BiometricCaptureHandler();
-        InitSimpleFingerPrintThread initSimpleFingerPrintThread = new InitSimpleFingerPrintThread(getActivity(),handler);
-        initSimpleFingerPrintThread.start();
-        super.onResume();
-    }
-
-    @Override
-    public void onPause() {
-        GGUtil.closeFingerPrint();
-        Log.i(TAG,"fingerprint scanner has ben stopped");
-        super.onPause();
-    }
-
 
     @Override
     protected void setViews(View view) {
@@ -104,6 +80,7 @@ public class BiometricCaptureFragment extends GGMainFragment {
         mImageLoader = MySingletonUtil.getInstance(getActivity()).getImageLoader();
         mProgressBar = (ProgressBar) view.findViewById(R.id.fingerprint_loader);
         mProgressBar.getIndeterminateDrawable().setColorFilter(getResources().getColor(R.color.colorPrimary), android.graphics.PorterDuff.Mode.SRC_ATOP);
+        handler = new BiometricCaptureHandler();
     }
 
     @Override
@@ -175,10 +152,7 @@ public class BiometricCaptureFragment extends GGMainFragment {
             @Override
             public void onErrorResponse(VolleyError error) {
                 hideProgressDialog();
-                if (error.networkResponse != null && error.networkResponse.statusCode != 500) {
-                    Log.e(TAG, "Network Error Response", error);
-                    GGUtil.showAToast(getActivity(), R.string.simple_exception_message);
-                }
+                GGUtil.showAToast(getActivity(), R.string.bad_connection_message);
             }
         };
         JSONObject parameters = new JSONObject();
@@ -199,7 +173,7 @@ public class BiometricCaptureFragment extends GGMainFragment {
     /**
      * FingerPrint Handler
      */
-    private class BiometricCaptureHandler extends FingerPrintHandler {
+    private class BiometricCaptureHandler extends ScannersActivityHandler {
 
         @Override
         protected void updateFingerPrintImageHolder(FingerprintImage fingerprintImage) {
@@ -235,7 +209,7 @@ public class BiometricCaptureFragment extends GGMainFragment {
         }
 
         @Override
-        protected void validateFingerPrint(Integer userId) {
+        protected void validateScannerResult(AppBean bean) {
 
         }
 

@@ -52,6 +52,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
+            <TextView
+                android:visibility="visible"
+                android:id="@+id/outOfSyncMark"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="5dp"
+                android:textColor="@android:color/black"
+                android:text="Out of Sync"
+                android:layout_alignParentRight="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
         </RelativeLayout>
 
 

@@ -10,18 +10,13 @@ import android.view.WindowManager;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import cn.com.aratek.dev.Terminal;
 import cn.com.aratek.fp.Bione;
-import cn.com.aratek.fp.FingerprintScanner;
-import cn.com.aratek.util.Result;
 import ggsmarttechnologyltd.reaxium_access_control.App;
 import ggsmarttechnologyltd.reaxium_access_control.GGMainActivity;
 import ggsmarttechnologyltd.reaxium_access_control.GGMainFragment;
 import ggsmarttechnologyltd.reaxium_access_control.R;
-import ggsmarttechnologyltd.reaxium_access_control.admin.threads.FingerPrintHandler;
 import ggsmarttechnologyltd.reaxium_access_control.global.GGGlobalValues;
 import ggsmarttechnologyltd.reaxium_access_control.login.activity.LoginActivity;
-import ggsmarttechnologyltd.reaxium_access_control.util.GGUtil;
 
 /**
  * Created by Eduardo Luttinger G&G on 11/04/2016.
@@ -66,10 +61,10 @@ public class ReaxiumSplash extends GGMainActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!isTaskRoot()) {
-            finish();
-            return;
-        }
+//        if (!isTaskRoot()) {
+//            finish();
+//            return;
+//        }
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 

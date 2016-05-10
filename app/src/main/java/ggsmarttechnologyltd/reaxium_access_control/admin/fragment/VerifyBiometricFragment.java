@@ -1,10 +1,8 @@
 package ggsmarttechnologyltd.reaxium_access_control.admin.fragment;
 
-import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -14,22 +12,22 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 
 import cn.com.aratek.fp.FingerprintImage;
-import cn.com.aratek.fp.FingerprintScanner;
-import ggsmarttechnologyltd.reaxium_access_control.App;
 import ggsmarttechnologyltd.reaxium_access_control.GGMainFragment;
 import ggsmarttechnologyltd.reaxium_access_control.R;
 import ggsmarttechnologyltd.reaxium_access_control.admin.activity.AdminActivity;
+import ggsmarttechnologyltd.reaxium_access_control.admin.threads.AutomaticCardValidationThread;
 import ggsmarttechnologyltd.reaxium_access_control.admin.threads.AutomaticFingerPrintValidationThread;
-import ggsmarttechnologyltd.reaxium_access_control.admin.threads.FingerPrintHandler;
+import ggsmarttechnologyltd.reaxium_access_control.admin.threads.InitScannersInAutoModeThread;
+import ggsmarttechnologyltd.reaxium_access_control.admin.threads.ScannersActivityHandler;
 import ggsmarttechnologyltd.reaxium_access_control.admin.threads.InitFingerPrintThread;
-import ggsmarttechnologyltd.reaxium_access_control.admin.threads.VerifyFingerPrintThread;
+import ggsmarttechnologyltd.reaxium_access_control.beans.AppBean;
 import ggsmarttechnologyltd.reaxium_access_control.beans.FingerPrint;
+import ggsmarttechnologyltd.reaxium_access_control.beans.SecurityObject;
 import ggsmarttechnologyltd.reaxium_access_control.beans.User;
 import ggsmarttechnologyltd.reaxium_access_control.database.ReaxiumUsersDAO;
 import ggsmarttechnologyltd.reaxium_access_control.util.FailureAccessPlayerSingleton;
 import ggsmarttechnologyltd.reaxium_access_control.util.GGUtil;
 import ggsmarttechnologyltd.reaxium_access_control.util.MySingletonUtil;
-import ggsmarttechnologyltd.reaxium_access_control.util.SuccessfulAccessPlayerSingleton;
 
 /**
  * Created by Eduardo Luttinger on 21/04/2016.
@@ -44,6 +42,7 @@ public class VerifyBiometricFragment extends GGMainFragment {
     private ImageLoader mImageLoader;
     private RelativeLayout userInfoContainer;
     private TextView infoText;
+    private ScannerValidationHandler handler;
 
     @Override
     public String getMyTag() {
@@ -93,16 +92,18 @@ public class VerifyBiometricFragment extends GGMainFragment {
     @Override
     public void onResume() {
         super.onResume();
-        BiometricValidationHandler handler = new BiometricValidationHandler();
-        InitFingerPrintThread initFingerPrintThread = new InitFingerPrintThread(getActivity(),handler);
-        initFingerPrintThread.start();
+        handler = new ScannerValidationHandler();
+        InitScannersInAutoModeThread initScannersInAutoModeThread = new InitScannersInAutoModeThread(getActivity(),handler);
+        initScannersInAutoModeThread.start();
     }
 
     @Override
     public void onPause() {
+        //AutomaticCardValidationThread.stopScanner();
         AutomaticFingerPrintValidationThread.stopScanner();
         GGUtil.closeFingerPrint();
-        Log.i(TAG, "the access control finger print process has ended");
+        //GGUtil.closeCardReader(getActivity(),handler);
+        Log.i(TAG, "the scanner has been turned off successfully");
         super.onPause();
     }
 
@@ -112,7 +113,7 @@ public class VerifyBiometricFragment extends GGMainFragment {
 
     }
 
-    private class BiometricValidationHandler extends FingerPrintHandler {
+    private class ScannerValidationHandler extends ScannersActivityHandler {
 
         @Override
         protected void updateFingerPrintImageHolder(FingerprintImage fingerprintImage) {
@@ -125,8 +126,9 @@ public class VerifyBiometricFragment extends GGMainFragment {
         }
 
         @Override
-        protected void validateFingerPrint(Integer userId) {
-            User user = ReaxiumUsersDAO.getInstance(getActivity()).getUserById("" + userId);
+        protected void validateScannerResult(AppBean bean) {
+            SecurityObject securityObject = (SecurityObject)bean;
+            User user = ReaxiumUsersDAO.getInstance(getActivity()).getUserById("" + securityObject.getUserId());
             hideProgressDialog();
             if (user != null) {
                 userInfoContainer.setVisibility(View.VISIBLE);
@@ -139,7 +141,7 @@ public class VerifyBiometricFragment extends GGMainFragment {
                 setUserPhoto(user);
             } else {
                 FailureAccessPlayerSingleton.getInstance(getActivity()).initRingTone();
-                GGUtil.showAToast(getActivity(), "Invalid user, not registered: " + userId);
+                GGUtil.showAToast(getActivity(), "Invalid user, not registered: " + securityObject.getUserId());
             }
         }
 

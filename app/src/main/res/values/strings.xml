@@ -9,7 +9,7 @@
     <!-- Functional Messages-->
     <string name="progress_dialog_message">Please Wait...</string>
     <string name="progress_login_dialog_message">Login to Reaxium Device...</string>
-    <string name="configure_device_progress_message">Download the configuration...</string>
+    <string name="configure_device_progress_message">Downloading the configuration...</string>
     <string name="synchronize_device_progress_message">Synchronizing...</string>
     <string name="synchronize_device_users_progress_message">Synchronizing Users...</string>
     <string name="synchronize_device_biometrics_progress_message">Synchronizing Biometrics...</string>
@@ -34,6 +34,9 @@
     <string name="menu_drawer_verify_biometric">Verify User Access</string>
     <string name="menu_drawer_access_control">Access Control</string>
     <string name="menu_drawer_logout">Log Out</string>
+    <string name="menu_drawer_show_map">Show Map</string>
+
+
 
 
     <!-- Admin Screens-->

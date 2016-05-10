@@ -130,7 +130,7 @@ public abstract class GGMainFragment extends Fragment implements Serializable {
      *
      * @return SharedPreferenceUtil Singleton Instance
      */
-    protected SharedPreferenceUtil getSharedPreferences() {
+    public SharedPreferenceUtil getSharedPreferences() {
         return SharedPreferenceUtil.getInstance(getActivity());
     }
 

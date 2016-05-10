@@ -260,5 +260,54 @@ public class ReaxiumUsersDAO {
         return user;
     }
 
+    /**
+     *
+     * @param userId
+     * @param rfidCode
+     * @return user found
+     */
+    public User getUserByIdAndRfidCode(String userId, String rfidCode) {
+        User user = null;
+        Cursor resultSet = null;
+        try {
+            database = dbHelper.getReadableDatabase();
+            String[] projection = {
+                    ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_ID,
+                    ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_NAME,
+                    ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_SECOND_NAME,
+                    ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_LAST_NAME,
+                    ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_SECOND_LAST_NAME,
+                    ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_DOCUMENT_ID,
+                    ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_PHOTO,
+                    ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_BUSINESS_NAME
+            };
+            String selection = ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_ACCESS_TYPE + "=? and " + ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_RFID_CODE + "=? and " +ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_ID + "=?";
+            String[] seelcctionArgs = {rfidCode,"RFID", userId};
+            resultSet = database.query(ReaxiumUsersContract.ReaxiumUsers.TABLE_NAME, projection, selection, seelcctionArgs, null, null, null);
+            if (resultSet.moveToFirst()) {
+                user = new User();
+                user.setUserId(resultSet.getLong(resultSet.getColumnIndex(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_ID)));
+                user.setFirstName(resultSet.getString(resultSet.getColumnIndex(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_NAME)));
+                user.setSecondName(resultSet.getString(resultSet.getColumnIndex(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_SECOND_NAME)));
+                user.setFirstLastName(resultSet.getString(resultSet.getColumnIndex(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_LAST_NAME)));
+                user.setSecondLastName(resultSet.getString(resultSet.getColumnIndex(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_SECOND_LAST_NAME)));
+                user.setPhoto(resultSet.getString(resultSet.getColumnIndex(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_PHOTO)));
+                user.setDocumentId(resultSet.getString(resultSet.getColumnIndex(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_DOCUMENT_ID)));
+                Business business = new Business();
+                business.setBusinessName(resultSet.getString(resultSet.getColumnIndex(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_BUSINESS_NAME)));
+                user.setBusiness(business);
+            }
+        }catch (Exception e){
+            Log.e(TAG,"Error retrieving user information from the device db",e);
+        }finally {
+            if(resultSet != null){
+                if(!resultSet.isClosed()){
+                    resultSet.close();
+                }
+            }
+        }
+        return user;
+    }
+
 
 }

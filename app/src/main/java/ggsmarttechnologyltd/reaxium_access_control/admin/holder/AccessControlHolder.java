@@ -12,6 +12,7 @@ import ggsmarttechnologyltd.reaxium_access_control.R;
 public class AccessControlHolder extends RecyclerView.ViewHolder {
 
     public TextView accessDateTime;
+    public TextView outOfSyncMark;
 
 
     public AccessControlHolder(View itemView) {
@@ -21,5 +22,6 @@ public class AccessControlHolder extends RecyclerView.ViewHolder {
 
     private void setViews(View itemView){
         accessDateTime = (TextView) itemView.findViewById(R.id.access_time);
+        outOfSyncMark = (TextView) itemView.findViewById(R.id.outOfSyncMark);
     }
 }

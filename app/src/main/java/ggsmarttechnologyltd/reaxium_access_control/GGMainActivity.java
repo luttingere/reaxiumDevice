@@ -204,8 +204,10 @@ public abstract class GGMainActivity extends AppCompatActivity {
      */
     public void showProgressDialog(String message) {
         if (mProgressDialog != null) {
-            mProgressDialog.setMessage(message);
-            mProgressDialog.show();
+            if(!mProgressDialog.isShowing()){
+                mProgressDialog.setMessage(message);
+                mProgressDialog.show();
+            }
         }
     }
 
@@ -238,7 +240,7 @@ public abstract class GGMainActivity extends AppCompatActivity {
      *
      * @return SharedPreferenceUtil Singleton Instance
      */
-    protected SharedPreferenceUtil getSharedPreferences() {
+    public SharedPreferenceUtil getSharedPreferences() {
         return SharedPreferenceUtil.getInstance(this);
     }
 

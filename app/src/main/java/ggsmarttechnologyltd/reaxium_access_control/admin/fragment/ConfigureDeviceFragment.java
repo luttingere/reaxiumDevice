@@ -1,5 +1,7 @@
 package ggsmarttechnologyltd.reaxium_access_control.admin.fragment;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.util.Log;
 import android.view.View;
@@ -14,6 +16,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.google.gson.reflect.TypeToken;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
@@ -24,12 +27,14 @@ import java.util.List;
 import ggsmarttechnologyltd.reaxium_access_control.GGMainFragment;
 import ggsmarttechnologyltd.reaxium_access_control.R;
 import ggsmarttechnologyltd.reaxium_access_control.admin.activity.AdminActivity;
+import ggsmarttechnologyltd.reaxium_access_control.beans.AccessControl;
 import ggsmarttechnologyltd.reaxium_access_control.beans.ApiResponse;
 import ggsmarttechnologyltd.reaxium_access_control.beans.BiometricData;
 import ggsmarttechnologyltd.reaxium_access_control.beans.ReaxiumDevice;
 import ggsmarttechnologyltd.reaxium_access_control.beans.User;
 import ggsmarttechnologyltd.reaxium_access_control.beans.UserAccessControl;
 import ggsmarttechnologyltd.reaxium_access_control.beans.UserAccessData;
+import ggsmarttechnologyltd.reaxium_access_control.database.AccessControlDAO;
 import ggsmarttechnologyltd.reaxium_access_control.database.BiometricDAO;
 import ggsmarttechnologyltd.reaxium_access_control.database.ReaxiumUsersDAO;
 import ggsmarttechnologyltd.reaxium_access_control.global.APPEnvironment;
@@ -56,6 +61,10 @@ public class ConfigureDeviceFragment extends GGMainFragment {
     private TextView mLastSync;
     private SharedPreferenceUtil sharedPreferenceUtil;
     private RelativeLayout mSynchronizeButton;
+    private AccessControlDAO accessControlDAO;
+    private List<AccessControl> accessControlList;
+    private List<AccessControl> outOfSyncList;
+
 
 
     @Override
@@ -93,6 +102,8 @@ public class ConfigureDeviceFragment extends GGMainFragment {
         mLastSync = (TextView) view.findViewById(R.id.reaxium_device_last_sync);
         mSynchronizeButton = (RelativeLayout) view.findViewById(R.id.synchronize_device_container);
         sharedPreferenceUtil = SharedPreferenceUtil.getInstance(getActivity());
+        accessControlDAO = AccessControlDAO.getInstance(getContext());
+        accessControlList = accessControlDAO.getAllAccessInDevice();
         fillFields();
     }
 
@@ -171,6 +182,31 @@ public class ConfigureDeviceFragment extends GGMainFragment {
 
                                         GGUtil.showAToast(getActivity(), apiResponse.getReaxiumResponse().getMessage());
 
+                                        if(accessControlList != null && !accessControlList.isEmpty()){
+                                            new AlertDialog.Builder(getActivity(), R.style.MyDialogTheme)
+                                                    .setTitle("Reset Access Control Records")
+                                                    .setMessage("all access control records in the device have been synchronized with the Reaxium Cloud. Do you want to reset them in the device?")
+                                                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            showProgressDialog("Restoring Access Control Data");
+                                                            accessControlDAO.deleteAllValuesFromAccessControlTable();
+                                                            hideProgressDialog();
+                                                            GGUtil.showAToast(getActivity(), "Access Control Records han been restored");
+                                                            dialog.dismiss();
+                                                        }
+                                                    })
+                                                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            if(outOfSyncList!= null && !outOfSyncList.isEmpty()){
+                                                                accessControlDAO.markAsRegisteredInCloudAsBulk(outOfSyncList);
+                                                            }
+                                                            dialog.dismiss();
+                                                        }
+                                                    }).show();
+                                        }
+
                                     } else {
 
                                         GGUtil.showAToast(getActivity(), "Error enrrolling biometric info in the device");
@@ -203,13 +239,14 @@ public class ConfigureDeviceFragment extends GGMainFragment {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     hideProgressDialog();
-                    if (error.networkResponse != null && error.networkResponse.statusCode != 500) {
-                        GGUtil.showAToast(getActivity(), R.string.simple_exception_message);
-                    }
+                    GGUtil.showAToast(getActivity(), R.string.simple_exception_message+ " error: "+error.getMessage());
                 }
             };
 
-            JsonObjectRequestUtil jsonObjectRequest = new JsonObjectRequestUtil(Request.Method.POST, APPEnvironment.createURL(GGGlobalValues.SYNCHRONIZE_DEVICE), loadConfigureDeviceParatemers(), responseListener, errorListener);
+            outOfSyncList = accessControlDAO.getAllAccessOutOfSync();
+            JSONObject parameters = loadConfigureDeviceParatemers(outOfSyncList);
+
+            JsonObjectRequestUtil jsonObjectRequest = new JsonObjectRequestUtil(Request.Method.POST, APPEnvironment.createURL(GGGlobalValues.SYNCHRONIZE_DEVICE), parameters, responseListener, errorListener);
             jsonObjectRequest.setShouldCache(false);
             MySingletonUtil.getInstance(getActivity()).addToRequestQueue(jsonObjectRequest);
 
@@ -271,8 +308,7 @@ public class ConfigureDeviceFragment extends GGMainFragment {
                     @Override
                     public void onResponse(JSONObject response) {
                         hideProgressDialog();
-                        Type responseType = new TypeToken<ApiResponse<ReaxiumDevice>>() {
-                        }.getType();
+                        Type responseType = new TypeToken<ApiResponse<ReaxiumDevice>>() {}.getType();
                         ApiResponse<ReaxiumDevice> apiResponse = JsonUtil.getEntityFromJSON(response, responseType);
                         if (apiResponse.getReaxiumResponse().getCode() == GGGlobalValues.SUCCESSFUL_API_RESPONSE_CODE) {
                             mLockConfiguration.setImageResource(R.drawable.passwordlogin);
@@ -282,6 +318,7 @@ public class ConfigureDeviceFragment extends GGMainFragment {
                         } else {
                             GGUtil.showAToast(getActivity(), apiResponse.getReaxiumResponse().getMessage());
                         }
+                        GGUtil.hideKeyboard(getActivity());
                     }
                 };
 
@@ -289,13 +326,12 @@ public class ConfigureDeviceFragment extends GGMainFragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         hideProgressDialog();
-                        if (error.networkResponse != null && error.networkResponse.statusCode != 500) {
-                            GGUtil.showAToast(getActivity(), R.string.simple_exception_message);
-                        }
+                        GGUtil.hideKeyboard(getActivity());
+                        GGUtil.showAToast(getActivity(), R.string.bad_connection_message);
                     }
                 };
 
-                JsonObjectRequestUtil jsonObjectRequest = new JsonObjectRequestUtil(Request.Method.POST, APPEnvironment.createURL(GGGlobalValues.CONFIGURE_DEVICE), loadConfigureDeviceParatemers(), responseListener, errorListener);
+                JsonObjectRequestUtil jsonObjectRequest = new JsonObjectRequestUtil(Request.Method.POST, APPEnvironment.createURL(GGGlobalValues.CONFIGURE_DEVICE), loadConfigureDeviceParatemers(null), responseListener, errorListener);
                 jsonObjectRequest.setShouldCache(false);
                 MySingletonUtil.getInstance(getActivity()).addToRequestQueue(jsonObjectRequest);
 
@@ -307,13 +343,26 @@ public class ConfigureDeviceFragment extends GGMainFragment {
         }
     }
 
-    private JSONObject loadConfigureDeviceParatemers() {
+    private JSONObject loadConfigureDeviceParatemers(List<AccessControl> outOfSyncList) {
         JSONObject requestObject = new JSONObject();
         try {
             JSONObject reaxiumParameters = new JSONObject();
             JSONObject reaxiumDevice = new JSONObject();
             reaxiumDevice.put("device_id", mDeviceIdInput.getText().toString().trim());
             reaxiumDevice.put("device_token", "temporal_device_token");
+            if(outOfSyncList != null && !outOfSyncList.isEmpty()){
+                JSONObject accessData = null;
+                JSONArray accessDataBulk = new JSONArray();
+                for(AccessControl accessControl: outOfSyncList){
+                    accessData = new JSONObject();
+                    accessData.put("userId",accessControl.getUserId());
+                    accessData.put("deviceId",accessControl.getDeviceId());
+                    accessData.put("accessType",accessControl.getAccessType());
+                    accessData.put("userAccessType",accessControl.getUserAccessType());
+                    accessDataBulk.put(accessData);
+                }
+                reaxiumDevice.put("accessBulkObject",accessDataBulk);
+            }
             reaxiumParameters.put("ReaxiumDevice", reaxiumDevice);
             requestObject.put("ReaxiumParameters", reaxiumParameters);
         } catch (Exception e) {

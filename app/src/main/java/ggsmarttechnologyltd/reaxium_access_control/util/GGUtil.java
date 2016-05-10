@@ -1,32 +1,29 @@
 package ggsmarttechnologyltd.reaxium_access_control.util;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import cn.com.aratek.dev.Terminal;
-import cn.com.aratek.fp.Bione;
 import cn.com.aratek.fp.FingerprintImage;
 import cn.com.aratek.fp.FingerprintScanner;
+import cn.com.aratek.iccard.ICCardReader;
 import cn.com.aratek.util.Result;
 import ggsmarttechnologyltd.reaxium_access_control.App;
-import ggsmarttechnologyltd.reaxium_access_control.GGMainActivity;
-import ggsmarttechnologyltd.reaxium_access_control.R;
-import ggsmarttechnologyltd.reaxium_access_control.admin.threads.FingerPrintHandler;
+import ggsmarttechnologyltd.reaxium_access_control.admin.threads.ScannersActivityHandler;
+import ggsmarttechnologyltd.reaxium_access_control.beans.SecurityObject;
 import ggsmarttechnologyltd.reaxium_access_control.global.GGGlobalValues;
 
 /**
@@ -57,7 +54,7 @@ public class GGUtil {
     /**
      * Init the finger scanner
      */
-    public static Boolean startFingerScannerService(Context context,FingerPrintHandler fingerPrintHandler){
+    public static Boolean startFingerScannerService(Context context,ScannersActivityHandler scannersActivityHandler){
         Boolean success = Boolean.FALSE;
         App.fingerprintScanner = FingerprintScanner.getInstance();
         int error;
@@ -75,10 +72,57 @@ public class GGUtil {
             App.fingerprintScanner.powerOn();
             success = Boolean.TRUE;
         }else{
-            fingerPrintHandler.sendMessage(fingerPrintHandler.obtainMessage(FingerPrintHandler.ERROR_ROUTINE, "Error initializing finger scanner, reset device"));
+            scannersActivityHandler.sendMessage(scannersActivityHandler.obtainMessage(ScannersActivityHandler.ERROR_ROUTINE, "Error initializing finger scanner, reset device"));
             Log.e(TAG, "***[*.*]*** Error initializing FingerPrint Scanner error code: " + error);
         }
         return success;
+    }
+
+    public static Boolean openCardReader(Context context,ScannersActivityHandler scannersActivityHandler) {
+        Boolean isOk = Boolean.FALSE;
+        int error;
+        App.cardReader = ICCardReader.getInstance();
+        if ((error = App.cardReader.powerOn()) != ICCardReader.RESULT_OK) {
+            scannersActivityHandler.sendMessage(scannersActivityHandler.obtainMessage(ScannersActivityHandler.ERROR_ROUTINE, "the system fail turning on the card reader, error code: "+error));
+        }else if((error = App.cardReader .open())!= ICCardReader.RESULT_OK){
+            scannersActivityHandler.sendMessage(scannersActivityHandler.obtainMessage(ScannersActivityHandler.ERROR_ROUTINE, "the system fail opening the card reader, error code: "+error));
+        }else{
+            isOk = Boolean.TRUE;
+        }
+        return isOk;
+    }
+
+    public static void closeCardReader(Context context,ScannersActivityHandler scannersActivityHandler){
+        int error;
+        if ((error = App.cardReader .close()) != ICCardReader.RESULT_OK) {
+            scannersActivityHandler.sendMessage(scannersActivityHandler.obtainMessage(ScannersActivityHandler.ERROR_ROUTINE, "the system fail closing the card reader, error code: "+error));
+        }else if((error = App.cardReader .powerOff())!= ICCardReader.RESULT_OK){
+            scannersActivityHandler.sendMessage(scannersActivityHandler.obtainMessage(ScannersActivityHandler.ERROR_ROUTINE, "the system fail turning off the card reader, error code: "+error));
+        }
+    }
+
+    public static SecurityObject scanRFID(ICCardReader cardReader) {
+        Result res = cardReader.activate();
+        Integer userId = null;
+        SecurityObject securityObject = null;
+        if(res.error == ICCardReader.RESULT_OK ){
+            int error;
+            long cardID = (Long) res.data;
+            error = cardReader.validateKey(cardID, ICCardReader.KEY_A, GGGlobalValues.BYTE_BLOCK, new byte[] { (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff });
+            if (error == ICCardReader.RESULT_OK) {
+                res = cardReader.read(GGGlobalValues.BYTE_BLOCK);
+                if (res.error == ICCardReader.RESULT_OK) {
+                    byte[] data = (byte[]) res.data;
+                    Log.i(TAG,"data read: "+ Arrays.toString(data));
+                    ByteBuffer wrapper = ByteBuffer.wrap(data);
+                    userId = wrapper.getInt();
+                    securityObject = new SecurityObject();
+                    securityObject.setCardId(cardID);
+                    securityObject.setUserId(userId);
+                }
+            }
+        }
+        return securityObject;
     }
 
     /**

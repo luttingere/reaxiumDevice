@@ -10,6 +10,7 @@ import android.util.Log;
 
 import cn.com.aratek.dev.Terminal;
 import cn.com.aratek.fp.Bione;
+import cn.com.aratek.iccard.ICCardReader;
 import cn.com.aratek.util.Result;
 
 import cn.com.aratek.fp.FingerprintScanner;
@@ -26,6 +27,7 @@ public class App extends MultiDexApplication implements Application.ActivityLife
     private boolean isDevelopment = Boolean.TRUE;
     public static FingerprintScanner fingerprintScanner;
     public static Bione bione;
+    public static ICCardReader cardReader;
 
     @Override
     public void onCreate() {

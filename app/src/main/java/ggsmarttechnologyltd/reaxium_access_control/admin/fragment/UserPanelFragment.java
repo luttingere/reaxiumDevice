@@ -317,6 +317,7 @@ public class UserPanelFragment extends GGMainFragment implements OnUserClickList
                 @Override
                 public void onResponse(JSONObject response) {
                     hideProgressDialog();
+                    GGUtil.hideKeyboard(getActivity());
                     Type responseType = new TypeToken<ApiResponse<User>>() {}.getType();
                     ApiResponse<User> apiResponse = JsonUtil.getEntityFromJSON(response, responseType);
                     if(apiResponse.getReaxiumResponse().getCode() == GGGlobalValues.SUCCESSFUL_API_RESPONSE_CODE){
@@ -332,6 +333,7 @@ public class UserPanelFragment extends GGMainFragment implements OnUserClickList
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     hideProgressDialog();
+                    GGUtil.hideKeyboard(getActivity());
                     GGUtil.showAToast(getActivity(), R.string.bad_connection_message);
                 }
             };
@@ -483,6 +485,7 @@ public class UserPanelFragment extends GGMainFragment implements OnUserClickList
                 @Override
                 public void onResponse(JSONObject response) {
                     hideProgressDialog();
+
                     Type responseType = new TypeToken<ApiResponse<User>>() {}.getType();
                     ApiResponse<User> apiResponse = JsonUtil.getEntityFromJSON(response, responseType);
                     if (apiResponse.getReaxiumResponse().getCode() == GGGlobalValues.SUCCESSFUL_API_RESPONSE_CODE) {
@@ -498,6 +501,7 @@ public class UserPanelFragment extends GGMainFragment implements OnUserClickList
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     hideProgressDialog();
+
                     if (error.networkResponse != null && error.networkResponse.statusCode != 500) {
                         Log.e(TAG, "Network Error Response", error);
                         GGUtil.showAToast(getActivity(), R.string.simple_exception_message);

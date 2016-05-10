@@ -36,6 +36,7 @@ import ggsmarttechnologyltd.reaxium_access_control.admin.activity.AdminActivity;
 import ggsmarttechnologyltd.reaxium_access_control.admin.adapter.UserSecurityTabsAdapter;
 import ggsmarttechnologyltd.reaxium_access_control.admin.adapter.UsersListAdapter;
 import ggsmarttechnologyltd.reaxium_access_control.admin.listeners.OnUserClickListener;
+import ggsmarttechnologyltd.reaxium_access_control.admin.threads.InitScannersThread;
 import ggsmarttechnologyltd.reaxium_access_control.beans.ApiResponse;
 import ggsmarttechnologyltd.reaxium_access_control.beans.ReaxiumResponse;
 import ggsmarttechnologyltd.reaxium_access_control.beans.User;
@@ -182,6 +183,20 @@ public class UserSecurityFragment extends GGMainFragment implements OnUserClickL
 
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        GGUtil.closeFingerPrint();
+        //GGUtil.closeCardReader(getActivity(),RFIDCaptureFragment.helper);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        InitScannersThread scannersThread = new InitScannersThread(getActivity(),BiometricCaptureFragment.handler,RFIDCaptureFragment.helper);
+        scannersThread.start();
+    }
+
     private  void loadFingerPrintImage(User user) {
         mUserPhoto.setImageResource(R.drawable.user_avatar);
         if(user.getPhoto() != null && !"".equals(user.getPhoto())){
@@ -238,6 +253,7 @@ public class UserSecurityFragment extends GGMainFragment implements OnUserClickL
                 @Override
                 public void onResponse(JSONObject response) {
                     hideProgressDialog();
+                    GGUtil.hideKeyboard(getActivity());
                     Type responseType = new TypeToken<ApiResponse<User>>() {}.getType();
                     ApiResponse<User> apiResponse = JsonUtil.getEntityFromJSON(response, responseType);
                     if(apiResponse.getReaxiumResponse().getCode() == GGGlobalValues.SUCCESSFUL_API_RESPONSE_CODE){
@@ -246,6 +262,7 @@ public class UserSecurityFragment extends GGMainFragment implements OnUserClickL
                     }else{
                         GGUtil.showAToast(getActivity(), apiResponse.getReaxiumResponse().getMessage());
                     }
+
                 }
             };
 
@@ -253,6 +270,7 @@ public class UserSecurityFragment extends GGMainFragment implements OnUserClickL
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     hideProgressDialog();
+                    GGUtil.hideKeyboard(getActivity());
                     GGUtil.showAToast(getActivity(), R.string.bad_connection_message);
                 }
             };
@@ -294,6 +312,7 @@ public class UserSecurityFragment extends GGMainFragment implements OnUserClickL
         mUserFullName.setText(user.getFirstName() + " " + user.getSecondName() + " " + user.getFirstLastName() + " " + user.getSecondLastName());
         mUserIDNumber.setText(user.getDocumentId());
         loadFingerPrintImage(user);
+        RFIDCaptureFragment.setUserSelected(user);
         BiometricCaptureFragment.setUserSelected(user);
     }
 
