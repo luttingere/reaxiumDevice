@@ -26,6 +26,7 @@ import cn.com.aratek.util.Result;
 import ggsmarttechnologyltd.reaxium_access_control.App;
 import ggsmarttechnologyltd.reaxium_access_control.GGMainFragment;
 import ggsmarttechnologyltd.reaxium_access_control.R;
+import ggsmarttechnologyltd.reaxium_access_control.admin.errormessages.RFIDErrorMessage;
 import ggsmarttechnologyltd.reaxium_access_control.admin.threads.ScannersActivityHandler;
 import ggsmarttechnologyltd.reaxium_access_control.beans.ApiResponse;
 import ggsmarttechnologyltd.reaxium_access_control.beans.AppBean;
@@ -115,6 +116,7 @@ public class RFIDCaptureFragment extends GGMainFragment {
     private void configureRFID(){
         showProgressDialog("Configuring the RFID Card...");
         if(writeUserIdInTheCard()){
+            hideProgressDialog();
             new AlertDialog.Builder(getActivity(), R.style.MyDialogTheme)
                     .setTitle("Device Access Association")
                     .setMessage("The system will save the RFID information in the server, do you wanna also associate this user rfid to this device?")
@@ -132,6 +134,8 @@ public class RFIDCaptureFragment extends GGMainFragment {
                             dialog.dismiss();
                         }
                     }).show();
+        }else{
+            hideProgressDialog();
         }
     }
 
@@ -141,7 +145,8 @@ public class RFIDCaptureFragment extends GGMainFragment {
         int error;
         if(res.error == ICCardReader.RESULT_OK){
             cardId = (Long) res.data;
-            error = App.cardReader.validateKey(cardId, ICCardReader.KEY_B, GGGlobalValues.BYTE_BLOCK, new byte[] { (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff });
+            Log.i(TAG,"Crad reader number: "+cardId);
+            error = App.cardReader.validateKey(cardId, ICCardReader.KEY_A, GGGlobalValues.BYTE_BLOCK, new byte[] { (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff });
             if (error == ICCardReader.RESULT_OK) {
                 byte[] bytes = ByteBuffer.allocate(GGGlobalValues.BYTE_SIZE).putInt(mSelectedUser.getUserId().intValue()).array();
                 Log.i(TAG,"data to store: "+ Arrays.toString(bytes));
@@ -152,13 +157,13 @@ public class RFIDCaptureFragment extends GGMainFragment {
                     isOk = Boolean.TRUE;
                     GGUtil.showAToast(getActivity(),"Card successfully configured");
                 } else {
-                    GGUtil.showAToast(getActivity(),"System fail writing the rfid card, error code: "+error);
+                    GGUtil.showAToast(getActivity(),"System fail writing the rfid card, error code: "+ RFIDErrorMessage.getErrorMessage(error));
                 }
             }else{
-                GGUtil.showAToast(getActivity(),"error in the validation of the rfdi card, error code: "+res.error);
+                GGUtil.showAToast(getActivity(),"error in the validation of the rfdi card, error code: "+RFIDErrorMessage.getErrorMessage(error));
             }
         }else{
-            GGUtil.showAToast(getActivity(),"error activating the rfdi card, error code: "+res.error);
+            GGUtil.showAToast(getActivity(),"error activating the rfdi card, error code: "+RFIDErrorMessage.getErrorMessage(res.error));
         }
         return isOk;
     }
@@ -192,6 +197,7 @@ public class RFIDCaptureFragment extends GGMainFragment {
         } catch (Exception e) {
             Log.e(TAG,"Error loading paremeters",e);
         }
+        showProgressDialog("Associating the rfid card to the user...");
         JsonObjectRequestUtil jsonObjectRequest = new JsonObjectRequestUtil(Request.Method.POST, APPEnvironment.createURL(GGGlobalValues.LOAD_USER_RFID_INFO), parameters, responseListener, errorListener);
         jsonObjectRequest.setShouldCache(false);
         MySingletonUtil.getInstance(getActivity()).addToRequestQueue(jsonObjectRequest);

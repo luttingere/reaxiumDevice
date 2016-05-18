@@ -7,6 +7,7 @@ import android.view.View;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
 import ggsmarttechnologyltd.reaxium_access_control.GGMainFragment;
@@ -54,7 +55,7 @@ public class ShowMapFragment extends GGMainFragment {
 
     @Override
     protected void setViews(View view) {
-        mRouteMap = ((MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.map)).getMap();
+        mRouteMap = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map)).getMap();
         ((AdminActivity) getActivity()).showBackButton();
     }
 

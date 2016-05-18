@@ -2,18 +2,25 @@
     package="ggsmarttechnologyltd.reaxium_access_control">
 
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <uses-permission android:name="android.permission.VIBRATE"/>
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission android:name="android.permission.CALL_PHONE"/>
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+    <permission
+        android:name="ggsmarttechnologyltd.reaxium_access_control.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="ggsmarttechnologyltd.reaxium_access_control.permission.C2D_MESSAGE" />
+    <!--<permission android:name="com.google.android.c2dm.permission.RECEIVE" />-->
 
     <application
         android:name=".App"
@@ -21,37 +28,87 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme" >
-        <activity android:name=".splash.ReaxiumSplash"  android:screenOrientation="landscape">
+        android:theme="@style/AppTheme">
+
+        <activity
+            android:name=".splash.ReaxiumSplash"
+            android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".login.activity.LoginActivity"
+            android:screenOrientation="landscape"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".activity.MainActivity"
+            android:screenOrientation="landscape"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".admin.activity.AdminActivity"
+            android:screenOrientation="landscape"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name="com.soundcloud.android.crop.CropImageActivity"
+            android:screenOrientation="landscape" />
 
-        <activity android:name=".login.activity.LoginActivity" android:screenOrientation="landscape" android:windowSoftInputMode="adjustPan"  />
-        <activity android:name=".viewprofile.activity.UserViewProfileActivity" android:screenOrientation="landscape" android:windowSoftInputMode="adjustPan"  />
-        <activity android:name=".routecontrol.activity.RouteControlActivity" android:screenOrientation="landscape" />
-        <activity android:name=".admin.activity.AdminActivity" android:windowSoftInputMode="adjustPan" android:screenOrientation="landscape" />
-        <activity android:name="com.soundcloud.android.crop.CropImageActivity" android:screenOrientation="landscape"/>
+        <!-- Services-->
+        <service
+            android:name=".service.SendLocationService"
+            android:enabled="true"
+            android:exported="true"></service>
 
-        <!-- Services -->
-        <!--<service-->
-            <!--android:name=".service.SendLocationService"-->
-            <!--android:enabled="true"-->
-            <!--android:exported="true">-->
-        <!--</service>-->
+        <!-- [ INIT ] All neccesary Receiver and service for Push Functionalities -->
 
         <service
-            android:name=".service.BiometricScannerService"
-            android:enabled="true"
-            android:exported="true">
+            android:name=".service.GcmIntentService"
+            android:exported="false" />
+
+        <receiver
+            android:name="com.google.android.gms.gcm.GcmReceiver"
+            android:exported="true"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+                <category android:name="com.luttinger.receiveapushnotification" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".service.PushGcmListenerService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            </intent-filter>
         </service>
+        <service
+            android:name=".service.PushIDListenerService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.android.gms.iid.InstanceID" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".service.PushRegistrationService"
+            android:exported="false"></service>
+
+        <!-- [ END ] All neccesary Receiver and service for Push Functionalities -->
 
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyDSr7LM9zmaOYoEwK6LBBZr3zFMgQ2B1VE"/>
+            android:value="AIzaSyBtbQD6C9C1pca7SB9sClfwaqp5OVRVKyw" />
 
+        <!--push notification-->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="76181343f5f338ffc5c6e87bc1ca54781620a30d" />
     </application>
 
 

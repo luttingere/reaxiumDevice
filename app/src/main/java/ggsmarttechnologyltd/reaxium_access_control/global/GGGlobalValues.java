@@ -19,12 +19,14 @@ public class GGGlobalValues {
 
     //Device cache storage
     public static final String DEVICE_ID = "DEVICE_ID";
+    public static final String DEVICE_SERIAL = "DEVICE_SERIAL";
     public static final String DEVICE_DESCRIPTION = "DEVICE_DESCRIPTION";
     public static final String DEVICE_NAME = "DEVICE_NAME";
     public static final String DEVICE_STATUS = "DEVICE_STATUS";
     public static final String APPLICATION_NAME = "APPLICATION_NAME";
     public static final String APPLICATION_VERSION = "APPLICATION_VERSION";
     public static final String LAST_SYNC = "LAST_SYNC";
+
 
     public static final String USER_ID_IN_SESSION = "USER_ID_IN_SESSION";
     public static final String USER_FULL_NAME_IN_SESSION = "USER_FULL_NAME_IN_SESSION";

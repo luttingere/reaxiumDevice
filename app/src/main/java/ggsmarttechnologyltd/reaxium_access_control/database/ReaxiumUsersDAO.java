@@ -7,7 +7,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import ggsmarttechnologyltd.reaxium_access_control.beans.BiometricData;
 import ggsmarttechnologyltd.reaxium_access_control.beans.Business;
@@ -138,6 +140,7 @@ public class ReaxiumUsersDAO {
         List<User> userList = null;
         User user = null;
         Cursor resultSet = null;
+        Map<Long,User> userFiltered = new HashMap<>();
         try {
             database = dbHelper.getReadableDatabase();
             String[] projection = {
@@ -149,11 +152,8 @@ public class ReaxiumUsersDAO {
                     ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_SECOND_LAST_NAME,
                     ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_PHOTO
             };
-            String selection = ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_ACCESS_TYPE + "=?";
-            String[] seelcctionArgs = {"Biometric"};
-            resultSet = database.query(ReaxiumUsersContract.ReaxiumUsers.TABLE_NAME, projection, selection, seelcctionArgs, null, null, null);
+            resultSet = database.query(ReaxiumUsersContract.ReaxiumUsers.TABLE_NAME, projection, null, null, null, null, ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_DOCUMENT_ID+" DESC");
             if (resultSet.moveToFirst()) {
-                userList = new ArrayList<>();
                 Log.i(TAG, "Biometric data found in database");
                 while (resultSet.isAfterLast() == false) {
                     user = new User();
@@ -164,7 +164,7 @@ public class ReaxiumUsersDAO {
                     user.setSecondLastName(resultSet.getString(resultSet.getColumnIndex(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_SECOND_LAST_NAME)));
                     user.setPhoto(resultSet.getString(resultSet.getColumnIndex(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_PHOTO)));
                     user.setDocumentId(resultSet.getString(resultSet.getColumnIndex(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_DOCUMENT_ID)));
-                    userList.add(user);
+                    userFiltered.put(user.getUserId(),user);
                     resultSet.moveToNext();
                 }
             }
@@ -175,6 +175,12 @@ public class ReaxiumUsersDAO {
                 if(!resultSet.isClosed()){
                     resultSet.close();
                 }
+            }
+        }
+        userList = new ArrayList<>();
+        if(userFiltered.size() > 0){
+            for(Map.Entry<Long,User> entry:userFiltered.entrySet()){
+                userList.add(entry.getValue());
             }
         }
         return userList;
@@ -282,7 +288,7 @@ public class ReaxiumUsersDAO {
                     ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_BUSINESS_NAME
             };
             String selection = ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_ACCESS_TYPE + "=? and " + ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_RFID_CODE + "=? and " +ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_ID + "=?";
-            String[] seelcctionArgs = {rfidCode,"RFID", userId};
+            String[] seelcctionArgs = {"RFID",rfidCode, userId};
             resultSet = database.query(ReaxiumUsersContract.ReaxiumUsers.TABLE_NAME, projection, selection, seelcctionArgs, null, null, null);
             if (resultSet.moveToFirst()) {
                 user = new User();

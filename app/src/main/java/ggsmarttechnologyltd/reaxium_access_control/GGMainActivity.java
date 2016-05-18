@@ -116,7 +116,11 @@ public abstract class GGMainActivity extends AppCompatActivity {
 
                 //set child activity Fragment
                 if (getMainFragment() != null) {
-                    runMyFragment(getMainFragment(),null);
+                    if(getIntent()!= null){
+                        runMyFragment(getMainFragment(),getIntent().getExtras());
+                    }else{
+                        runMyFragment(getMainFragment(),null);
+                    }
                 }
 
             } else {

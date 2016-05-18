@@ -17,6 +17,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.android.gms.iid.InstanceID;
+
 import ggsmarttechnologyltd.reaxium_access_control.GGMainActivity;
 import ggsmarttechnologyltd.reaxium_access_control.GGMainFragment;
 import ggsmarttechnologyltd.reaxium_access_control.R;
@@ -31,6 +34,7 @@ import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.VerifyBiometri
 import ggsmarttechnologyltd.reaxium_access_control.admin.threads.AutomaticFingerPrintValidationThread;
 import ggsmarttechnologyltd.reaxium_access_control.global.GGGlobalValues;
 import ggsmarttechnologyltd.reaxium_access_control.login.activity.LoginActivity;
+import ggsmarttechnologyltd.reaxium_access_control.service.SendLocationService;
 import ggsmarttechnologyltd.reaxium_access_control.util.GGUtil;
 import ggsmarttechnologyltd.reaxium_access_control.util.SharedPreferenceUtil;
 
@@ -81,7 +85,9 @@ public class AdminActivity extends GGMainActivity {
             ((TextView)header.findViewById(R.id.user_full_name)).setText("Invited User");
         }
         mMenuDrawer.addHeaderView(header);
+
     }
+
 
     @Override
     protected void setViewsEvents() {
@@ -215,6 +221,7 @@ public class AdminActivity extends GGMainActivity {
                     Intent goToLoginPage = new Intent(this, LoginActivity.class);
                     startActivity(goToLoginPage);
                     finish();
+                    break;
                 case R.id.show_map:
                     runMyFragment(new ShowMapFragment(), null,menuItem.getItemId());
                     mDrawerLayout.closeDrawer(GravityCompat.END);

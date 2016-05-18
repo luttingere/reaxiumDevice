@@ -24,7 +24,7 @@ public class UserINFoundDialog extends Dialog {
     /**
      * Time to wait for dismiss the dialog
      */
-    public static final Integer SLEEP_TIME = 2000;
+    public static final Integer SLEEP_TIME = 3000;
 
     /**
      * User owner the info showed in the dialog
@@ -96,12 +96,16 @@ public class UserINFoundDialog extends Dialog {
     }
 
     private void fillFields(){
-        userName.setText(user.getFirstName() + " " + user.getSecondName() + " " + user.getFirstLastName() + " " + user.getSecondLastName());
-        userDocumentId.setText(user.getDocumentId());
-        if (user.getBusiness() != null) {
-            userBusinessName.setText(user.getBusiness().getBusinessName());
+        if(user != null){
+            userName.setText(user.getFirstName() + " " + user.getSecondName() + " " + user.getFirstLastName() + " " + user.getSecondLastName());
+            userDocumentId.setText(user.getDocumentId());
+            if (user.getBusiness() != null) {
+                userBusinessName.setText(user.getBusiness().getBusinessName());
+            }
+            setUserPhoto(user);
+        }else{
+            userPhotoLoader.setVisibility(View.GONE);
         }
-        setUserPhoto(user);
     }
 
     private void setUserPhoto(User user) {

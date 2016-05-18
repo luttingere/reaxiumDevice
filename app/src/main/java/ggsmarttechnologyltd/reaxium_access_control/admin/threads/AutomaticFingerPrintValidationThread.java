@@ -126,6 +126,8 @@ public class AutomaticFingerPrintValidationThread extends Thread {
                         ((AdminActivity)mContext).dismissProgressDialog();
                         Log.i(TAG,"validate whats happened if the biometric miss the finger after validate one on the hole");
                     }
+                }else{
+                    Log.d(TAG,"There is no finger, error code: "+fingerCaptureResult.error);
                 }
             } catch (Exception e) {
                 dismissProgressDialog();

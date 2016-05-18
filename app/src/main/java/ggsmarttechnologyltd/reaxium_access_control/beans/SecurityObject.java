@@ -7,6 +7,8 @@ public class SecurityObject extends AppBean {
 
     private Long cardId;
     private Integer userId;
+    private int errorCode = 0;
+    private String errorMessage;
 
 
     public Long getCardId() {
@@ -23,5 +25,21 @@ public class SecurityObject extends AppBean {
 
     public void setUserId(Integer userId) {
         this.userId = userId;
+    }
+
+    public int getErrorCode() {
+        return errorCode;
+    }
+
+    public void setErrorCode(int errorCode) {
+        this.errorCode = errorCode;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 }

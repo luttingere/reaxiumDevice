@@ -1,9 +1,12 @@
 package ggsmarttechnologyltd.reaxium_access_control.login.activity;
 
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -17,6 +20,7 @@ import java.lang.reflect.Type;
 import ggsmarttechnologyltd.reaxium_access_control.GGMainActivity;
 import ggsmarttechnologyltd.reaxium_access_control.GGMainFragment;
 import ggsmarttechnologyltd.reaxium_access_control.R;
+import ggsmarttechnologyltd.reaxium_access_control.activity.MainActivity;
 import ggsmarttechnologyltd.reaxium_access_control.admin.activity.AdminActivity;
 import ggsmarttechnologyltd.reaxium_access_control.beans.ApiResponse;
 import ggsmarttechnologyltd.reaxium_access_control.beans.ReaxiumDevice;
@@ -43,7 +47,7 @@ public class LoginActivity extends GGMainActivity {
 
     private EditText mUserNameInput;
     private EditText mPasswordInput;
-    private Button mLoginFormSubmit;
+    private RelativeLayout mLoginFormSubmit;
     private SharedPreferenceUtil sharedPreferenceUtil;
 
 
@@ -54,10 +58,11 @@ public class LoginActivity extends GGMainActivity {
 
     @Override
     protected void setViews() {
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         sharedPreferenceUtil = SharedPreferenceUtil.getInstance(this);
         mUserNameInput = (EditText) findViewById(R.id.username_input);
         mPasswordInput = (EditText) findViewById(R.id.password_input);
-        mLoginFormSubmit = (Button) findViewById(R.id.login_form_submit);
+        mLoginFormSubmit = (RelativeLayout) findViewById(R.id.login_container);
         mLoginFormSubmit.requestFocus();
         GGUtil.hideKeyboard(this);
     }
@@ -92,11 +97,25 @@ public class LoginActivity extends GGMainActivity {
                             if(apiResponse.getReaxiumResponse().getObject() != null){
                                 if(!apiResponse.getReaxiumResponse().getObject().isEmpty()){
                                     if(apiResponse.getReaxiumResponse().getObject().get(0).getUser() != null){
-                                        storeUserLogin(apiResponse.getReaxiumResponse().getObject().get(0).getUser());
+                                        User user = apiResponse.getReaxiumResponse().getObject().get(0).getUser();
+                                        storeUserLogin(user);
+
+                                        if(user.getUserType().getUserTypeName().equalsIgnoreCase("ADMINISTRATOR")){
+
+                                            GGUtil.goToScreen(LoginActivity.this,null, AdminActivity.class);
+
+                                        }else if(user.getUserType().getUserTypeName().equalsIgnoreCase("DRIVER")){
+
+                                            Bundle arguments = new Bundle();
+                                            arguments.putSerializable("USER_VALUE",user);
+                                            GGUtil.goToScreen(LoginActivity.this,arguments, MainActivity.class);
+
+                                        }else{
+                                            GGUtil.showAToast(LoginActivity.this, "Invalid User");
+                                        }
                                     }
                                 }
                             }
-                            GGUtil.goToScreen(LoginActivity.this,null, AdminActivity.class);
                         } else {
                             GGUtil.showAToast(LoginActivity.this, apiResponse.getReaxiumResponse().getMessage());
                         }

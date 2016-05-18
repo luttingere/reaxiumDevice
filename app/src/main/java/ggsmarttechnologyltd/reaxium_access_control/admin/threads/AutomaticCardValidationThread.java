@@ -6,6 +6,7 @@ import android.util.Log;
 import cn.com.aratek.iccard.ICCardReader;
 import cn.com.aratek.util.Result;
 import ggsmarttechnologyltd.reaxium_access_control.admin.activity.AdminActivity;
+import ggsmarttechnologyltd.reaxium_access_control.admin.errormessages.RFIDErrorMessage;
 import ggsmarttechnologyltd.reaxium_access_control.beans.SecurityObject;
 import ggsmarttechnologyltd.reaxium_access_control.global.GGGlobalValues;
 import ggsmarttechnologyltd.reaxium_access_control.util.FailureAccessPlayerSingleton;
@@ -43,13 +44,20 @@ public class AutomaticCardValidationThread extends Thread {
                 }
                 securityObject = GGUtil.scanRFID(cardReader);
                 if (securityObject != null) {
-                    if(securityObject.getUserId() != 0){
-                        cardReadedSuccessfully = Boolean.TRUE;
-                        SuccessfulAccessPlayerSingleton.getInstance(mContext).initRingTone();
-                        scannersActivityHandler.sendMessage(scannersActivityHandler.obtainMessage(ScannersActivityHandler.VALIDATE_SCANNER_RESULT, securityObject));
+                    if(securityObject.getErrorCode() == 0){
+                        if(securityObject.getUserId() != null){
+                            cardReadedSuccessfully = Boolean.TRUE;
+                            scannersActivityHandler.sendMessage(scannersActivityHandler.obtainMessage(ScannersActivityHandler.VALIDATE_SCANNER_RESULT, securityObject));
+                        }else{
+                            FailureAccessPlayerSingleton.getInstance(mContext).initRingTone();
+                            scannersActivityHandler.sendMessage(scannersActivityHandler.obtainMessage(ScannersActivityHandler.ERROR_ROUTINE, "Not valid user"));
+                        }
                     }else{
-                        FailureAccessPlayerSingleton.getInstance(mContext).initRingTone();
-                        scannersActivityHandler.sendMessage(scannersActivityHandler.obtainMessage(ScannersActivityHandler.ERROR_ROUTINE, "This card are not configured"));
+                       if(securityObject.getErrorCode() != RFIDErrorMessage.NO_CARD){
+                           scannersActivityHandler.sendMessage(scannersActivityHandler.obtainMessage(ScannersActivityHandler.ERROR_ROUTINE, "Card read failure, "+RFIDErrorMessage.getErrorMessage(securityObject.getErrorCode())));
+                       }else{
+                           Log.d(TAG,"No card");
+                       }
                     }
                 }
             } catch (Exception e) {

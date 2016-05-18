@@ -26,7 +26,7 @@ public class InitScannersThread extends Thread {
     public void run() {
         showProgressDialog();
         GGUtil.startFingerScannerService(mContext, biometricHandler);
-        //GGUtil.openCardReader(mContext,rfidHandler);
+        GGUtil.openCardReader(mContext,rfidHandler);
         dismissProgressDialog();
     }
 

@@ -7,7 +7,7 @@
     <ImageView
         android:textColor="@android:color/black"
         android:layout_centerInParent="true"
-        android:src="@drawable/logo_main_t4ss"
+        android:src="@drawable/logo_reaxium"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 

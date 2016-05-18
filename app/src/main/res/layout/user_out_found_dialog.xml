@@ -3,34 +3,49 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/profile_view_box_shape"
-    android:padding="25dp">
-
-    <ImageView
-        android:id="@+id/close_dialog"
-        android:layout_marginTop="10dp"
-        android:layout_marginRight="15dp"
-        android:src="@drawable/close_icon"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_width="50dp"
-        android:layout_height="50dp" />
+    android:padding="25dp"
+    android:background="@color/white">
 
     <RelativeLayout
+        android:id="@+id/title_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="@dimen/profile_view_border_indicator">
+        android:layout_height="70dp">
+
+        <ImageView
+            android:layout_centerInParent="true"
+            android:src="@drawable/logo_reaxium"
+            android:layout_width="150dp"
+            android:layout_height="match_parent" />
+
+
+        <ImageView
+            android:id="@+id/close_dialog"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="15dp"
+            android:src="@drawable/close_icon"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_width="25dp"
+            android:layout_height="25dp" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_below="@+id/title_container"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:id="@+id/user_info_container"
+        android:layout_width="match_parent"
+        android:layout_height="330dp">
 
         <RelativeLayout
-            android:background="@android:color/white"
-            android:id="@+id/user_profile_container"
-            android:layout_width="@dimen/profile_view_user_avatar_container_width"
-            android:layout_height="@dimen/profile_view_user_avatar_container_height"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true">
+            android:gravity="right"
+            android:id="@+id/user_picture_container"
+            android:layout_width="0dp"
+            android:layout_weight="50"
+            android:layout_height="match_parent">
 
             <ProgressBar
-                android:visibility="gone"
+                android:visibility="visible"
                 android:id="@+id/user_image_loader"
                 style="?android:attr/progressBarStyle"
                 android:layout_width="150dp"
@@ -39,111 +54,195 @@
 
             <com.makeramen.RoundedImageView xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/user_photo"
-                android:layout_width="320dp"
-                android:layout_height="300dp"
-                android:layout_centerInParent="true"
+                android:layout_width="220dp"
+                android:layout_height="220dp"
                 android:clickable="true"
-                android:scaleType="centerCrop"
-                android:padding="10dp"
+                android:layout_centerInParent="true"
                 android:src="@drawable/user_avatar"
                 app:riv_border_width="1dip"
-                app:riv_corner_radius="30dip"
-                app:riv_oval="true" />
+                app:riv_corner_radius="10dip"
+                app:riv_border_color="@android:color/transparent"
+                app:riv_oval="false" />
 
 
         </RelativeLayout>
 
 
         <LinearLayout
-            android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@+id/user_profile_container"
-            android:layout_width="@dimen/profile_view_user_avatar_container_width"
-            android:layout_height="@dimen/profile_view_user_avatar_container_height"
-            android:layout_alignParentRight="true"
             android:gravity="center"
+            android:layout_width="0dp"
+            android:layout_weight="45"
+            android:paddingLeft="20dp"
+            android:layout_height="match_parent"
             android:orientation="vertical">
 
             <LinearLayout
-                android:id="@+id/username_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:background="@drawable/login_box_shape">
+                android:layout_width="match_parent"
+                android:layout_height="55dp">
 
-                <ImageView
-                    android:background="@drawable/login_box_shape"
-                    android:padding="10dp"
-                    android:src="@drawable/user_avatar_thumnail"
-                    android:layout_width="70dp"
-                    android:layout_height="@dimen/login_input_text_height" />
+                <LinearLayout
+                    android:layout_gravity="center_vertical"
+                    android:background="@drawable/rounded_corners_orange"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:src="@drawable/user_icon"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp" />
+
+
+                </LinearLayout>
 
                 <TextView
-                    android:padding="10dp"
-                    android:gravity="center_vertical"
-                    android:textColor="@android:color/black"
                     android:id="@+id/username_input"
-                    android:textSize="18sp"
+                    android:textColor="@color/black"
+                    android:paddingLeft="10dp"
+                    android:gravity="center_vertical"
+                    android:text="Student name"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/login_input_text_height" />
+                    android:layout_height="match_parent" />
 
             </LinearLayout>
 
-
             <LinearLayout
-                android:id="@+id/lisense_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:background="@drawable/login_box_shape">
+                android:layout_width="match_parent"
+                android:layout_height="55dp">
 
-                <ImageView
-                    android:background="@drawable/login_box_shape"
-                    android:padding="10dp"
-                    android:src="@drawable/document_id_icon"
-                    android:layout_width="70dp"
-                    android:layout_height="@dimen/login_input_text_height" />
+                <LinearLayout
+                    android:layout_gravity="center_vertical"
+                    android:background="@drawable/rounded_corners_yellow"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:src="@drawable/student_id_icon"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp" />
+
+
+                </LinearLayout>
 
                 <TextView
-                    android:padding="10dp"
-                    android:gravity="center_vertical"
-                    android:textColor="@android:color/black"
                     android:id="@+id/user_document_id"
-                    android:textSize="18sp"
+                    android:textColor="@color/black"
+                    android:paddingLeft="10dp"
+                    android:gravity="center_vertical"
+                    android:text="Student ID"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/login_input_text_height" />
+                    android:layout_height="match_parent" />
 
             </LinearLayout>
 
-
-
             <LinearLayout
-                android:id="@+id/school_bus_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:background="@drawable/login_box_shape">
+                android:layout_width="match_parent"
+                android:layout_height="55dp">
 
-                <ImageView
-                    android:background="@drawable/login_box_shape"
-                    android:padding="10dp"
-                    android:src="@drawable/business_icon"
-                    android:layout_width="70dp"
-                    android:layout_height="@dimen/login_input_text_height" />
+                <LinearLayout
+                    android:layout_gravity="center_vertical"
+                    android:background="@drawable/rounded_corners_sand"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:src="@drawable/bus_number_icon"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp" />
+
+
+                </LinearLayout>
 
                 <TextView
-                    android:padding="10dp"
+                    android:id="@+id/bus_number"
+                    android:textColor="@color/black"
+                    android:paddingLeft="10dp"
                     android:gravity="center_vertical"
-                    android:textColor="@android:color/black"
-                    android:id="@+id/user_business_name"
-                    android:textSize="18sp"
+                    android:text="Bus number"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/login_input_text_height" />
+                    android:layout_height="match_parent" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="55dp">
+
+                <LinearLayout
+                    android:layout_gravity="center_vertical"
+                    android:background="@drawable/rounded_corners_yellow"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:src="@drawable/stop_bus_icon"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp" />
+
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/stop_bus_number"
+                    android:textColor="@color/black"
+                    android:paddingLeft="10dp"
+                    android:gravity="center_vertical"
+                    android:text="Stop Number"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="55dp">
+
+                <LinearLayout
+                    android:layout_gravity="center_vertical"
+                    android:background="@drawable/rounded_corners_orange"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:src="@drawable/school_icon"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp" />
+
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/user_business_name"
+                    android:textColor="@color/black"
+                    android:paddingLeft="10dp"
+                    android:gravity="center_vertical"
+                    android:text="School Name"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
 
             </LinearLayout>
 
 
         </LinearLayout>
 
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/rounded_corners_blue"
+        android:layout_below="@+id/user_info_container"
+        android:layout_width="400dp"
+        android:layout_height="60dp">
 
     </RelativeLayout>
 

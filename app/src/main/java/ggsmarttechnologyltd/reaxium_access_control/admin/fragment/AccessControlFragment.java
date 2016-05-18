@@ -50,6 +50,7 @@ import ggsmarttechnologyltd.reaxium_access_control.util.GGUtil;
 import ggsmarttechnologyltd.reaxium_access_control.util.JsonObjectRequestUtil;
 import ggsmarttechnologyltd.reaxium_access_control.util.JsonUtil;
 import ggsmarttechnologyltd.reaxium_access_control.util.MySingletonUtil;
+import ggsmarttechnologyltd.reaxium_access_control.util.SuccessfulAccessPlayerSingleton;
 
 /**
  * Created by Eduardo Luttinger on 26/04/2016.
@@ -98,6 +99,8 @@ public class AccessControlFragment extends GGMainFragment implements OnUserClick
     @Override
     protected void setViews(View view) {
         setRetainInstance(Boolean.TRUE);
+        accessControlDAO = AccessControlDAO.getInstance(getActivity());
+        reaxiumUsersDAO = ReaxiumUsersDAO.getInstance(getActivity());
         fillUserListINAndOutData();
         userINList = (RecyclerView) view.findViewById(R.id.user_in_list);
         linearINLayoutManager = new LinearLayoutManager(getActivity());
@@ -111,7 +114,6 @@ public class AccessControlFragment extends GGMainFragment implements OnUserClick
         adapterOUT = new UsersListAdapter(getActivity(), this, listOUT, LIST_OUT_NAME);
         userOUTList.setAdapter(adapterOUT);
         ((AdminActivity) getActivity()).showBackButton();
-        accessControlDAO = AccessControlDAO.getInstance(getActivity());
     }
 
 
@@ -126,17 +128,16 @@ public class AccessControlFragment extends GGMainFragment implements OnUserClick
 
     @Override
     public void onPause() {
-        //AutomaticCardValidationThread.stopScanner();
         AutomaticFingerPrintValidationThread.stopScanner();
         GGUtil.closeFingerPrint();
-        //GGUtil.closeCardReader(getActivity(),handler);
+        AutomaticCardValidationThread.stopScanner();
+        GGUtil.closeCardReader(getActivity(),handler);
         Log.i(TAG, "the scanners han bean turned off successfully");
         super.onPause();
     }
 
     private void fillUserListINAndOutData() {
-        ReaxiumUsersDAO dao = ReaxiumUsersDAO.getInstance(getActivity());
-        List<User> listOfUserAssociated = dao.getAllUsersRegisteredInTheDevice();
+        List<User> listOfUserAssociated = reaxiumUsersDAO.getAllUsersRegisteredInTheDevice();
         accessControlDAO = AccessControlDAO.getInstance(getActivity());
         AccessControl accessControl = null;
         if (listOfUserAssociated != null) {
@@ -309,18 +310,29 @@ public class AccessControlFragment extends GGMainFragment implements OnUserClick
         protected void validateScannerResult(AppBean bean) {
             SecurityObject securityObject = (SecurityObject) bean;
             User user = null;
+            String userAccessType = "";
+            String userAccessTypeID = "";
+            String trafficInfo ="";
             if(securityObject.getCardId() == null){
+                userAccessType = "BIOMETRIC";
+                userAccessTypeID = "2";
                 user =reaxiumUsersDAO.getUserById("" + securityObject.getUserId());
             }else{
+                userAccessType = "RFID";
+                userAccessTypeID = "3";
                 user =reaxiumUsersDAO.getUserByIdAndRfidCode("" + securityObject.getUserId(),""+securityObject.getCardId());
             }
+            String trafficInfoResult = "";
             if (user != null) {
+                SuccessfulAccessPlayerSingleton.getInstance(getActivity()).initRingTone();
+                trafficInfo = user.getFirstName()+" "+user.getFirstLastName()+", @IN_OR_OUT@ #, at @Time@";
                 user.setAccessTime(timeFormat.format(new Date()));
                 Long lastInsertedId = null;
                 String trafficTypeId = "1";
                 if (findAndRemoveUserFromList(listIN, user)) {
                     trafficTypeId = "2";
-                    lastInsertedId = accessControlDAO.insertUserAccess(user.getUserId(), "BIOMETRIC", LIST_OUT_NAME);
+                    trafficInfoResult = trafficInfo.replace("@IN_OR_OUT@","Off the bus");
+                    lastInsertedId = accessControlDAO.insertUserAccess(user.getUserId(), userAccessType, LIST_OUT_NAME);
                     userOUTFoundDialog = new UserOUTFoundDialog(getActivity(), android.R.style.Theme_NoTitleBar_Fullscreen);
                     userOUTFoundDialog.updateUserInfo(user);
                     userOUTFoundDialog.show();
@@ -329,7 +341,8 @@ public class AccessControlFragment extends GGMainFragment implements OnUserClick
                     Collections.sort(listOUT);
                 } else if (findAndRemoveUserFromList(listOUT, user)) {
                     trafficTypeId = "1";
-                    lastInsertedId = accessControlDAO.insertUserAccess(user.getUserId(), "BIOMETRIC", LIST_IN_NAME);
+                    trafficInfoResult = trafficInfo.replace("@IN_OR_OUT@","aboard the bus");
+                    lastInsertedId = accessControlDAO.insertUserAccess(user.getUserId(), userAccessType, LIST_IN_NAME);
                     userINFoundDialog = new UserINFoundDialog(getActivity(), android.R.style.Theme_NoTitleBar_Fullscreen);
                     userINFoundDialog.updateUserInfo(user);
                     userINFoundDialog.show();
@@ -339,7 +352,7 @@ public class AccessControlFragment extends GGMainFragment implements OnUserClick
                 }
                 adapterIN.refreshList(listIN);
                 adapterOUT.refreshList(listOUT);
-                saveAccessInServer(lastInsertedId,user.getUserId(),trafficTypeId,getSharedPreferences().getLong(GGGlobalValues.DEVICE_ID),"2","");
+                saveAccessInServer(lastInsertedId,user.getUserId(),trafficTypeId,getSharedPreferences().getLong(GGGlobalValues.DEVICE_ID),userAccessTypeID,trafficInfoResult);
             } else {
                 FailureAccessPlayerSingleton.getInstance(getActivity()).initRingTone();
                 GGUtil.showAToast(getActivity(), "Invalid user, not registered: " + securityObject.getUserId());

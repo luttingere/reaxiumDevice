@@ -1,6 +1,7 @@
 package ggsmarttechnologyltd.reaxium_access_control.admin.threads;
 
 import android.content.Context;
+import android.util.Log;
 
 import ggsmarttechnologyltd.reaxium_access_control.App;
 import ggsmarttechnologyltd.reaxium_access_control.GGMainActivity;
@@ -28,15 +29,22 @@ public class InitScannersInAutoModeThread extends Thread {
     @Override
     public void run() {
         showProgressDialog();
-        if(GGUtil.startFingerScannerService(mContext, scannersHandler)){
-            automaticFingerPrintValidationThread = new AutomaticFingerPrintValidationThread(App.fingerprintScanner, scannersHandler,mContext);
-            automaticFingerPrintValidationThread.start();
+        try{
+            if(GGUtil.startFingerScannerService(mContext, scannersHandler)){
+                automaticFingerPrintValidationThread = new AutomaticFingerPrintValidationThread(App.fingerprintScanner, scannersHandler,mContext);
+                automaticFingerPrintValidationThread.start();
+            }
+        }catch (Exception e){
+            Log.e(TAG,"Finger print error:",e);
         }
-//         if(GGUtil.openCardReader(mContext,scannersHandler)){
-//             automaticCardValidationThread = new AutomaticCardValidationThread(App.cardReader,scannersHandler,mContext);
-//             automaticCardValidationThread.start();
-//         }
-
+        try{
+            if(GGUtil.openCardReader(mContext,scannersHandler)){
+                automaticCardValidationThread = new AutomaticCardValidationThread(App.cardReader,scannersHandler,mContext);
+                automaticCardValidationThread.start();
+            }
+        }catch (Exception e){
+            Log.e(TAG,"Card reader error:",e);
+        }
         dismissProgressDialog();
     }
 

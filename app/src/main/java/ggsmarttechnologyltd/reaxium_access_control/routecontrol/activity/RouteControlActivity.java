@@ -7,6 +7,7 @@ import android.util.Log;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -38,9 +39,7 @@ public class RouteControlActivity extends GGMainActivity {
 
     @Override
     protected void setViews() {
-        mRouteMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
-
-
+        mRouteMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
     }
 
     @Override

@@ -10,9 +10,14 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.android.gms.iid.InstanceID;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import ggsmarttechnologyltd.reaxium_access_control.R;
+import ggsmarttechnologyltd.reaxium_access_control.global.GGGlobalValues;
 import ggsmarttechnologyltd.reaxium_access_control.util.GGUtil;
 
 
@@ -24,7 +29,7 @@ public class SendLocationService extends Service implements LocationListener {
     /**
      * tag for log proposals
      */
-    private static final String TAG = SendLocationService.class.getName();
+    private static final String TAG = GGGlobalValues.TRACE_ID;
 
     /**
      * 1 second in milliseconds
@@ -83,11 +88,15 @@ public class SendLocationService extends Service implements LocationListener {
     }
 
 
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "Se inicia el servicio de notificacion de ubicacion");
         Location location = getLocation();
-        notifyMyPosition(location.getLatitude(), location.getLongitude());
+        Log.i(TAG,"lOCATION"+location);
+        if(location != null){
+            notifyMyPosition(location.getLatitude(), location.getLongitude());
+        }
         return START_STICKY;
     }
 
@@ -97,6 +106,8 @@ public class SendLocationService extends Service implements LocationListener {
     private void notifyMyPosition(Double latitude, Double longitude) {
         Log.i(TAG, "Notificando posicion: Latitude: "+latitude+" Longitude: "+longitude);
     }
+
+
 
 
     /**
@@ -117,6 +128,7 @@ public class SendLocationService extends Service implements LocationListener {
 
                 if (!isGPSEnabled && !isNetworkEnabled) {
                     // no network provider is enabled. DEFAULT COORDINATES
+                    Log.i(TAG,"no network provider enabled");
 
                 } else {
                     this.canGetLocation = true;

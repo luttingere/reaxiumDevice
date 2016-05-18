@@ -170,53 +170,51 @@ public class ConfigureDeviceFragment extends GGMainFragment {
                             Boolean fillOk = dao.fillUsersTable(apiResponse.getReaxiumResponse().getObject());
 
                             if (fillOk) {
+
                                 changeProgressDialogMessage(getString(R.string.synchronize_device_biometrics_progress_message));
+
+                                //Run the biometric store information process
                                 Log.i(TAG, "prepared to extract biometric data to the device db");
                                 List<BiometricData> biometricDataList = dao.getUsersBiometricData();
-
-                                if (biometricDataList != null) {
+                                if (biometricDataList != null && !biometricDataList.isEmpty()) {
                                     Log.i(TAG, "biometric data retrieved successfully, biometric count: " + biometricDataList.size());
-                                    Boolean enrollOk = BiometricDAO.storeBiometrics(biometricDataList);
-
+                                    Boolean enrollOk = BiometricDAO.storeBiometrics(biometricDataList, getActivity());
                                     if (enrollOk) {
-
-                                        GGUtil.showAToast(getActivity(), apiResponse.getReaxiumResponse().getMessage());
-
-                                        if(accessControlList != null && !accessControlList.isEmpty()){
-                                            new AlertDialog.Builder(getActivity(), R.style.MyDialogTheme)
-                                                    .setTitle("Reset Access Control Records")
-                                                    .setMessage("all access control records in the device have been synchronized with the Reaxium Cloud. Do you want to reset them in the device?")
-                                                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                                        @Override
-                                                        public void onClick(DialogInterface dialog, int which) {
-                                                            showProgressDialog("Restoring Access Control Data");
-                                                            accessControlDAO.deleteAllValuesFromAccessControlTable();
-                                                            hideProgressDialog();
-                                                            GGUtil.showAToast(getActivity(), "Access Control Records han been restored");
-                                                            dialog.dismiss();
-                                                        }
-                                                    })
-                                                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                                        @Override
-                                                        public void onClick(DialogInterface dialog, int which) {
-                                                            if(outOfSyncList!= null && !outOfSyncList.isEmpty()){
-                                                                accessControlDAO.markAsRegisteredInCloudAsBulk(outOfSyncList);
-                                                            }
-                                                            dialog.dismiss();
-                                                        }
-                                                    }).show();
-                                        }
-
-                                    } else {
-
-                                        GGUtil.showAToast(getActivity(), "Error enrrolling biometric info in the device");
-
+                                        Log.i(TAG, "biometric information stored successfully");
+                                    }else{
+                                        Log.i(TAG,"Error storing the biometric information in the device");
                                     }
-                                } else {
+                                }else{
+                                    Log.i(TAG,"No biometric information found");
+                               }
 
-                                    GGUtil.showAToast(getActivity(), "Error getting the biometric info from device db");
 
+                                //Run the ask to the user
+                                if(accessControlList != null && !accessControlList.isEmpty()){
+                                    new AlertDialog.Builder(getActivity(), R.style.MyDialogTheme)
+                                            .setTitle("Reset Access Control Records")
+                                            .setMessage("all access control records in the device have been synchronized with the Reaxium Cloud. Do you want to reset them in the device?")
+                                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    showProgressDialog("Restoring Access Control Data");
+                                                    accessControlDAO.deleteAllValuesFromAccessControlTable();
+                                                    hideProgressDialog();
+                                                    GGUtil.showAToast(getActivity(), "Access Control Records han been restored");
+                                                    dialog.dismiss();
+                                                }
+                                            })
+                                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    if(outOfSyncList!= null && !outOfSyncList.isEmpty()){
+                                                        accessControlDAO.markAsRegisteredInCloudAsBulk(outOfSyncList);
+                                                    }
+                                                    dialog.dismiss();
+                                                }
+                                            }).show();
                                 }
+
                             } else {
 
                                 GGUtil.showAToast(getActivity(), "Error saving the reaxium users data in device db");

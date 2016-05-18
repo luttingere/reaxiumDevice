@@ -17,6 +17,7 @@ import ggsmarttechnologyltd.reaxium_access_control.GGMainFragment;
 import ggsmarttechnologyltd.reaxium_access_control.R;
 import ggsmarttechnologyltd.reaxium_access_control.global.GGGlobalValues;
 import ggsmarttechnologyltd.reaxium_access_control.login.activity.LoginActivity;
+import ggsmarttechnologyltd.reaxium_access_control.service.SendLocationService;
 
 /**
  * Created by Eduardo Luttinger G&G on 11/04/2016.
@@ -26,6 +27,7 @@ public class ReaxiumSplash extends GGMainActivity {
     /**
      *
      */
+
     private static final long SPLASH_SCREEN_DELAY = 2000;
 
     @Override
@@ -44,7 +46,6 @@ public class ReaxiumSplash extends GGMainActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        iniFingerPrintAlgorith();
         finishTheSplash();
     }
 
@@ -61,25 +62,16 @@ public class ReaxiumSplash extends GGMainActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        if (!isTaskRoot()) {
-//            finish();
-//            return;
-//        }
+        if (!isTaskRoot()) {
+            finish();
+            return;
+        }
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
     }
 
-    private void iniFingerPrintAlgorith(){
-        int error =0;
-        if((error = App.bione.initialize(this, GGGlobalValues.BION_DB_PATH)) == Bione.RESULT_OK){
-            Log.i(TAG, "Bione version: "+Integer.toHexString(Bione.getVersion()));
-        }else{
-            Log.e(TAG, "Error initializing Bion algorith error code: " + error);
-        }
-    }
-
-
+    
     private void finishTheSplash() {
         TimerTask task = new TimerTask() {
             @Override
@@ -91,5 +83,7 @@ public class ReaxiumSplash extends GGMainActivity {
         Timer timer = new Timer();
         timer.schedule(task, SPLASH_SCREEN_DELAY);
     }
+
+
 
 }
