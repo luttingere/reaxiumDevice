@@ -10,6 +10,8 @@
         android:layout_height="match_parent">
 
         <RelativeLayout
+            android:clickable="true"
+            android:id="@+id/allContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@android:color/white">
@@ -78,9 +80,11 @@
                             android:layout_alignParentBottom="true"
                             android:id="@+id/user_document_id"
                             style="@style/userAddTextStyle"
+                            android:inputType="phone"
+                            android:digits="1234567890"
                             android:layout_width="match_parent"
                             android:hint="Document ID"
-                            android:inputType="textPersonName" />
+                             />
 
                     </RelativeLayout>
 
@@ -192,7 +196,7 @@
                         <TextView
                             android:textSize="20sp"
                             android:layout_alignParentTop="true"
-                            android:text="Second Name:"
+                            android:text="Middle Name:"
                             android:textStyle="bold"
                             android:textColor="@color/colorPrimary"
                             android:layout_width="match_parent"
@@ -203,7 +207,7 @@
                             android:id="@+id/user_second_name"
                             style="@style/userAddTextStyle"
                             android:layout_width="match_parent"
-                            android:hint="Second Name"
+                            android:hint="Middle Name"
                             android:inputType="textPersonName" />
 
                     </RelativeLayout>
@@ -258,7 +262,7 @@
                         <TextView
                             android:textSize="20sp"
                             android:layout_alignParentTop="true"
-                            android:text="Second Last Name:"
+                            android:text="Email:"
                             android:textStyle="bold"
                             android:textColor="@color/colorPrimary"
                             android:layout_width="match_parent"
@@ -266,13 +270,15 @@
 
                         <EditText
                             android:layout_alignParentBottom="true"
-                            android:id="@+id/user_second_last_name"
+                            android:id="@+id/user_email"
                             style="@style/userAddTextStyle"
                             android:layout_width="match_parent"
-                            android:hint="Second Last Name"
-                            android:inputType="textPersonName" />
+                            android:hint="Email"
+                            android:inputType="textEmailAddress" />
 
                     </RelativeLayout>
+
+
 
 
                 </LinearLayout>
@@ -288,23 +294,6 @@
                         android:layout_height="match_parent"
                         android:layout_width="0dp"
                         android:layout_weight="35">
-
-                        <TextView
-                            android:textSize="20sp"
-                            android:layout_alignParentTop="true"
-                            android:text="Email:"
-                            android:textStyle="bold"
-                            android:textColor="@color/colorPrimary"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent" />
-
-                        <EditText
-                            android:layout_alignParentBottom="true"
-                            android:id="@+id/user_email"
-                            style="@style/userAddTextStyle"
-                            android:layout_width="match_parent"
-                            android:hint="Email"
-                            android:inputType="textPersonName" />
 
                     </RelativeLayout>
 
@@ -350,7 +339,12 @@
             </LinearLayout>
         </RelativeLayout>
 
+        <RelativeLayout
+            android:layout_below="@+id/allContainer"
+            android:layout_height="250dp"
+            android:layout_width="match_parent">
 
+        </RelativeLayout>
 
     </RelativeLayout>
 </ScrollView>

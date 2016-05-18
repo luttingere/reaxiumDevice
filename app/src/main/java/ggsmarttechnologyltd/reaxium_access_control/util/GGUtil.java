@@ -45,11 +45,18 @@ public class GGUtil {
      * @param screen
      */
     public static void goToScreen(Context context, Bundle arguments, Class screen) {
-        Intent goToTheMain = new Intent(context, screen);
-        if (arguments != null) {
-            goToTheMain.putExtras(arguments);
+        try {
+            Intent goToTheMain = new Intent(context, screen);
+            if (arguments != null) {
+                goToTheMain.putExtras(arguments);
+            }
+            goToTheMain.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            context.startActivity(goToTheMain);
+            ((Activity)context).finish();
+        }catch (Exception e){
+            Log.e(TAG,"",e);
         }
-        context.startActivity(goToTheMain);
+
     }
 
 

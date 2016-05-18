@@ -176,7 +176,7 @@ public class RFIDCaptureFragment extends GGMainFragment {
                 Type responseType = new TypeToken<ApiResponse<Object>>() {}.getType();
                 ApiResponse<Object> apiResponse = JsonUtil.getEntityFromJSON(response, responseType);
                 if (apiResponse.getReaxiumResponse().getCode() == GGGlobalValues.SUCCESSFUL_API_RESPONSE_CODE) {
-                    GGUtil.showAToast(getActivity(),  apiResponse.getReaxiumResponse().getMessage());
+                    GGUtil.showAToast(getActivity(),  "Card configuration successfully saved");
                 } else {
                     GGUtil.showAToast(getActivity(), apiResponse.getReaxiumResponse().getMessage());
                 }
@@ -197,7 +197,7 @@ public class RFIDCaptureFragment extends GGMainFragment {
         } catch (Exception e) {
             Log.e(TAG,"Error loading paremeters",e);
         }
-        showProgressDialog("Associating the rfid card to the user...");
+        showProgressDialog("Saving card configuration in the cloud...");
         JsonObjectRequestUtil jsonObjectRequest = new JsonObjectRequestUtil(Request.Method.POST, APPEnvironment.createURL(GGGlobalValues.LOAD_USER_RFID_INFO), parameters, responseListener, errorListener);
         jsonObjectRequest.setShouldCache(false);
         MySingletonUtil.getInstance(getActivity()).addToRequestQueue(jsonObjectRequest);

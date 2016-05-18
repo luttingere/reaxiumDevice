@@ -80,7 +80,6 @@ public class UserPanelFragment extends GGMainFragment implements OnUserClickList
     private EditText userName;
     private EditText userSecondName;
     private EditText userLastName;
-    private EditText userSecondLastName;
     private EditText userDocumentId;
     private EditText userEmail;
     private EditText userBirthDate;
@@ -95,6 +94,7 @@ public class UserPanelFragment extends GGMainFragment implements OnUserClickList
     private ProgressBar mUserPhotoLoader;
     private static ImageLoader mImageLoader;
     private RelativeLayout searchUserContainer;
+    private RelativeLayout allContainer;
 
     
 
@@ -131,14 +131,12 @@ public class UserPanelFragment extends GGMainFragment implements OnUserClickList
         //FloatingActionButton
         addUserButton = (FloatingActionButton) view.findViewById(R.id.add_user_button);
 
-
         //User search container
         mSearchField = (EditText) view.findViewById(R.id.user_search_text);
         mSearchIcon = (ImageView) view.findViewById(R.id.search_icon);
         mGoButton = (Button) view.findViewById(R.id.go_button);
         mGoButton.getBackground().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
         deleteTextButton = (ImageView) view.findViewById(R.id.delete_text);
-
 
         //User list container
         mUserRecyclerList = (RecyclerView) view.findViewById(R.id.user_list);
@@ -147,12 +145,11 @@ public class UserPanelFragment extends GGMainFragment implements OnUserClickList
         mUsersListAdapter = new UsersListAdapter(getContext(),this,null,"");
         mUserRecyclerList.setAdapter(mUsersListAdapter);
 
-
         //Add or Edit User panel
         userName = (EditText) view.findViewById(R.id.user_first_name);
         userSecondName = (EditText) view.findViewById(R.id.user_second_name);
         userLastName = (EditText) view.findViewById(R.id.user_last_name);
-        userSecondLastName = (EditText) view.findViewById(R.id.user_second_last_name);
+        allContainer = (RelativeLayout) view.findViewById(R.id.allContainer);
         userDocumentId = (EditText) view.findViewById(R.id.user_document_id);
         userBirthDate = (EditText) view.findViewById(R.id.user_birth_date);
         userEmail = (EditText) view.findViewById(R.id.user_email);
@@ -251,6 +248,13 @@ public class UserPanelFragment extends GGMainFragment implements OnUserClickList
                 showAddUserContainer();
             }
         });
+
+        allContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                GGUtil.hideKeyboard(getActivity());
+            }
+        });
     }
 
     private void showAddUserContainer(){
@@ -275,7 +279,6 @@ public class UserPanelFragment extends GGMainFragment implements OnUserClickList
         userName.setText("");
         userSecondName.setText("");
         userLastName.setText("");
-        userSecondLastName.setText("");
         userDocumentId.setText("");
         userBirthDate.setText("");
         userEmail.setText("");
@@ -387,7 +390,6 @@ public class UserPanelFragment extends GGMainFragment implements OnUserClickList
         userName.setText(user.getFirstName());
         userSecondName.setText(user.getSecondName());
         userLastName.setText(user.getFirstLastName());
-        userSecondLastName.setText(user.getSecondLastName());
         userDocumentId.setText(user.getDocumentId());
         userBirthDate.setText(user.getBirthDate());
         userEmail.setText(user.getEmail());
@@ -453,9 +455,6 @@ public class UserPanelFragment extends GGMainFragment implements OnUserClickList
                 if(!"".equals(userSecondName.getText().toString().trim())){
                     parameters.put("userSecondName", userSecondName.getText().toString().trim());
                 }
-                if(!"".equals(userSecondLastName.getText().toString().trim())){
-                    parameters.put("userSecondLastName", userSecondLastName.getText().toString().trim());
-                }
                 if(!"".equals(userEmail.getText().toString().trim())){
                     parameters.put("userEmail", userEmail.getText().toString().trim());
                 }
@@ -516,9 +515,7 @@ public class UserPanelFragment extends GGMainFragment implements OnUserClickList
                 if(!"".equals(userSecondName.getText().toString().trim())){
                     parameters.put("userSecondName", userSecondName.getText().toString().trim());
                 }
-                if(!"".equals(userSecondLastName.getText().toString().trim())){
-                    parameters.put("userSecondLastName", userSecondLastName.getText().toString().trim());
-                }
+
                 if(!"".equals(userEmail.getText().toString().trim())){
                     parameters.put("userEmail", userEmail.getText().toString().trim());
                 }

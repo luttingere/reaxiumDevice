@@ -53,7 +53,6 @@ public class AddUserFragment extends GGMainFragment {
     private EditText userName;
     private EditText userSecondName;
     private EditText userLastName;
-    private EditText userSecondLastName;
     private EditText userDocumentId;
     private EditText userEmail;
     private EditText userBirthDate;
@@ -87,7 +86,6 @@ public class AddUserFragment extends GGMainFragment {
         userName = (EditText) view.findViewById(R.id.user_first_name);
         userSecondName = (EditText) view.findViewById(R.id.user_second_name);
         userLastName = (EditText) view.findViewById(R.id.user_last_name);
-        userSecondLastName = (EditText) view.findViewById(R.id.user_second_last_name);
         userDocumentId = (EditText) view.findViewById(R.id.user_document_id);
         userBirthDate = (EditText) view.findViewById(R.id.user_birth_date);
         userEmail = (EditText) view.findViewById(R.id.user_email);
@@ -193,9 +191,6 @@ public class AddUserFragment extends GGMainFragment {
                 }
                 if(!"".equals(userSecondName.getText().toString().trim())){
                     parameters.put("userSecondName", userSecondName.getText().toString().trim());
-                }
-                if(!"".equals(userSecondLastName.getText().toString().trim())){
-                    parameters.put("userSecondLastName", userSecondLastName.getText().toString().trim());
                 }
                 if(!"".equals(userEmail.getText().toString().trim())){
                     parameters.put("userEmail", userEmail.getText().toString().trim());

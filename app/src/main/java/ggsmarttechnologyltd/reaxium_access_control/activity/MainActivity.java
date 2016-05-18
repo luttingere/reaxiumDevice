@@ -136,7 +136,6 @@ public class MainActivity extends GGMainActivity {
 
     public void runMyFragment(GGMainFragment fragment, Bundle params,int drawerId) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        AutomaticFingerPrintValidationThread.stopScanner();
         fragment.setArguments(params);
         setToolBarTitle(fragment.getToolbarTitle());
         mMenuDrawer.getMenu().findItem(drawerId).setChecked(Boolean.TRUE);

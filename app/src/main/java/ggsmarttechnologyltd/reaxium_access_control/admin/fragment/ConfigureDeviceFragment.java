@@ -188,7 +188,6 @@ public class ConfigureDeviceFragment extends GGMainFragment {
                                     Log.i(TAG,"No biometric information found");
                                }
 
-
                                 //Run the ask to the user
                                 if(accessControlList != null && !accessControlList.isEmpty()){
                                     new AlertDialog.Builder(getActivity(), R.style.MyDialogTheme)
@@ -214,6 +213,8 @@ public class ConfigureDeviceFragment extends GGMainFragment {
                                                 }
                                             }).show();
                                 }
+
+                                GGUtil.showAToast(getActivity(),"Device successfully synchronized");
 
                             } else {
 

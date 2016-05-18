@@ -47,6 +47,7 @@ public class GGGlobalValues {
     public static final String CONFIGURE_DEVICE = "Device/configureDevice";
     public static final String SYNCHRONIZE_DEVICE = "Device/synchronizeDeviceAccess";
     public static final String VALIDATE_ACCESS = "Access/checkUserAccess";
+    public static final String VALIDATE_ACCESS_WITH_RFID = "UserAccess/executeAnRFIDAccessInADevice";
     public static final String SAVE_A_USER = "Users/saveUserFromDevice";
     public static final String SAVE_ACCESS_IN_SERVER = "UserAccess/executeAnAccessOfAUser";
     public static final String EDIT_A_USER = "Users/editUserFromDevice";

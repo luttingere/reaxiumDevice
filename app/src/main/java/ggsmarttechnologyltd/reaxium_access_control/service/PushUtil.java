@@ -57,13 +57,18 @@ public class PushUtil {
      */
     public static Boolean checkGooglePlayServices(Context context){
         Boolean isAvailable = Boolean.TRUE;
-        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(context);
-        if(resultCode != ConnectionResult.SUCCESS){
-            if(GooglePlayServicesUtil.isUserRecoverableError(resultCode)){
-                GooglePlayServicesUtil.getErrorDialog(resultCode,(Activity)context,PLAY_SERVICES_RESOLUTION_REQUEST).show();
-            }else{
-                Log.e(TAG, "This device is not supported");
+        try{
+            int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(context);
+            if(resultCode != ConnectionResult.SUCCESS){
+                if(GooglePlayServicesUtil.isUserRecoverableError(resultCode)){
+                    GooglePlayServicesUtil.getErrorDialog(resultCode, (Activity) context, PLAY_SERVICES_RESOLUTION_REQUEST).show();
+                }else{
+                    Log.e(TAG, "This device is not supported");
+                }
+                isAvailable = Boolean.FALSE;
             }
+        }catch (Exception e){
+            Log.i(TAG,"Error, ",e);
             isAvailable = Boolean.FALSE;
         }
         return isAvailable;
