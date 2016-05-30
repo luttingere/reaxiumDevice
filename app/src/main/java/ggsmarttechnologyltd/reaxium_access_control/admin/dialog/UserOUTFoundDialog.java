@@ -26,7 +26,7 @@ public class UserOUTFoundDialog extends Dialog {
     /**
      * Time to wait for dismiss the dialog
      */
-    public static final Integer SLEEP_TIME = 3000;
+    public static final Integer SLEEP_TIME = 2000;
 
     /**
      * User owner the info showed in the dialog

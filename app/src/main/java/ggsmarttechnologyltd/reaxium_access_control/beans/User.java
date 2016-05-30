@@ -5,6 +5,7 @@ import android.util.Log;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.Comparator;
+import java.util.Date;
 
 /**
  * Created by Eduardo Luttinger on 19/04/2016.
@@ -53,6 +54,12 @@ public class User extends AppBean implements Comparable{
     private String accessTime;
 
     private String lastAccess;
+
+    @SerializedName("date_init")
+    private Date userAtStopDateInit;
+
+    @SerializedName("date_end")
+    private Date userAtStopDateEnd;
 
 
     public Long getUserId() {
@@ -164,6 +171,22 @@ public class User extends AppBean implements Comparable{
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Date getUserAtStopDateInit() {
+        return userAtStopDateInit;
+    }
+
+    public void setUserAtStopDateInit(Date userAtStopDateInit) {
+        this.userAtStopDateInit = userAtStopDateInit;
+    }
+
+    public Date getUserAtStopDateEnd() {
+        return userAtStopDateEnd;
+    }
+
+    public void setUserAtStopDateEnd(Date userAtStopDateEnd) {
+        this.userAtStopDateEnd = userAtStopDateEnd;
     }
 
     public String getAccessTime() {

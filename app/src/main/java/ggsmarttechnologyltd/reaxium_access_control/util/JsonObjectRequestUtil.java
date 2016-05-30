@@ -31,6 +31,11 @@ public class JsonObjectRequestUtil extends JsonObjectRequest {
         setRetryPolicy(new DefaultRetryPolicy(GGGlobalValues.TIME_OUT_SECONDS, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
     }
 
+    public JsonObjectRequestUtil(int method, String url, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
+        super(method, url, listener, errorListener);
+        setRetryPolicy(new DefaultRetryPolicy(GGGlobalValues.TIME_OUT_SECONDS, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+    }
+
 
     @Override
     public Map<String, String> getHeaders() throws AuthFailureError {

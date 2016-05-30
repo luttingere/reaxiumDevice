@@ -14,7 +14,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 
 import cn.com.aratek.dev.Terminal;
 import cn.com.aratek.fp.Bione;
@@ -36,6 +38,7 @@ import ggsmarttechnologyltd.reaxium_access_control.global.GGGlobalValues;
 public class GGUtil {
 
     private static final String TAG = GGGlobalValues.TRACE_ID;
+    private static final SimpleDateFormat time_format = new SimpleDateFormat("hh:mm a");
 
     /**
      * Navigate to any screen in the app
@@ -50,13 +53,15 @@ public class GGUtil {
             if (arguments != null) {
                 goToTheMain.putExtras(arguments);
             }
-            goToTheMain.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             context.startActivity(goToTheMain);
-            ((Activity)context).finish();
         }catch (Exception e){
             Log.e(TAG,"",e);
         }
 
+    }
+
+    public static String getTimeFormatted(Date date){
+        return time_format.format(date);
     }
 
 
@@ -120,14 +125,12 @@ public class GGUtil {
         return isOk;
     }
 
-    public static void closeCardReader(Context context, ScannersActivityHandler scannersActivityHandler) {
-        int error;
-        if ((error = App.cardReader.close()) != ICCardReader.RESULT_OK) {
-            scannersActivityHandler.sendMessage(scannersActivityHandler.obtainMessage(ScannersActivityHandler.ERROR_ROUTINE, "the system fail closing the card reader, error code: " + error));
-        } else if ((error = App.cardReader.powerOff()) != ICCardReader.RESULT_OK) {
-            scannersActivityHandler.sendMessage(scannersActivityHandler.obtainMessage(ScannersActivityHandler.ERROR_ROUTINE, "the system fail turning off the card reader, error code: " + error));
+    public static void closeCardReader() {
+        if(App.cardReader != null){
+            App.cardReader.close();
+            App.cardReader.powerOff();
+            App.cardReader = null;
         }
-        App.cardReader = null;
     }
 
     public static SecurityObject scanRFID(ICCardReader cardReader) {
@@ -167,10 +170,12 @@ public class GGUtil {
      * Close fingerprint
      */
     public static void closeFingerPrint() {
-        App.fingerprintScanner.close();
-        App.fingerprintScanner.powerOff();
-        App.fingerprintScanner = null;
-        App.bione.exit();
+        if( App.fingerprintScanner != null){
+            App.fingerprintScanner.close();
+            App.fingerprintScanner.powerOff();
+            App.fingerprintScanner = null;
+            App.bione.exit();
+        }
     }
 
     /**
@@ -236,6 +241,16 @@ public class GGUtil {
      */
     public static void showAToast(Context context, String message) {
         Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+    }
+
+    /**
+     * show a message as a toast
+     *
+     * @param context
+     * @param message
+     */
+    public static void showAShortToast(Context context, String message) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 
     /**

@@ -1,5 +1,7 @@
 package ggsmarttechnologyltd.reaxium_access_control.global;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import ggsmarttechnologyltd.reaxium_access_control.R;
 
 /**
@@ -8,13 +10,14 @@ import ggsmarttechnologyltd.reaxium_access_control.R;
 public class GGGlobalValues {
 
     public static String TRACE_ID = "REAXIUM_DEVICE";
+    public static final String STRING_DATE_PATTERN_WITH_TIMEZONE = "yyyy-MM-dd'T'hh:mm:ssZ";
     public static final String STRING_DATE_PATTERN = "yyyy-MM-dd hh:mm:ss";
     public static final String PREFERENCE_FOLDER = "ggsmarttechnologyltd.reaxiumdevice";
     public static final Integer TIME_OUT_SECONDS = 20000;
     public static final Integer FRAGMENT_CONTAINER = R.id.fragment_container;
     public static final Integer SUCCESSFUL_API_RESPONSE_CODE = 0;
     public static final String BION_DB_PATH = "/sdcard/fp.db";
-    public static final Long DEFAULT_DEVICE_ID = 1l;
+    public static final Integer DEFAULT_DEVICE_ID = 1;
 
 
     //Device cache storage
@@ -34,10 +37,28 @@ public class GGGlobalValues {
     public static final String DEFAULT_USER_TYPE = "Student";
 
 
+    //Broadcast data
+    public static final String BROADCAST_PARAM = "BROADCAST_PARAM";
+
+    //Location
+    public static LatLng LAST_LOCATION;
+
+
+    //ACCESS TYPES
+    public static final String BIOMETRIC = "BIOMETRIC";
+    public static final String RFID = "RFID";
+    public static final String STUDENT_ID = "STUDENT_ID";
+
+
     //RFID
     public static final int BYTE_SIZE = 16;
     public static final int BYTE_BLOCK = 4;
 
+
+    public static final int EMERGENCY_ALARM_ID = 1;
+    public static final int TRAFFIC_ALARM_ID = 2;
+    public static final int CHECK_ENGINE_ALARM_ID = 3;
+    public static final int CAR_CRASH_ALARM_ID = 4;
 
 
     //Service Names
@@ -46,10 +67,14 @@ public class GGGlobalValues {
     public static final String LOAD_USER_RFID_INFO = "RFID/saveRFIDInformation";
     public static final String CONFIGURE_DEVICE = "Device/configureDevice";
     public static final String SYNCHRONIZE_DEVICE = "Device/synchronizeDeviceAccess";
-    public static final String VALIDATE_ACCESS = "Access/checkUserAccess";
+    public static final String VALIDATE_ACCESS = "UserAccess/executeUserAndPasswordAccessInADevice";
     public static final String VALIDATE_ACCESS_WITH_RFID = "UserAccess/executeAnRFIDAccessInADevice";
     public static final String SAVE_A_USER = "Users/saveUserFromDevice";
     public static final String SAVE_ACCESS_IN_SERVER = "UserAccess/executeAnAccessOfAUser";
     public static final String EDIT_A_USER = "Users/editUserFromDevice";
+    public static final String SEND_NOTIFICATIONS = "Alarm/sendNotification";
+    public static final String GET_ROUTES = "Routes/deviceGetRoutes";
+    public static final String NOTIFY_POSITION = "DeviceUpdateLocation/notifyLocation";
+    public static final String GET_POLYLINE_ROUTE = "https://maps.googleapis.com/maps/api/directions/json?origin=@ORIGIN@&destination=@DESTINATION@&waypoints=@WAY_POINTS@&key=AIzaSyBlSE61xW7a0B4P5SEPcDccdSWBtoRM4tw";
 
 }

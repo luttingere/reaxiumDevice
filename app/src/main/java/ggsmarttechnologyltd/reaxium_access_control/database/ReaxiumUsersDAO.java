@@ -31,7 +31,7 @@ public class ReaxiumUsersDAO {
     private ContentValues insertValues;
 
     private ReaxiumUsersDAO(Context context) {
-        dbHelper = new ReaxiumDbHelper(context);
+        dbHelper = ReaxiumDbHelper.getInstance(context);
     }
 
     public static ReaxiumUsersDAO getInstance(Context context) {
@@ -47,6 +47,7 @@ public class ReaxiumUsersDAO {
     public void deleteAllValuesFromReaxiumUserTable() {
         database = dbHelper.getWritableDatabase();
         database.delete(ReaxiumUsersContract.ReaxiumUsers.TABLE_NAME, null, null);
+
     }
 
     /**

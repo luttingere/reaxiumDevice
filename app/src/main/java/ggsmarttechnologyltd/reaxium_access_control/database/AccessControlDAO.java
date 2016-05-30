@@ -29,7 +29,7 @@ public class AccessControlDAO {
 
     private AccessControlDAO(Context context) {
         this.context = context;
-        dbHelper = new ReaxiumDbHelper(context);
+        dbHelper = ReaxiumDbHelper.getInstance(context);
     }
 
     public static AccessControlDAO getInstance(Context context) {
@@ -70,6 +70,7 @@ public class AccessControlDAO {
         } catch (Exception e) {
             inserted = null;
             Log.e(TAG, "Error inserting the access action of a user", e);
+        }finally {
         }
         return inserted;
     }
@@ -93,6 +94,7 @@ public class AccessControlDAO {
         } catch (Exception e) {
             Log.e(TAG, "Error inserting the access action of a user", e);
             rowsAffected = null;
+        }finally {
         }
         return rowsAffected;
     }
@@ -173,6 +175,54 @@ public class AccessControlDAO {
             }
         }
         return accessControl;
+    }
+
+    /**
+     * get the all users in the bus
+     *
+     * @return last user access
+     */
+    public List<AccessControl> getAllAccessIN() {
+        List<AccessControl> accessControlList = null;
+        AccessControl accessControl = null;
+        Cursor resultSet = null;
+        try {
+            database = dbHelper.getReadableDatabase();
+            String[] projection = {
+                    AccessControlContract.AccessControlTable.COLUMN_NAME_USER_ID,
+                    AccessControlContract.AccessControlTable.COLUMN_NAME_USER_ACCESS_DATE,
+                    AccessControlContract.AccessControlTable.COLUMN_NAME_USER_ACCESS_TYPE,
+                    AccessControlContract.AccessControlTable.COLUMN_NAME_ACCESS_TYPE,
+                    AccessControlContract.AccessControlTable.COLUMN_REGISTERED_IN_CLOUD
+            };
+            String selection = AccessControlContract.AccessControlTable.COLUMN_NAME_ACCESS_TYPE + "=?";
+            String[] selectionArgs = {"IN"};
+            String orderBy = AccessControlContract.AccessControlTable.COLUMN_NAME_USER_ACCESS_DATE + " DESC";
+            resultSet = database.query(AccessControlContract.AccessControlTable.TABLE_NAME, projection, selection, selectionArgs, null, null, orderBy);
+            if (resultSet.moveToFirst()) {
+                accessControlList = new ArrayList<>();
+                while (resultSet.isAfterLast() == false){
+                    accessControl = new AccessControl();
+                    accessControl.setUserId(resultSet.getLong(resultSet.getColumnIndex(AccessControlContract.AccessControlTable.COLUMN_NAME_USER_ID)));
+                    accessControl.setAccessType(resultSet.getString(resultSet.getColumnIndex(AccessControlContract.AccessControlTable.COLUMN_NAME_ACCESS_TYPE)));
+                    accessControl.setUserAccessType(resultSet.getString(resultSet.getColumnIndex(AccessControlContract.AccessControlTable.COLUMN_NAME_USER_ACCESS_TYPE)));
+                    accessControl.setAccessDate(resultSet.getLong(resultSet.getColumnIndex(AccessControlContract.AccessControlTable.COLUMN_NAME_USER_ACCESS_DATE)));
+                    accessControl.setOnTheCloud(resultSet.getInt(resultSet.getColumnIndex(AccessControlContract.AccessControlTable.COLUMN_REGISTERED_IN_CLOUD)) != 0);
+                    accessControl.setDeviceId(((GGMainActivity)context).getSharedPreferences().getLong(GGGlobalValues.DEVICE_ID));
+                    accessControlList.add(accessControl);
+                    resultSet.moveToNext();
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error retrieving the last access user information from device db", e);
+        } finally {
+            if (resultSet != null) {
+                if (!resultSet.isClosed()) {
+                    resultSet.close();
+                }
+            }
+        }
+        return accessControlList;
     }
 
 

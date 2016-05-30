@@ -35,6 +35,7 @@ import ggsmarttechnologyltd.reaxium_access_control.admin.threads.AutomaticFinger
 import ggsmarttechnologyltd.reaxium_access_control.global.GGGlobalValues;
 import ggsmarttechnologyltd.reaxium_access_control.login.activity.LoginActivity;
 import ggsmarttechnologyltd.reaxium_access_control.service.SendLocationService;
+import ggsmarttechnologyltd.reaxium_access_control.service.SendLocationServiceDefault;
 import ggsmarttechnologyltd.reaxium_access_control.util.GGUtil;
 import ggsmarttechnologyltd.reaxium_access_control.util.SharedPreferenceUtil;
 
@@ -149,6 +150,20 @@ public class AdminActivity extends GGMainActivity {
         transaction.replace(GGGlobalValues.FRAGMENT_CONTAINER, fragment).addToBackStack(null).commit();
     }
 
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        //startNotificationService();
+    }
+
+    /**
+     * Inicia el servicio de notificacion de ubicacion satelital
+     */
+    private void startNotificationService(){
+        Intent servIntent = new Intent(this,SendLocationServiceDefault.class);
+        startService(servIntent);
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

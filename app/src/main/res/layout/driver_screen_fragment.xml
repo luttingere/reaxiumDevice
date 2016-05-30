@@ -4,186 +4,202 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="25dp">
+
     <RelativeLayout
         android:id="@+id/title_container"
         android:layout_width="match_parent"
         android:layout_height="70dp">
 
         <ImageView
-            android:layout_centerInParent="true"
-            android:src="@drawable/logo_reaxium"
             android:layout_width="150dp"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:src="@drawable/logo_reaxium" />
 
     </RelativeLayout>
 
     <LinearLayout
-        android:layout_below="@+id/title_container"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:id="@+id/user_info_container"
+        android:id="@+id/allContainer"
         android:layout_width="match_parent"
-        android:layout_height="200dp">
-
-        <RelativeLayout
-            android:paddingRight="20dp"
-            android:gravity="right"
-            android:id="@+id/user_picture_container"
-            android:layout_width="0dp"
-            android:layout_weight="50"
-            android:layout_height="match_parent">
-
-            <!--<ProgressBar-->
-                <!--android:visibility="visible"-->
-                <!--android:id="@+id/user_image_loader"-->
-                <!--style="?android:attr/progressBarStyle"-->
-                <!--android:layout_width="150dp"-->
-                <!--android:layout_height="150dp"-->
-                <!--android:layout_centerInParent="true"/>-->
-
-            <com.makeramen.RoundedImageView xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/user_photo"
-                android:layout_width="220dp"
-                android:layout_height="220dp"
-                android:clickable="true"
-                android:layout_centerInParent="true"
-                android:src="@drawable/driver_icon_profile"
-                app:riv_border_width="1dip"
-                app:riv_corner_radius="10dip"
-                app:riv_border_color="@android:color/transparent"
-                app:riv_oval="false" />
-
-
-        </RelativeLayout>
-
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
 
         <LinearLayout
-            android:gravity="center"
+            android:id="@+id/user_info_container"
             android:layout_width="0dp"
-            android:layout_weight="45"
-            android:paddingLeft="20dp"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_below="@+id/title_container"
+            android:layout_weight="70"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <RelativeLayout
+                android:id="@+id/user_picture_container"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="50"
+                android:gravity="right"
+                android:paddingRight="20dp">
+
+                <ProgressBar
+                    android:id="@+id/user_image_loader"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_centerInParent="true"
+                    android:visibility="gone" />
+
+                <com.makeramen.RoundedImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/user_photo"
+                    android:layout_width="220dp"
+                    android:layout_height="220dp"
+                    android:layout_centerInParent="true"
+                    android:clickable="true"
+                    android:src="@drawable/driver_icon_profile"
+                    app:riv_border_color="@android:color/transparent"
+                    app:riv_border_width="1dip"
+                    app:riv_corner_radius="10dip"
+                    app:riv_oval="false" />
+
+
+            </RelativeLayout>
+
 
             <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="70dp">
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="45"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingLeft="20dp">
 
                 <LinearLayout
-                    android:layout_gravity="center_vertical"
-                    android:background="@drawable/rounded_corners_orange"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:gravity="center">
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp"
+                    android:orientation="horizontal">
 
-                    <ImageView
-                        android:src="@drawable/driver_icon"
-                        android:layout_width="45dp"
-                        android:layout_height="45dp" />
+                    <LinearLayout
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="center_vertical"
+                        android:background="@drawable/rounded_corners_orange"
+                        android:gravity="center">
 
+                        <ImageView
+                            android:layout_width="45dp"
+                            android:layout_height="45dp"
+                            android:src="@drawable/driver_icon" />
+
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/username_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="10dp"
+                        android:text="Driver's name"
+                        android:textColor="@color/black"
+                        android:textSize="18sp" />
 
                 </LinearLayout>
 
-                <TextView
-                    android:textSize="18sp"
-                    android:id="@+id/username_input"
-                    android:textColor="@color/black"
-                    android:paddingLeft="10dp"
-                    android:gravity="center_vertical"
-                    android:text="Driver's name"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="70dp">
-
                 <LinearLayout
-                    android:layout_gravity="center_vertical"
-                    android:background="@drawable/rounded_corners_yellow"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:gravity="center">
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp"
+                    android:orientation="horizontal">
 
-                    <ImageView
-                        android:src="@drawable/student_id_icon"
-                        android:layout_width="45dp"
-                        android:layout_height="45dp" />
+                    <LinearLayout
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="center_vertical"
+                        android:background="@drawable/rounded_corners_yellow"
+                        android:gravity="center">
 
+                        <ImageView
+                            android:layout_width="45dp"
+                            android:layout_height="45dp"
+                            android:src="@drawable/student_id_icon" />
+
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/user_document_id"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="10dp"
+                        android:text="Driver's licence or ID"
+                        android:textColor="@color/black"
+                        android:textSize="18sp" />
 
                 </LinearLayout>
 
-                <TextView
-                    android:textSize="18sp"
-                    android:id="@+id/user_document_id"
-                    android:textColor="@color/black"
-                    android:paddingLeft="10dp"
-                    android:gravity="center_vertical"
-                    android:text="Driver's licence or ID"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="70dp">
-
                 <LinearLayout
-                    android:layout_gravity="center_vertical"
-                    android:background="@drawable/rounded_corners_sand"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:gravity="center">
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp"
+                    android:orientation="horizontal">
 
-                    <ImageView
-                        android:src="@drawable/bus_number_icon"
-                        android:layout_width="45dp"
-                        android:layout_height="45dp" />
+                    <LinearLayout
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="center_vertical"
+                        android:background="@drawable/rounded_corners_sand"
+                        android:gravity="center">
 
+                        <ImageView
+                            android:layout_width="45dp"
+                            android:layout_height="45dp"
+                            android:src="@drawable/bus_number_icon" />
+
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/bus_number"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="10dp"
+                        android:text="School Bus #40"
+                        android:textColor="@color/black"
+                        android:textSize="18sp" />
 
                 </LinearLayout>
 
-                <TextView
-                    android:textSize="18sp"
-                    android:id="@+id/bus_number"
-                    android:textColor="@color/black"
-                    android:paddingLeft="10dp"
-                    android:gravity="center_vertical"
-                    android:text="School Bus #40"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-
             </LinearLayout>
+
 
         </LinearLayout>
 
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="30">
+
+            <RelativeLayout
+                android:id="@+id/go_button"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_centerInParent="true"
+                android:background="@drawable/rounded_corners_green"
+                android:clickable="true"
+                android:padding="10dp">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_centerInParent="true"
+                    android:clickable="false"
+                    android:src="@drawable/go_text" />
+
+            </RelativeLayout>
+        </RelativeLayout>
+
 
     </LinearLayout>
-
-    <RelativeLayout
-        android:clickable="true"
-        android:id="@+id/go_button"
-        android:layout_centerHorizontal="true"
-        android:background="@drawable/rounded_corners_green"
-        android:layout_below="@+id/user_info_container"
-        android:layout_width="100dp"
-        android:padding="10dp"
-        android:layout_height="100dp">
-
-        <ImageView
-            android:clickable="false"
-            android:layout_centerInParent="true"
-            android:src="@drawable/go_text"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-    </RelativeLayout>
 
 
 </RelativeLayout>

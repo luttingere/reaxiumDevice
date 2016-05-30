@@ -25,7 +25,7 @@ public class InitScannersThread extends Thread {
     @Override
     public void run() {
         showProgressDialog();
-        GGUtil.startFingerScannerService(mContext, biometricHandler);
+        //GGUtil.startFingerScannerService(mContext, biometricHandler);
         GGUtil.openCardReader(mContext,rfidHandler);
         dismissProgressDialog();
     }

@@ -1,8 +1,8 @@
 <resources>
 
     <style name="AppTheme" parent="AppTheme.Base">
-        <item name="android:dialogTheme">@style/MyDialogTheme</item>
-        <item name="android:alertDialogTheme">@style/MyDialogTheme</item>
+        <!--<item name="android:dialogTheme">@style/MyDialogTheme</item>-->
+        <!--<item name="android:alertDialogTheme">@style/MyDialogTheme</item>-->
     </style>
 
     <!-- Base application theme. -->

@@ -100,11 +100,11 @@ public class VerifyBiometricFragment extends GGMainFragment {
     @Override
     public void onPause() {
 
-        AutomaticFingerPrintValidationThread.stopScanner();
-        GGUtil.closeFingerPrint();
+//        AutomaticFingerPrintValidationThread.stopScanner();
+//        GGUtil.closeFingerPrint();
 
         AutomaticCardValidationThread.stopScanner();
-        GGUtil.closeCardReader(getActivity(),handler);
+        GGUtil.closeCardReader();
 
         Log.i(TAG, "the scanner has been turned off successfully");
         super.onPause();

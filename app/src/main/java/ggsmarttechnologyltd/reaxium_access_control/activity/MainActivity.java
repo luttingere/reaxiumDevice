@@ -1,10 +1,14 @@
 package ggsmarttechnologyltd.reaxium_access_control.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
@@ -16,6 +20,11 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.model.LatLng;
+
+import java.util.LinkedList;
+import java.util.List;
+
 import ggsmarttechnologyltd.reaxium_access_control.GGMainActivity;
 import ggsmarttechnologyltd.reaxium_access_control.GGMainFragment;
 import ggsmarttechnologyltd.reaxium_access_control.R;
@@ -26,10 +35,15 @@ import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.ShowMapFragmen
 import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.UserPanelFragment;
 import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.UserSecurityFragment;
 import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.VerifyBiometricFragment;
+import ggsmarttechnologyltd.reaxium_access_control.admin.threads.AutomaticCardValidationThread;
 import ggsmarttechnologyltd.reaxium_access_control.admin.threads.AutomaticFingerPrintValidationThread;
+import ggsmarttechnologyltd.reaxium_access_control.beans.LocationObject;
+import ggsmarttechnologyltd.reaxium_access_control.fragment.BusScreenFragment;
 import ggsmarttechnologyltd.reaxium_access_control.fragment.DriverScreenFragment;
 import ggsmarttechnologyltd.reaxium_access_control.global.GGGlobalValues;
 import ggsmarttechnologyltd.reaxium_access_control.login.activity.LoginActivity;
+import ggsmarttechnologyltd.reaxium_access_control.service.SendLocationService;
+import ggsmarttechnologyltd.reaxium_access_control.service.SendLocationServiceDefault;
 import ggsmarttechnologyltd.reaxium_access_control.util.GGUtil;
 import ggsmarttechnologyltd.reaxium_access_control.util.SharedPreferenceUtil;
 
@@ -58,6 +72,22 @@ public class MainActivity extends GGMainActivity {
     private LinearLayout navigationBack;
 
     private SharedPreferenceUtil sharedPreferenceUtil;
+
+    /**
+     * Manager of broadCast between this activity and any service
+     */
+    protected LocalBroadcastManager mLocalBroadcastManager;
+
+    /**
+     * FILTER List
+     */
+    public static List<String> ACTIONS_LIST = new LinkedList<>();
+
+    /**
+     * Filters
+     */
+    public static final String LOCATION_CHANGED = "LOCATION_CHANGED";
+
 
     @Override
     protected Integer getMainLayout() {
@@ -116,6 +146,17 @@ public class MainActivity extends GGMainActivity {
                 }
             }
         });
+        initActions();
+    }
+
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        stopNotificationService();
+        unregisterBroadCast();
+        Log.i(TAG,"Servicio de Ubicacion detenido");
     }
 
     public void hideBackButton(){
@@ -183,6 +224,7 @@ public class MainActivity extends GGMainActivity {
             switch (menuItem.getItemId()) {
                 case R.id.action_logout:
                     AutomaticFingerPrintValidationThread.stopScanner();
+                    AutomaticCardValidationThread.stopScanner();
                     sharedPreferenceUtil.removeValue(GGGlobalValues.USER_ID_IN_SESSION);
                     sharedPreferenceUtil.removeValue(GGGlobalValues.USER_FULL_NAME_IN_SESSION);
                     sharedPreferenceUtil.removeValue(GGGlobalValues.USER_FULL_TYPE_IN_SESSION);
@@ -198,8 +240,80 @@ public class MainActivity extends GGMainActivity {
     }
 
     @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        registerTheBroadCast();
+        startNotificationService();
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Fragment myFragemnt = getSupportFragmentManager().findFragmentById(GGGlobalValues.FRAGMENT_CONTAINER);
         myFragemnt.onActivityResult(requestCode, resultCode, data);
     }
+
+    /**
+     * Inicia el servicio de notificacion de ubicacion satelital
+     */
+    private void startNotificationService(){
+        Intent servIntent = new Intent(this,SendLocationService.class);
+        startService(servIntent);
+    }
+
+    /**
+     * Detiene el proceso de envio de ubicacion
+     */
+    private void stopNotificationService(){
+        Intent servIntent = new Intent(this,SendLocationService.class);
+        stopService(servIntent);
+    }
+
+    /**
+     * Broad cast handler
+     */
+    protected BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()) {
+                case LOCATION_CHANGED:
+                    if(getMainFragment() instanceof BusScreenFragment){
+                        LocationObject locationObject = (LocationObject)intent.getExtras().getSerializable(GGGlobalValues.BROADCAST_PARAM);
+                       ((BusScreenFragment) getMainFragment()).updateMyPosition(locationObject);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+
+    /**
+     * attach to the activity the broadcast listener, so it can be notified if the receiver cancel the call
+     */
+    private void registerTheBroadCast() {
+        mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
+        IntentFilter mIntentFilter = new IntentFilter();
+        for (String actions : ACTIONS_LIST) {
+            mIntentFilter.addAction(actions);
+        }
+        mLocalBroadcastManager.registerReceiver(mBroadcastReceiver, mIntentFilter);
+    }
+
+    /**
+     * unattach broadcast
+     */
+    private void unregisterBroadCast(){
+        mLocalBroadcastManager.unregisterReceiver(mBroadcastReceiver);
+    }
+
+
+    /**
+     * init the posible action that the activity will receive through broadcast
+     */
+    private void initActions() {
+        ACTIONS_LIST.clear();
+        ACTIONS_LIST.add(LOCATION_CHANGED);
+    }
+
+
 }

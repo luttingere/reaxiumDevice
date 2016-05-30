@@ -186,8 +186,8 @@ public class UserSecurityFragment extends GGMainFragment implements OnUserClickL
     @Override
     public void onPause() {
         super.onPause();
-        GGUtil.closeFingerPrint();
-        GGUtil.closeCardReader(getActivity(),RFIDCaptureFragment.helper);
+        //GGUtil.closeFingerPrint();
+        GGUtil.closeCardReader();
     }
 
     @Override

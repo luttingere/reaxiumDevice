@@ -39,7 +39,7 @@ public class AutomaticCardValidationThread extends Thread {
         while (!stop) {
             try {
                 if (cardReadedSuccessfully) {
-                    sleep(1000);
+                    sleep(3000);
                     cardReadedSuccessfully = Boolean.FALSE;
                 }
                 securityObject = GGUtil.scanRFID(cardReader);
@@ -56,7 +56,7 @@ public class AutomaticCardValidationThread extends Thread {
                        if(securityObject.getErrorCode() != RFIDErrorMessage.NO_CARD){
                            scannersActivityHandler.sendMessage(scannersActivityHandler.obtainMessage(ScannersActivityHandler.ERROR_ROUTINE, "Card read failure, "+RFIDErrorMessage.getErrorMessage(securityObject.getErrorCode())));
                        }else{
-                           Log.d(TAG,"No card");
+                          // Log.d(TAG,"No card");
                        }
                     }
                 }
@@ -64,7 +64,8 @@ public class AutomaticCardValidationThread extends Thread {
                 Log.e(TAG,"",e);
             }
         }
-        Log.i(TAG, "The fingerprint capture proccess has ended");
+        GGUtil.closeCardReader();
+        Log.i(TAG, "The scanners has bean stopped");
     }
 
     private void showProgressDialog() {

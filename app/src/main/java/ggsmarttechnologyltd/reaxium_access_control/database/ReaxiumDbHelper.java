@@ -12,8 +12,17 @@ public class ReaxiumDbHelper extends SQLiteOpenHelper {
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "Reaxium.db";
+    public static ReaxiumDbHelper reaxiumDbHelper;
 
-    public ReaxiumDbHelper(Context context) {
+
+    public static ReaxiumDbHelper getInstance(Context context){
+        if(reaxiumDbHelper == null){
+            reaxiumDbHelper = new ReaxiumDbHelper(context);
+        }
+        return reaxiumDbHelper;
+    }
+
+    private ReaxiumDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -21,6 +30,10 @@ public class ReaxiumDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(ReaxiumUsersContract.SQL_CREATE_USER_TABLE);
         db.execSQL(AccessControlContract.SQL_CREATE_ACCESS_CONTROL_TABLE);
+        db.execSQL(RoutesContract.SQL_CREATE_ROUTE_TABLE);
+        db.execSQL(StopsContract.SQL_CREATE_STOP_TABLE);
+        db.execSQL(UserInStopContract.SQL_CREATE_USER_AT_STOP_TABLE);
+        db.execSQL(BusStatusContract.SQL_CREATE_BUS_STATUS_TABLE);
     }
 
     @Override
@@ -29,6 +42,10 @@ public class ReaxiumDbHelper extends SQLiteOpenHelper {
         // to simply to discard the data and start over
         db.execSQL(ReaxiumUsersContract.SQL_DELETE_USER_TABLE);
         db.execSQL(AccessControlContract.SQL_DELETE_ACCESS_CONTROL_TABLE);
+        db.execSQL(RoutesContract.SQL_DELETE_ROUTE_TABLE);
+        db.execSQL(StopsContract.SQL_DELETE_SOP_TABLE);
+        db.execSQL(UserInStopContract.SQL_DELETE_USER_AT_STOP_TABLE);
+        db.execSQL(BusStatusContract.SQL_DELETE_BUS_STATUS_TABLE);
         onCreate(db);
     }
 

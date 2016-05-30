@@ -76,6 +76,14 @@
     <!--Access control-->
     <string name="access_control_title">Access Control</string>
 
+    <!--Route Screen-->
+    <string name="route_screen_title">Pick your Route</string>
+
+
+    <!--Dialog buttons-->
+    <string name="YES">Yes</string>
+    <string name="NO">No</string>
+
 
 
 

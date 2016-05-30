@@ -22,12 +22,12 @@
 
             <RelativeLayout
                 android:id="@+id/route_information_container"
-                android:layout_width="300dp"
-                android:layout_height="180dp"
+                android:layout_width="320dp"
+                android:layout_height="220dp"
                 android:layout_marginLeft="50dp"
                 android:layout_marginTop="50dp"
                 android:background="@drawable/rounded_corners_gray_transparent"
-                android:padding="20dp">
+                android:padding="10dp">
 
 
                 <LinearLayout
@@ -45,6 +45,7 @@
 
 
                     <TextView
+                        android:id="@+id/routeInformation"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginLeft="10dp"
@@ -69,6 +70,7 @@
                         android:layout_height="35dp"></View>
 
                     <TextView
+                        android:id="@+id/stopInformation"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginLeft="10dp"
@@ -94,10 +96,11 @@
                 android:layout_height="match_parent">
 
                 <RelativeLayout
+                    android:padding="5dp"
                     android:id="@+id/students_on_board_container"
                     android:clickable="true"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
+                    android:layout_width="170dp"
+                    android:layout_height="135dp"
                     android:layout_marginLeft="70dp"
                     android:background="@drawable/rounded_corners_green_transparent"
                     android:gravity="center">
@@ -116,6 +119,7 @@
 
 
                     <TextView
+                        android:textSize="20sp"
                         android:clickable="false"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -130,8 +134,9 @@
 
                 <RelativeLayout
                     android:id="@+id/studentsOnTheNextStopContainer"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
+                    android:layout_width="170dp"
+                    android:padding="5dp"
+                    android:layout_height="135dp"
                     android:layout_marginLeft="50dp"
                     android:background="@drawable/rounded_corners_blue_transparent"
                     android:gravity="center">
@@ -141,7 +146,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:text="16"
+                        android:text="0"
                         android:textAllCaps="true"
                         android:textColor="@color/white"
                         android:textSize="40sp"
@@ -149,6 +154,7 @@
 
 
                     <TextView
+                        android:textSize="20sp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/studentsNextStopCount"
@@ -184,7 +190,7 @@
 
             <LinearLayout
                 android:clickable="false"
-                android:visibility="gone"
+                android:visibility="visible"
                 android:id="@+id/show_driver_option_container"
                 android:layout_width="450dp"
                 android:layout_height="100dp"
@@ -202,27 +208,27 @@
 
 
                 <ImageView
-                    android:id="@+id/traffic_alarm"
+                    android:id="@+id/emergency_alarm"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:src="@drawable/helth_cross_icon" />
 
 
                 <ImageView
-                    android:id="@+id/fault_alarm"
+                    android:id="@+id/traffic_alarm"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:src="@drawable/traffic_alarm_icon" />
 
 
                 <ImageView
-                    android:id="@+id/car_crash_alarm"
+                    android:id="@+id/car_engine_failure_alarm"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:src="@drawable/fault_alarm_icon" />
 
                 <ImageView
-                    android:id="@+id/ambulance_alarm"
+                    android:id="@+id/car_crash_alarm"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:src="@drawable/car_crash_alarm_icon" />

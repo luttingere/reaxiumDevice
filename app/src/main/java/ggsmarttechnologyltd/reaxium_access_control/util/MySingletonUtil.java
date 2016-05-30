@@ -16,6 +16,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 
 import java.lang.reflect.Type;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import ggsmarttechnologyltd.reaxium_access_control.global.GGGlobalValues;
@@ -76,13 +78,23 @@ public class MySingletonUtil {
         mRequestQueue = getRequestQueue();
 
         GSON_BUILDER = new GsonBuilder();
+
+        GSON_BUILDER.setDateFormat(GGGlobalValues.STRING_DATE_PATTERN_WITH_TIMEZONE);
         GSON_BUILDER.registerTypeAdapter(Date.class, new JsonDeserializer<Date>() {
             public Date deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-                return new Date(json.getAsJsonPrimitive().getAsLong());
+                String dateLiteral = json.getAsJsonPrimitive().getAsString();
+                SimpleDateFormat format = new SimpleDateFormat(GGGlobalValues.STRING_DATE_PATTERN_WITH_TIMEZONE);
+                Date jsonDate = null;
+                try {
+                    jsonDate = format.parse(dateLiteral);
+                } catch (ParseException e) {
+                    jsonDate = new Date(json.getAsJsonPrimitive().getAsLong());
+                }
+                return jsonDate;
             }
         });
 
-        GSON_BUILDER.setDateFormat(GGGlobalValues.STRING_DATE_PATTERN);
+
         GSON = GSON_BUILDER.create();
     }
 

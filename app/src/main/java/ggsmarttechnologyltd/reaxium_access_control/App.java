@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.multidex.MultiDexApplication;
@@ -17,6 +18,8 @@ import cn.com.aratek.iccard.ICCardReader;
 import cn.com.aratek.fp.FingerprintScanner;
 
 import com.crashlytics.android.Crashlytics;
+
+import ggsmarttechnologyltd.reaxium_access_control.database.ReaxiumDbHelper;
 import ggsmarttechnologyltd.reaxium_access_control.global.GGGlobalValues;
 import ggsmarttechnologyltd.reaxium_access_control.service.PushUtil;
 import ggsmarttechnologyltd.reaxium_access_control.util.SharedPreferenceUtil;
@@ -35,6 +38,7 @@ public class App extends MultiDexApplication implements Application.ActivityLife
     public static Bione bione;
     public static ICCardReader cardReader;
     private SharedPreferenceUtil sharedPreferenceUtil;
+    private ReaxiumDbHelper reaxiumDbHelper;
 
     @Override
     public void onCreate() {
@@ -42,10 +46,11 @@ public class App extends MultiDexApplication implements Application.ActivityLife
         super.onCreate();
         Fabric.with(this, new Crashlytics());
         mContext = getContext();
-//        registerPushNotification();
+        registerPushNotification();
         registerActivityLifecycleCallbacks(this);
         registerDeviceSerialNumber();
         logUser();
+        initTables();
     }
 
     public static Context getContext() {
@@ -77,6 +82,12 @@ public class App extends MultiDexApplication implements Application.ActivityLife
         Crashlytics.setUserIdentifier("19044081");
         Crashlytics.setUserEmail("luttingere@gmail.com");
         Crashlytics.setUserName("Eduardo Luttinger");
+    }
+
+    private void initTables(){
+        reaxiumDbHelper = ReaxiumDbHelper.getInstance(this);
+        SQLiteDatabase database = reaxiumDbHelper.getWritableDatabase();
+        database.close();
     }
 
 

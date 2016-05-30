@@ -128,10 +128,10 @@ public class AccessControlFragment extends GGMainFragment implements OnUserClick
 
     @Override
     public void onPause() {
-        AutomaticFingerPrintValidationThread.stopScanner();
-        GGUtil.closeFingerPrint();
+//        AutomaticFingerPrintValidationThread.stopScanner();
+//        GGUtil.closeFingerPrint();
         AutomaticCardValidationThread.stopScanner();
-        GGUtil.closeCardReader(getActivity(),handler);
+        GGUtil.closeCardReader();
         Log.i(TAG, "the scanners han bean turned off successfully");
         super.onPause();
     }

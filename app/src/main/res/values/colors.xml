@@ -23,7 +23,7 @@
     <color name="colorPrimaryDark">#B27632</color>
     <color name="colorPrimaryLight">#DBAB1C</color>
     <color name="colorAccent">#FBAC2C</color>
-    <color name="windowBackgroundColor">@android:color/transparent</color>
+    <color name="windowBackgroundColor">#D19037</color>
 
     <color name="user_in_color">#169e1f</color>
     <color name="user_out_color">#16699E</color>

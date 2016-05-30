@@ -1,5 +1,6 @@
 package ggsmarttechnologyltd.reaxium_access_control.login.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -13,11 +14,14 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.google.gson.reflect.TypeToken;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.lang.reflect.Type;
+import java.util.List;
 
 import cn.com.aratek.fp.FingerprintImage;
+import ggsmarttechnologyltd.reaxium_access_control.App;
 import ggsmarttechnologyltd.reaxium_access_control.GGMainActivity;
 import ggsmarttechnologyltd.reaxium_access_control.GGMainFragment;
 import ggsmarttechnologyltd.reaxium_access_control.R;
@@ -29,16 +33,22 @@ import ggsmarttechnologyltd.reaxium_access_control.admin.threads.AutomaticCardVa
 import ggsmarttechnologyltd.reaxium_access_control.admin.threads.InitCardReaderThread;
 import ggsmarttechnologyltd.reaxium_access_control.admin.threads.InitScannersThread;
 import ggsmarttechnologyltd.reaxium_access_control.admin.threads.ScannersActivityHandler;
+import ggsmarttechnologyltd.reaxium_access_control.beans.AccessControl;
 import ggsmarttechnologyltd.reaxium_access_control.beans.ApiResponse;
 import ggsmarttechnologyltd.reaxium_access_control.beans.AppBean;
+import ggsmarttechnologyltd.reaxium_access_control.beans.DeviceData;
 import ggsmarttechnologyltd.reaxium_access_control.beans.FingerPrint;
+import ggsmarttechnologyltd.reaxium_access_control.beans.LoginObject;
 import ggsmarttechnologyltd.reaxium_access_control.beans.ReaxiumDevice;
 import ggsmarttechnologyltd.reaxium_access_control.beans.SecurityObject;
 import ggsmarttechnologyltd.reaxium_access_control.beans.User;
 import ggsmarttechnologyltd.reaxium_access_control.beans.UserAccessData;
+import ggsmarttechnologyltd.reaxium_access_control.controller.SynchronizeController;
+import ggsmarttechnologyltd.reaxium_access_control.database.AccessControlDAO;
 import ggsmarttechnologyltd.reaxium_access_control.global.APPEnvironment;
 import ggsmarttechnologyltd.reaxium_access_control.global.GGGlobalValues;
-import ggsmarttechnologyltd.reaxium_access_control.routecontrol.activity.RouteControlActivity;
+
+import ggsmarttechnologyltd.reaxium_access_control.service.PushUtil;
 import ggsmarttechnologyltd.reaxium_access_control.util.FailureAccessPlayerSingleton;
 import ggsmarttechnologyltd.reaxium_access_control.util.GGUtil;
 import ggsmarttechnologyltd.reaxium_access_control.util.JsonObjectRequestUtil;
@@ -46,7 +56,7 @@ import ggsmarttechnologyltd.reaxium_access_control.util.JsonUtil;
 import ggsmarttechnologyltd.reaxium_access_control.util.MySingletonUtil;
 import ggsmarttechnologyltd.reaxium_access_control.util.SharedPreferenceUtil;
 import ggsmarttechnologyltd.reaxium_access_control.util.SuccessfulAccessPlayerSingleton;
-import ggsmarttechnologyltd.reaxium_access_control.viewprofile.activity.UserViewProfileActivity;
+
 
 /**
  * Created by Eduardo Luttinger on 11/04/2016.
@@ -63,6 +73,9 @@ public class LoginActivity extends GGMainActivity {
     private SharedPreferenceUtil sharedPreferenceUtil;
     private LoginWithRFIDHandler loginWithRFIDHandler;
     private static Boolean isRfidEnabled = Boolean.FALSE;
+    private AccessControlDAO accessControlDAO;
+    private List<AccessControl> outOfSyncList;
+    private SynchronizeController synchronizeController;
 
 
     @Override
@@ -79,6 +92,7 @@ public class LoginActivity extends GGMainActivity {
         mLoginFormSubmit = (RelativeLayout) findViewById(R.id.login_container);
         allContainer = (RelativeLayout) findViewById(R.id.allContainer);
         loginWithRFIDHandler = new LoginWithRFIDHandler();
+        synchronizeController = new SynchronizeController(this, this);
         GGUtil.hideKeyboard(this);
     }
 
@@ -108,10 +122,12 @@ public class LoginActivity extends GGMainActivity {
         super.onStop();
     }
 
+
     @Override
     protected void onResume() {
         super.onResume();
-        isRfidEnabled = true;
+        accessControlDAO = AccessControlDAO.getInstance(this);
+        outOfSyncList = accessControlDAO.getAllAccessOutOfSync();
         InitCardReaderThread cardReaderThread = new InitCardReaderThread(this, loginWithRFIDHandler);
         cardReaderThread.start();
     }
@@ -119,12 +135,8 @@ public class LoginActivity extends GGMainActivity {
     private void closeRfidReader() {
         try {
             AutomaticCardValidationThread.stopScanner();
-            if (isRfidEnabled) {
-                GGUtil.closeCardReader(this, loginWithRFIDHandler);
-            }
-            isRfidEnabled = Boolean.FALSE;
             Log.i(TAG, "card reader closed successfully");
-        } catch (Exception e) {
+        } catch (Error e) {
             Log.e(TAG, "", e);
         }
     }
@@ -140,36 +152,50 @@ public class LoginActivity extends GGMainActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         dismissProgressDialog();
-                        Type responseType = new TypeToken<ApiResponse<UserAccessData>>() {
-                        }.getType();
-                        ApiResponse<UserAccessData> apiResponse = JsonUtil.getEntityFromJSON(response, responseType);
+                        Type responseType = new TypeToken<ApiResponse<LoginObject>>() {}.getType();
+                        ApiResponse<LoginObject> apiResponse = JsonUtil.getEntityFromJSON(response, responseType);
                         if (apiResponse.getReaxiumResponse().getCode() == GGGlobalValues.SUCCESSFUL_API_RESPONSE_CODE) {
-                            if (apiResponse.getReaxiumResponse().getObject() != null) {
-                                if (!apiResponse.getReaxiumResponse().getObject().isEmpty()) {
-                                    if (apiResponse.getReaxiumResponse().getObject().get(0).getUser() != null) {
-                                        final User user = apiResponse.getReaxiumResponse().getObject().get(0).getUser();
-                                        storeUserLogin(user);
+                            if (apiResponse.getReaxiumResponse().getObject() != null && !apiResponse.getReaxiumResponse().getObject().isEmpty()) {
 
-                                        if (user.getUserType().getUserTypeName().equalsIgnoreCase("ADMINISTRATOR")) {
+                                LoginObject loginObject = apiResponse.getReaxiumResponse().getObject().get(0);
 
-                                            closeRfidReader();
-                                            GGUtil.goToScreen(LoginActivity.this, null, AdminActivity.class);
+                                if (loginObject.getUser() != null) {
 
-                                        } else if (user.getUserType().getUserTypeName().equalsIgnoreCase("DRIVER")) {
-
-                                            closeRfidReader();
-                                            Bundle arguments = new Bundle();
-                                            arguments.putSerializable("USER_VALUE", user);
-                                            GGUtil.goToScreen(LoginActivity.this, arguments, MainActivity.class);
-
-                                        } else {
+                                    final User user = apiResponse.getReaxiumResponse().getObject().get(0).getUser();
+                                    storeUserLogin(user);
 
 
-                                            GGUtil.showAToast(LoginActivity.this, "Invalid User");
+                                    if (user.getUserType().getUserTypeName().equalsIgnoreCase("ADMINISTRATOR")) {
 
+
+                                        GGUtil.showAToast(LoginActivity.this, apiResponse.getReaxiumResponse().getMessage());
+                                        GGUtil.goToScreen(LoginActivity.this, null, AdminActivity.class);
+
+                                    } else if (user.getUserType().getUserTypeName().equalsIgnoreCase("DRIVER")) {
+
+                                        Log.i(TAG,"running synchronize process");
+                                        Boolean result = Boolean.TRUE;
+                                        if(apiResponse.getReaxiumResponse().getObject().get(0).getDeviceData() != null){
+                                            DeviceData deviceData = apiResponse.getReaxiumResponse().getObject().get(0).getDeviceData();
+                                            result = synchronizeController.synchronizeDevice(deviceData, outOfSyncList);
                                         }
+                                        if(!result){
+                                            GGUtil.showAToast(LoginActivity.this, apiResponse.getReaxiumResponse().getMessage()+" Synchronize Failure error.");
+                                        }else{
+                                            GGUtil.showAToast(LoginActivity.this, apiResponse.getReaxiumResponse().getMessage());
+                                        }
+                                        Bundle arguments = new Bundle();
+                                        arguments.putSerializable("USER_VALUE", user);
+                                        GGUtil.goToScreen(LoginActivity.this, arguments, MainActivity.class);
+
+                                    } else {
+                                        GGUtil.showAShortToast(LoginActivity.this, "Invalid User Account");
                                     }
+                                } else {
+                                    GGUtil.showAToast(LoginActivity.this, "Invalid user information, contact with Reaxium Support");
                                 }
+                            } else {
+                                GGUtil.showAToast(LoginActivity.this, "Invalid user information, contact with Reaxium Support");
                             }
                         } else {
                             GGUtil.showAToast(LoginActivity.this, apiResponse.getReaxiumResponse().getMessage());
@@ -187,11 +213,21 @@ public class LoginActivity extends GGMainActivity {
                 jsonObjectRequest.setShouldCache(false);
                 MySingletonUtil.getInstance(LoginActivity.this).addToRequestQueue(jsonObjectRequest);
             } else {
-                GGUtil.showAToast(this, "Please fill login and password input fields");
+                GGUtil.showAShortToast(this, "Please fill login and password input fields");
             }
         } else {
             GGUtil.showAToast(this, R.string.no_network_available);
         }
+    }
+
+    private void goToDriverScreen(User user) {
+        Bundle arguments = new Bundle();
+        arguments.putSerializable("USER_VALUE", user);
+        GGUtil.goToScreen(LoginActivity.this, arguments, MainActivity.class);
+    }
+
+    private void goToAdminScreen() {
+        GGUtil.goToScreen(this, null, AdminActivity.class);
     }
 
     /**
@@ -205,40 +241,57 @@ public class LoginActivity extends GGMainActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         dismissProgressDialog();
-                        Type responseType = new TypeToken<ApiResponse<User>>() {
-                        }.getType();
-                        ApiResponse<User> apiResponse = JsonUtil.getEntityFromJSON(response, responseType);
+                        Type responseType = new TypeToken<ApiResponse<LoginObject>>() {}.getType();
+                        ApiResponse<LoginObject> apiResponse = JsonUtil.getEntityFromJSON(response, responseType);
                         if (apiResponse.getReaxiumResponse().getCode() == GGGlobalValues.SUCCESSFUL_API_RESPONSE_CODE) {
-                            if (apiResponse.getReaxiumResponse().getObject() != null) {
-                                if (!apiResponse.getReaxiumResponse().getObject().isEmpty()) {
+                            if (apiResponse.getReaxiumResponse().getObject() != null && !apiResponse.getReaxiumResponse().getObject().isEmpty()) {
 
-                                    User user = apiResponse.getReaxiumResponse().getObject().get(0);
+                                LoginObject loginObject = apiResponse.getReaxiumResponse().getObject().get(0);
+                                if (loginObject.getUser() != null) {
+
+                                    User user = loginObject.getUser();
+
                                     storeUserLogin(user);
 
                                     if (user.getUserType().getUserTypeName().equalsIgnoreCase("ADMINISTRATOR")) {
+
                                         SuccessfulAccessPlayerSingleton.getInstance(LoginActivity.this).initRingTone();
-                                        closeRfidReader();
-                                        GGUtil.goToScreen(LoginActivity.this, null, AdminActivity.class);
                                         GGUtil.showAToast(LoginActivity.this, apiResponse.getReaxiumResponse().getMessage());
+                                        goToAdminScreen();
+
+
                                     } else if (user.getUserType().getUserTypeName().equalsIgnoreCase("DRIVER")) {
+
                                         SuccessfulAccessPlayerSingleton.getInstance(LoginActivity.this).initRingTone();
-                                        closeRfidReader();
-                                        Bundle arguments = new Bundle();
-                                        arguments.putSerializable("USER_VALUE", user);
-                                        GGUtil.goToScreen(LoginActivity.this, arguments, MainActivity.class);
-                                        GGUtil.showAToast(LoginActivity.this, apiResponse.getReaxiumResponse().getMessage());
+                                        Log.i(TAG,"running synchronize process");
+                                        Boolean result = Boolean.TRUE;
+                                        if(apiResponse.getReaxiumResponse().getObject().get(0).getDeviceData() != null){
+                                            DeviceData deviceData = apiResponse.getReaxiumResponse().getObject().get(0).getDeviceData();
+                                            result = synchronizeController.synchronizeDevice(deviceData, outOfSyncList);
+                                        }
+                                        if(!result){
+                                            GGUtil.showAToast(LoginActivity.this, apiResponse.getReaxiumResponse().getMessage()+" Synchronize Failure error.");
+                                        }else{
+                                            GGUtil.showAToast(LoginActivity.this, apiResponse.getReaxiumResponse().getMessage());
+                                        }
+                                        goToDriverScreen(user);
+
                                     } else {
                                         FailureAccessPlayerSingleton.getInstance(LoginActivity.this).initRingTone();
-                                        GGUtil.showAToast(LoginActivity.this, "Invalid User");
+                                        GGUtil.showAShortToast(LoginActivity.this, "Invalid User");
                                     }
+
+                                }else{
+                                    FailureAccessPlayerSingleton.getInstance(LoginActivity.this).initRingTone();
+                                    GGUtil.showAShortToast(LoginActivity.this, "Invalid user information, contact with Reaxium Support");
                                 }
                             } else {
                                 FailureAccessPlayerSingleton.getInstance(LoginActivity.this).initRingTone();
-                                GGUtil.showAToast(LoginActivity.this, "Invalid user");
+                                GGUtil.showAShortToast(LoginActivity.this, "Invalid user");
                             }
                         } else {
                             FailureAccessPlayerSingleton.getInstance(LoginActivity.this).initRingTone();
-                            GGUtil.showAToast(LoginActivity.this, apiResponse.getReaxiumResponse().getMessage());
+                            GGUtil.showAShortToast(LoginActivity.this, apiResponse.getReaxiumResponse().getMessage());
                         }
                     }
                 };
@@ -253,7 +306,7 @@ public class LoginActivity extends GGMainActivity {
                 jsonObjectRequest.setShouldCache(false);
                 MySingletonUtil.getInstance(LoginActivity.this).addToRequestQueue(jsonObjectRequest);
             } else {
-                GGUtil.showAToast(this, "non user id found in the card");
+                GGUtil.showAShortToast(this, "non user id found in the card");
             }
         } else {
             GGUtil.showAToast(this, R.string.no_network_available);
@@ -283,13 +336,25 @@ public class LoginActivity extends GGMainActivity {
             } else {
                 userAccessData.put("device_id", "" + GGGlobalValues.DEFAULT_DEVICE_ID);
             }
-            userAccessData.put("access_type_id", "" + 1);
-            userAccessData.put("user_login_name", mUserNameInput.getText().toString());
+            if (outOfSyncList != null && !outOfSyncList.isEmpty()) {
+                JSONObject accessData;
+                JSONArray accessDataBulk = new JSONArray();
+                for (AccessControl accessControl : outOfSyncList) {
+                    accessData = new JSONObject();
+                    accessData.put("userId", accessControl.getUserId());
+                    accessData.put("deviceId", accessControl.getDeviceId());
+                    accessData.put("accessType", accessControl.getAccessType());
+                    accessData.put("userAccessType", accessControl.getUserAccessType());
+                    accessDataBulk.put(accessData);
+                }
+                userAccessData.put("accessBulkObject", accessDataBulk);
+            }
+            userAccessData.put("device_token", PushUtil.getRegistrationId(this));
+            userAccessData.put("user_name", mUserNameInput.getText().toString());
             userAccessData.put("user_password", mPasswordInput.getText().toString());
-            reaxiumParameters.put("UserAccessData", userAccessData);
+            reaxiumParameters.put("UserAccess", userAccessData);
             loginParams.put("ReaxiumParameters", reaxiumParameters);
         } catch (Exception e) {
-            GGUtil.showAToast(this, "Unknown error login, contact Reaxium Support");
             Log.e(TAG, "Error logint to the reaxium device", e);
         }
         return loginParams;
@@ -313,6 +378,21 @@ public class LoginActivity extends GGMainActivity {
                 userAccess.put("device_id", "" + GGGlobalValues.DEFAULT_DEVICE_ID);
             }
             userAccess.put("card_code", cardId.longValue());
+            if (outOfSyncList != null && !outOfSyncList.isEmpty()) {
+
+                JSONObject accessData;
+                JSONArray accessDataBulk = new JSONArray();
+                for (AccessControl accessControl : outOfSyncList) {
+                    accessData = new JSONObject();
+                    accessData.put("userId", accessControl.getUserId());
+                    accessData.put("deviceId", accessControl.getDeviceId());
+                    accessData.put("accessType", accessControl.getAccessType());
+                    accessData.put("userAccessType", accessControl.getUserAccessType());
+                    accessDataBulk.put(accessData);
+                }
+                userAccess.put("accessBulkObject", accessDataBulk);
+            }
+            userAccess.put("device_token", PushUtil.getRegistrationId(this));
 
             reaxiumParameters.put("UserAccess", userAccess);
             loginParams.put("ReaxiumParameters", reaxiumParameters);
@@ -352,13 +432,13 @@ public class LoginActivity extends GGMainActivity {
                 loginWithRFID(securityObject.getUserId(), securityObject.getCardId());
             } else {
                 FailureAccessPlayerSingleton.getInstance(LoginActivity.this).initRingTone();
-                GGUtil.showAToast(LoginActivity.this, "Invalid userId and CardId");
+                GGUtil.showAShortToast(LoginActivity.this, "Invalid userId and CardId");
             }
         }
 
         @Override
         protected void errorRoutine(String message) {
-            GGUtil.showAToast(LoginActivity.this, message);
+            GGUtil.showAShortToast(LoginActivity.this, message);
         }
     }
 
