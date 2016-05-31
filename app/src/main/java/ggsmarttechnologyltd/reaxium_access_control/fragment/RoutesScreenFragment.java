@@ -53,6 +53,7 @@ public class RoutesScreenFragment extends GGMainFragment implements OnRouteSelec
         Bundle arguments = new Bundle();
         arguments.putSerializable("USER_VALUE",driverUser);
         GGUtil.goToScreen(getActivity(), arguments, MainActivity.class);
+        getActivity().finish();
         return Boolean.TRUE;
     }
 

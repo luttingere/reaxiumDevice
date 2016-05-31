@@ -33,7 +33,7 @@
     <string name="menu_drawer_configure_device">Configure Device</string>
     <string name="menu_drawer_add_user">Add or Edit a User</string>
     <string name="menu_drawer_add_security">Add User Access</string>
-    <string name="menu_drawer_verify_biometric">Verify User Access</string>
+    <string name="menu_drawer_verify_biometric">Validate a RFID Card</string>
     <string name="menu_drawer_access_control">Access Control</string>
     <string name="menu_drawer_logout">Log Out</string>
     <string name="menu_drawer_show_map">Show Map</string>
@@ -83,6 +83,9 @@
     <!--Dialog buttons-->
     <string name="YES">Yes</string>
     <string name="NO">No</string>
+
+    <string name="student_id_label">Student ID:</string>
+    <string name="student_id_hint">Type your student id...</string>
 
 
 

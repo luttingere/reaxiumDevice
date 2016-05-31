@@ -32,7 +32,7 @@
     <dimen name="device_configuration_edit_text_width">260dp</dimen>
     <dimen name="device_configuration_text_size">18sp</dimen>
 
-
+    <dimen name="ancho_texto_dialogo">220dp</dimen>
 
 
 </resources>

@@ -34,6 +34,7 @@ public final class ReaxiumUsersContract {
                     ReaxiumUsers.COLUMN_NAME_USER_BUSINESS_NAME + TEXT_TYPE + COMMA_SEP +
                     ReaxiumUsers.COLUMN_NAME_USER_BIOMETRIC_CODE + TEXT_TYPE + COMMA_SEP +
                     ReaxiumUsers.COLUMN_NAME_USER_FINGERPRINT + TEXT_TYPE + COMMA_SEP +
+                    ReaxiumUsers.COLUMN_NAME_USER_DOCUMENT_CODE + TEXT_TYPE + COMMA_SEP +
                     ReaxiumUsers.COLUMN_NAME_USER_RFID_CODE + TEXT_TYPE  + " )";
 
     /**
@@ -66,6 +67,7 @@ public final class ReaxiumUsersContract {
         public static final String COLUMN_NAME_USER_PHOTO = "user_photo";
         public static final String COLUMN_NAME_USER_BUSINESS_NAME = "user_business_name";
         public static final String COLUMN_NAME_USER_BIOMETRIC_CODE= "user_biometric_code";
+        public static final String COLUMN_NAME_USER_DOCUMENT_CODE= "user_document_code";
         public static final String COLUMN_NAME_USER_RFID_CODE= "user_rfid_code";
         public static final String COLUMN_NAME_USER_FINGERPRINT= "user_fingerprint";
     }

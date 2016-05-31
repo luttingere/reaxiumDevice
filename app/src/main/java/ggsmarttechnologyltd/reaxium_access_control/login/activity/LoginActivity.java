@@ -167,12 +167,13 @@ public class LoginActivity extends GGMainActivity {
 
                                     if (user.getUserType().getUserTypeName().equalsIgnoreCase("ADMINISTRATOR")) {
 
-
+                                        closeRfidReader();
                                         GGUtil.showAToast(LoginActivity.this, apiResponse.getReaxiumResponse().getMessage());
                                         GGUtil.goToScreen(LoginActivity.this, null, AdminActivity.class);
 
                                     } else if (user.getUserType().getUserTypeName().equalsIgnoreCase("DRIVER")) {
 
+                                        closeRfidReader();
                                         Log.i(TAG,"running synchronize process");
                                         Boolean result = Boolean.TRUE;
                                         if(apiResponse.getReaxiumResponse().getObject().get(0).getDeviceData() != null){
@@ -253,8 +254,10 @@ public class LoginActivity extends GGMainActivity {
 
                                     storeUserLogin(user);
 
+
                                     if (user.getUserType().getUserTypeName().equalsIgnoreCase("ADMINISTRATOR")) {
 
+                                        closeRfidReader();
                                         SuccessfulAccessPlayerSingleton.getInstance(LoginActivity.this).initRingTone();
                                         GGUtil.showAToast(LoginActivity.this, apiResponse.getReaxiumResponse().getMessage());
                                         goToAdminScreen();
@@ -262,6 +265,7 @@ public class LoginActivity extends GGMainActivity {
 
                                     } else if (user.getUserType().getUserTypeName().equalsIgnoreCase("DRIVER")) {
 
+                                        closeRfidReader();
                                         SuccessfulAccessPlayerSingleton.getInstance(LoginActivity.this).initRingTone();
                                         Log.i(TAG,"running synchronize process");
                                         Boolean result = Boolean.TRUE;
@@ -320,6 +324,11 @@ public class LoginActivity extends GGMainActivity {
         if (user.getUserType() != null) {
             sharedPreferenceUtil.saveString(GGGlobalValues.USER_FULL_TYPE_IN_SESSION, user.getUserType().getUserTypeName());
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+            finish();
     }
 
     /**

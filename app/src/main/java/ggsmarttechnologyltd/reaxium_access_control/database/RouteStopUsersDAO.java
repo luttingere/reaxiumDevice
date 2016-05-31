@@ -64,6 +64,7 @@ public class RouteStopUsersDAO {
                 routeValues.put(RoutesContract.ReaxiumRoutes.COLUMN_NAME_ROUTE_NAME, routes.getRouteName());
                 routeValues.put(RoutesContract.ReaxiumRoutes.COLUMN_NAME_ROUTE_NUMBER, routes.getRouteNumber());
                 routeValues.put(RoutesContract.ReaxiumRoutes.COLUMN_NAME_ROUTE_ADDRESS, routes.getRouteAddress());
+                routeValues.put(RoutesContract.ReaxiumRoutes.COLUMN_NAME_ROUTE_POLYLINE, routes.getRoutePolyLine());
                 routeValues.put(RoutesContract.ReaxiumRoutes.COLUMN_NAME_ROUTE_START_DATE, routes.getRouteDateInit().getTime());
                 routeValues.put(RoutesContract.ReaxiumRoutes.COLUMN_NAME_ROUTE_END_DATE, routes.getRouteDateEnd().getTime());
                 routeValues.put(RoutesContract.ReaxiumRoutes.COLUMN_NAME_ROUTE_STOP_COUNT, routes.getStopCount());
@@ -122,6 +123,7 @@ public class RouteStopUsersDAO {
                     RoutesContract.ReaxiumRoutes.COLUMN_NAME_ROUTE_NAME,
                     RoutesContract.ReaxiumRoutes.COLUMN_NAME_ROUTE_NUMBER,
                     RoutesContract.ReaxiumRoutes.COLUMN_NAME_ROUTE_ADDRESS,
+                    RoutesContract.ReaxiumRoutes.COLUMN_NAME_ROUTE_POLYLINE,
                     RoutesContract.ReaxiumRoutes.COLUMN_NAME_ROUTE_START_DATE,
                     RoutesContract.ReaxiumRoutes.COLUMN_NAME_ROUTE_END_DATE,
                     RoutesContract.ReaxiumRoutes.COLUMN_NAME_ROUTE_STOP_COUNT};
@@ -138,6 +140,8 @@ public class RouteStopUsersDAO {
                     route.setRouteId(resultSet.getLong(resultSet.getColumnIndex(RoutesContract.ReaxiumRoutes.COLUMN_NAME_ROUTE_ID)));
                     route.setRouteType(resultSet.getInt(resultSet.getColumnIndex(RoutesContract.ReaxiumRoutes.COLUMN_NAME_ROUTE_TYPE)));
                     route.setRouteName(resultSet.getString(resultSet.getColumnIndex(RoutesContract.ReaxiumRoutes.COLUMN_NAME_ROUTE_NAME)));
+                    route.setRouteAddress(resultSet.getString(resultSet.getColumnIndex(RoutesContract.ReaxiumRoutes.COLUMN_NAME_ROUTE_ADDRESS)));
+                    route.setRoutePolyLine(resultSet.getString(resultSet.getColumnIndex(RoutesContract.ReaxiumRoutes.COLUMN_NAME_ROUTE_POLYLINE)));
                     route.setRouteNumber(resultSet.getString(resultSet.getColumnIndex(RoutesContract.ReaxiumRoutes.COLUMN_NAME_ROUTE_NUMBER)));
                     route.setRouteDateInit(new Date(resultSet.getLong(resultSet.getColumnIndex(RoutesContract.ReaxiumRoutes.COLUMN_NAME_ROUTE_START_DATE))));
                     route.setRouteDateEnd(new Date(resultSet.getLong(resultSet.getColumnIndex(RoutesContract.ReaxiumRoutes.COLUMN_NAME_ROUTE_END_DATE))));
@@ -219,6 +223,7 @@ public class RouteStopUsersDAO {
         List<User> userList = new ArrayList<>();
         List<User> temporalUserList = new ArrayList<>();
         try {
+
             database = dbHelper.getReadableDatabase();
             String[] projection = {StopsContract.ReaxiumStop.COLUMN_NAME_STOP_ID};
             String selection = StopsContract.ReaxiumStop.COLUMN_NAME_STOP_ROUTE_ID + "=?";

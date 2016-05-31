@@ -8,31 +8,41 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
+import com.google.gson.reflect.TypeToken;
+
+import org.json.JSONObject;
+
+import java.lang.reflect.Type;
 
 import cn.com.aratek.fp.FingerprintImage;
 import ggsmarttechnologyltd.reaxium_access_control.GGMainFragment;
 import ggsmarttechnologyltd.reaxium_access_control.R;
 import ggsmarttechnologyltd.reaxium_access_control.admin.activity.AdminActivity;
 import ggsmarttechnologyltd.reaxium_access_control.admin.threads.AutomaticCardValidationThread;
-import ggsmarttechnologyltd.reaxium_access_control.admin.threads.AutomaticFingerPrintValidationThread;
 import ggsmarttechnologyltd.reaxium_access_control.admin.threads.InitScannersInAutoModeThread;
 import ggsmarttechnologyltd.reaxium_access_control.admin.threads.ScannersActivityHandler;
-import ggsmarttechnologyltd.reaxium_access_control.admin.threads.InitFingerPrintThread;
+import ggsmarttechnologyltd.reaxium_access_control.beans.ApiResponse;
 import ggsmarttechnologyltd.reaxium_access_control.beans.AppBean;
 import ggsmarttechnologyltd.reaxium_access_control.beans.FingerPrint;
 import ggsmarttechnologyltd.reaxium_access_control.beans.SecurityObject;
 import ggsmarttechnologyltd.reaxium_access_control.beans.User;
-import ggsmarttechnologyltd.reaxium_access_control.database.ReaxiumUsersDAO;
+import ggsmarttechnologyltd.reaxium_access_control.global.APPEnvironment;
+import ggsmarttechnologyltd.reaxium_access_control.global.GGGlobalValues;
 import ggsmarttechnologyltd.reaxium_access_control.util.FailureAccessPlayerSingleton;
 import ggsmarttechnologyltd.reaxium_access_control.util.GGUtil;
+import ggsmarttechnologyltd.reaxium_access_control.util.JsonObjectRequestUtil;
+import ggsmarttechnologyltd.reaxium_access_control.util.JsonUtil;
 import ggsmarttechnologyltd.reaxium_access_control.util.MySingletonUtil;
+import ggsmarttechnologyltd.reaxium_access_control.util.SuccessfulAccessPlayerSingleton;
 
 /**
  * Created by Eduardo Luttinger on 21/04/2016.
  */
-public class VerifyBiometricFragment extends GGMainFragment {
+public class VerifyRFIDFragment extends GGMainFragment {
 
     private TextView userName;
     private TextView userDocumentId;
@@ -46,7 +56,7 @@ public class VerifyBiometricFragment extends GGMainFragment {
 
     @Override
     public String getMyTag() {
-        return VerifyBiometricFragment.class.getName();
+        return VerifyRFIDFragment.class.getName();
     }
 
     @Override
@@ -61,10 +71,10 @@ public class VerifyBiometricFragment extends GGMainFragment {
 
     @Override
     public Boolean onBackPressed() {
-        if(userInfoContainer.getVisibility() == View.VISIBLE){
+        if (userInfoContainer.getVisibility() == View.VISIBLE) {
             userInfoContainer.setVisibility(View.GONE);
             infoText.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             ((AdminActivity) getActivity()).runMyFragment(new AdminFragment(), null, R.id.action_menu_home);
         }
         return Boolean.TRUE;
@@ -93,7 +103,7 @@ public class VerifyBiometricFragment extends GGMainFragment {
     public void onResume() {
         super.onResume();
         handler = new ScannerValidationHandler();
-        InitScannersInAutoModeThread initScannersInAutoModeThread = new InitScannersInAutoModeThread(getActivity(),handler);
+        InitScannersInAutoModeThread initScannersInAutoModeThread = new InitScannersInAutoModeThread(getActivity(), handler);
         initScannersInAutoModeThread.start();
     }
 
@@ -108,6 +118,61 @@ public class VerifyBiometricFragment extends GGMainFragment {
 
         Log.i(TAG, "the scanner has been turned off successfully");
         super.onPause();
+    }
+
+    private void validateRFIDCard(String rfidCode) {
+        if (GGUtil.isNetworkAvailable(getActivity())) {
+            Response.Listener<JSONObject> responseListener = new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    hideProgressDialog();
+                    Type responseType = new TypeToken<ApiResponse<User>>() {}.getType();
+                    ApiResponse<User> apiResponse = JsonUtil.getEntityFromJSON(response, responseType);
+                    if (apiResponse.getReaxiumResponse().getCode() == GGGlobalValues.SUCCESSFUL_API_RESPONSE_CODE) {
+                        SuccessfulAccessPlayerSingleton.getInstance(getActivity()).initRingTone();
+                        User user = apiResponse.getReaxiumResponse().getObject().get(0);
+                        userInfoContainer.setVisibility(View.VISIBLE);
+                        infoText.setVisibility(View.GONE);
+                        userName.setText(user.getFirstName() + " " + user.getSecondName() + " " + user.getFirstLastName() + " " + user.getSecondLastName());
+                        userDocumentId.setText(user.getDocumentId());
+                        if (user.getBusiness() != null) {
+                            userBusinessName.setText(user.getBusiness().getBusinessName());
+                        }
+                        setUserPhoto(user);
+                    } else {
+                        FailureAccessPlayerSingleton.getInstance(getActivity()).initRingTone();
+                        GGUtil.showAToast(getActivity(), apiResponse.getReaxiumResponse().getMessage());
+                    }
+                }
+            };
+            Response.ErrorListener errorListener = new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    hideProgressDialog();
+                    GGUtil.showAToast(getActivity(), R.string.bad_connection_message);
+                }
+            };
+            showProgressDialog("Looking for this card in our cloud...");
+            JsonObjectRequestUtil jsonObjectRequest = new JsonObjectRequestUtil(Request.Method.POST, APPEnvironment.createURL(GGGlobalValues.VALIDATE_RFID_CARD), loadValidateRFIDParams(rfidCode), responseListener, errorListener);
+            jsonObjectRequest.setShouldCache(false);
+            MySingletonUtil.getInstance(getActivity()).addToRequestQueue(jsonObjectRequest);
+        } else {
+            GGUtil.showAToast(getActivity(), R.string.no_network_available);
+        }
+    }
+
+    private JSONObject loadValidateRFIDParams(String rfidCode) {
+        JSONObject parameters = new JSONObject();
+        try {
+            JSONObject ReaxiumParameters = new JSONObject();
+            JSONObject RFIDValidation = new JSONObject();
+            RFIDValidation.put("rfid_code", rfidCode);
+            ReaxiumParameters.put("RFIDValidation", RFIDValidation);
+            parameters.put("ReaxiumParameters", ReaxiumParameters);
+        } catch (Exception e) {
+            Log.e(TAG, "", e);
+        }
+        return parameters;
     }
 
 
@@ -130,22 +195,8 @@ public class VerifyBiometricFragment extends GGMainFragment {
 
         @Override
         protected void validateScannerResult(AppBean bean) {
-            SecurityObject securityObject = (SecurityObject)bean;
-            User user = ReaxiumUsersDAO.getInstance(getActivity()).getUserById("" + securityObject.getUserId());
-            hideProgressDialog();
-            if (user != null) {
-                userInfoContainer.setVisibility(View.VISIBLE);
-                infoText.setVisibility(View.GONE);
-                userName.setText(user.getFirstName() + " " + user.getSecondName() + " " + user.getFirstLastName() + " " + user.getSecondLastName());
-                userDocumentId.setText(user.getDocumentId());
-                if (user.getBusiness() != null) {
-                    userBusinessName.setText(user.getBusiness().getBusinessName());
-                }
-                setUserPhoto(user);
-            } else {
-                FailureAccessPlayerSingleton.getInstance(getActivity()).initRingTone();
-                GGUtil.showAToast(getActivity(), "Invalid user, not registered: " + securityObject.getUserId());
-            }
+            SecurityObject securityObject = (SecurityObject) bean;
+            validateRFIDCard(""+securityObject.getCardId());
         }
 
         @Override
@@ -168,7 +219,6 @@ public class VerifyBiometricFragment extends GGMainFragment {
                         userPhoto.setImageBitmap(bitmap);
                     }
                 }
-
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     userPhotoLoader.setVisibility(View.GONE);

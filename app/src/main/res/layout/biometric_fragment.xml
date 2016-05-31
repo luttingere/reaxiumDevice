@@ -30,9 +30,8 @@
         android:layout_height="match_parent"
         android:layout_weight="50">
 
-
-
         <Button
+            android:enabled="false"
             android:id="@+id/capture_fingerprint"
             android:layout_centerInParent="true"
             android:layout_width="150dp"

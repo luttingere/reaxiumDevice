@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
+import android.util.ArrayMap;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -31,8 +32,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -40,8 +43,10 @@ import cn.com.aratek.fp.FingerprintImage;
 import ggsmarttechnologyltd.reaxium_access_control.GGMainFragment;
 import ggsmarttechnologyltd.reaxium_access_control.R;
 import ggsmarttechnologyltd.reaxium_access_control.activity.MainActivity;
+import ggsmarttechnologyltd.reaxium_access_control.admin.dialog.DocumentCodeAccessDialog;
 import ggsmarttechnologyltd.reaxium_access_control.admin.dialog.UserINFoundDialog;
 import ggsmarttechnologyltd.reaxium_access_control.admin.dialog.UserOUTFoundDialog;
+import ggsmarttechnologyltd.reaxium_access_control.admin.listeners.OnValidateDocumentCodeListener;
 import ggsmarttechnologyltd.reaxium_access_control.admin.threads.AutomaticCardValidationThread;
 import ggsmarttechnologyltd.reaxium_access_control.admin.threads.InitScannersInAutoModeThread;
 import ggsmarttechnologyltd.reaxium_access_control.admin.threads.ScannersActivityHandler;
@@ -79,7 +84,7 @@ import ggsmarttechnologyltd.reaxium_access_control.util.SuccessfulAccessPlayerSi
 /**
  * Created by Eduardo Luttinger on 09/05/2016.
  */
-public class BusScreenFragment extends GGMainFragment {
+public class BusScreenFragment extends GGMainFragment implements OnValidateDocumentCodeListener {
 
 
     private ImageView emergencyAlarmButton;
@@ -122,6 +127,10 @@ public class BusScreenFragment extends GGMainFragment {
     private Stops lastStop;
     private SharedPreferenceUtil sharedPreferenceUtil;
     private List<Long> usersIDSOFTheRoute;
+    public static Boolean busPositionRouteAlreadyPainted = Boolean.FALSE;
+    private DocumentCodeAccessDialog documentCodeAccessDialog;
+    private List<LatLng> indications;
+    private Map<Integer,List<LatLng>> radioMap;
 
 
     @Override
@@ -144,6 +153,7 @@ public class BusScreenFragment extends GGMainFragment {
         Bundle arguments = new Bundle();
         arguments.putSerializable("USER_VALUE", driverUser);
         GGUtil.goToScreen(getActivity(), arguments, MainActivity.class);
+        getActivity().finish();
         return Boolean.TRUE;
     }
 
@@ -151,6 +161,7 @@ public class BusScreenFragment extends GGMainFragment {
     @Override
     public void onResume() {
         super.onResume();
+        BusScreenFragment.busPositionRouteAlreadyPainted = Boolean.FALSE;
         processInstanceState();
         loadScreenValues();
         initScanners();
@@ -242,6 +253,9 @@ public class BusScreenFragment extends GGMainFragment {
      * initialize the route or get the last status of the route
      */
     private void initializeRoute() {
+        String decodePoints = route.getRoutePolyLine();
+        List<LatLng> polyLine = PolyUtil.decodePoly(decodePoints);
+        indications = polyLine;
         busStatus = busStatusDAO.getBusStatus();
         if (busStatus != null) {
             if (busStatus.getRouteId() != route.getRouteId()) {
@@ -266,7 +280,7 @@ public class BusScreenFragment extends GGMainFragment {
                 mRouteMap = googleMap;
                 configureMap();
                 loadStopsInTheMap();
-                loadRouteInTheMap();
+                loadStopRouteOnTheMap();
             }
         });
 
@@ -315,10 +329,16 @@ public class BusScreenFragment extends GGMainFragment {
             }
         });
 
-
+        studentsOnTheNextStopContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                documentCodeAccessDialog = new DocumentCodeAccessDialog(getActivity(), android.R.style.Theme_NoTitleBar_Fullscreen, BusScreenFragment.this);
+                documentCodeAccessDialog.show();
+            }
+        });
     }
 
-    private void startNotificationProcess(final int notificationType,final List<Long> usersId,final Long deviceId){
+    private void startNotificationProcess(final int notificationType, final List<Long> usersId, final Long deviceId) {
         new AlertDialog.Builder(getActivity())
                 .setTitle("Alarm Confirmation")
                 .setMessage("¿Are you sure you want to send the alarm?")
@@ -328,7 +348,7 @@ public class BusScreenFragment extends GGMainFragment {
                         dialog.dismiss();
                         sendAlarm(notificationType, usersId, deviceId);
                     }
-                }).setNegativeButton(R.string.NO,new DialogInterface.OnClickListener() {
+                }).setNegativeButton(R.string.NO, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
@@ -336,19 +356,20 @@ public class BusScreenFragment extends GGMainFragment {
         }).show();
     }
 
-    private void sendAlarm(int notificationType,List<Long> usersId,Long deviceId){
+    private void sendAlarm(int notificationType, List<Long> usersId, Long deviceId) {
         if (GGUtil.isNetworkAvailable(getActivity())) {
 
             showProgressDialog("Sending the notification...");
             Response.Listener<JSONObject> responseListener = new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    Type responseType = new TypeToken<ApiResponse<Object>>() {}.getType();
+                    Type responseType = new TypeToken<ApiResponse<Object>>() {
+                    }.getType();
                     ApiResponse<Object> apiResponse = JsonUtil.getEntityFromJSON(response, responseType);
                     if (apiResponse.getReaxiumResponse().getCode() == GGGlobalValues.SUCCESSFUL_API_RESPONSE_CODE) {
-                        GGUtil.showAToast(getActivity(),"Notification sent successfully");
-                    }else{
-                        GGUtil.showAToast(getActivity(),apiResponse.getReaxiumResponse().getMessage());
+                        GGUtil.showAToast(getActivity(), "Notification sent successfully");
+                    } else {
+                        GGUtil.showAToast(getActivity(), apiResponse.getReaxiumResponse().getMessage());
                     }
                     hideProgressDialog();
                 }
@@ -357,32 +378,45 @@ public class BusScreenFragment extends GGMainFragment {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     hideProgressDialog();
-                    GGUtil.showAToast(getActivity(),"There was an error sending the notifications, it is possible that you had a bad connection.");
+                    GGUtil.showAToast(getActivity(), "There was an error sending the notifications, it is possible that you had a bad connection.");
                 }
             };
             JSONObject notificationServiceParams = new JSONObject();
             try {
                 JSONObject reaxiumParameters = new JSONObject();
                 JSONObject notification = new JSONObject();
-                notification.put("device_id",deviceId);
-                notification.put("notification_type",notificationType);
-                notification.put("driver_name",sharedPreferenceUtil.getString(GGGlobalValues.USER_FULL_NAME_IN_SESSION));
+                notification.put("device_id", deviceId);
+                notification.put("notification_type", notificationType);
+                notification.put("driver_name", sharedPreferenceUtil.getString(GGGlobalValues.USER_FULL_NAME_IN_SESSION));
                 JSONArray jsonArray = new JSONArray();
-                for(Long userId: usersId){
+                for (Long userId : usersId) {
                     jsonArray.put(userId);
                 }
-                notification.put("users_id",jsonArray);
-                reaxiumParameters.put("Notification",notification);
-                notificationServiceParams.put("ReaxiumParameters",reaxiumParameters);
-            }catch (Exception e){}
+                notification.put("users_id", jsonArray);
+                reaxiumParameters.put("Notification", notification);
+                notificationServiceParams.put("ReaxiumParameters", reaxiumParameters);
+            } catch (Exception e) {
+            }
 
-            JsonObjectRequestUtil routeRequest = new JsonObjectRequestUtil(Request.Method.POST, APPEnvironment.createURL(GGGlobalValues.SEND_NOTIFICATIONS),notificationServiceParams, responseListener, errorListener);
+            JsonObjectRequestUtil routeRequest = new JsonObjectRequestUtil(Request.Method.POST, APPEnvironment.createURL(GGGlobalValues.SEND_NOTIFICATIONS), notificationServiceParams, responseListener, errorListener);
             routeRequest.setShouldCache(false);
             MySingletonUtil.getInstance(getActivity()).addToRequestQueue(routeRequest);
 
-        }else{
+        } else {
             GGUtil.showAToast(getActivity(), R.string.no_network_available);
         }
+    }
+
+    private void loadStopRouteOnTheMap() {
+        PolylineOptions polylineOptions = new PolylineOptions();
+        polylineOptions.color(R.color.orange);
+        polylineOptions.visible(Boolean.TRUE);
+        polylineOptions.geodesic(Boolean.TRUE);
+        polylineOptions.width(10);
+        for (LatLng location : indications) {
+            polylineOptions.add(location);
+        }
+        mRouteMap.addPolyline(polylineOptions);
     }
 
     private void loadRouteInTheMap() {
@@ -391,27 +425,30 @@ public class BusScreenFragment extends GGMainFragment {
             Response.Listener<JSONObject> responseListener = new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    Type responseType = new TypeToken<DirectionApiBean>() {}.getType();
+                    Type responseType = new TypeToken<DirectionApiBean>() {
+                    }.getType();
                     DirectionApiBean directionApiBean = JsonUtil.getEntityFromJSON(response, responseType);
-                    if(directionApiBean != null && directionApiBean.getErrorMessage() == null){
-                        if(!directionApiBean.getDirectionRouteApiBeanList().isEmpty()){
+                    if (directionApiBean != null && directionApiBean.getErrorMessage() == null) {
+                        if (!directionApiBean.getDirectionRouteApiBeanList().isEmpty()) {
                             String decodePoints = directionApiBean.getDirectionRouteApiBeanList().get(0).getOverViewPolyLine().getPoints();
                             List<LatLng> polyLine = PolyUtil.decodePoly(decodePoints);
+                            indications.addAll(polyLine);
                             PolylineOptions polylineOptions = new PolylineOptions();
-                            polylineOptions.color(R.color.orange);
+                            polylineOptions.color(R.color.blue);
                             polylineOptions.visible(Boolean.TRUE);
                             polylineOptions.geodesic(Boolean.TRUE);
-                            polylineOptions.width(5);
-                            for(LatLng location: polyLine){
+                            polylineOptions.width(7);
+                            for (LatLng location : polyLine) {
                                 polylineOptions.add(location);
                             }
                             mRouteMap.addPolyline(polylineOptions);
-                            Log.i(TAG,"Route drawed in the map");
-                        }else{
-                            Log.i(TAG,"Empty polyline");
+                            BusScreenFragment.busPositionRouteAlreadyPainted = Boolean.TRUE;
+                            Log.i(TAG, "Route drawed in the map");
+                        } else {
+                            Log.i(TAG, "Empty polyline");
                         }
-                    }else{
-                        GGUtil.showAToast(getActivity(),directionApiBean.getErrorMessage());
+                    } else {
+                        GGUtil.showAToast(getActivity(), directionApiBean.getErrorMessage());
                     }
                     hideProgressDialog();
                 }
@@ -423,12 +460,12 @@ public class BusScreenFragment extends GGMainFragment {
                     GGUtil.showAToast(getActivity(), R.string.bad_connection_message);
                 }
             };
-            if(GGGlobalValues.LAST_LOCATION != null){
+            if (GGGlobalValues.LAST_LOCATION != null) {
                 String routeUrl = getRouteUrl(GGGlobalValues.GET_POLYLINE_ROUTE);
                 JsonObjectRequestUtil routeRequest = new JsonObjectRequestUtil(Request.Method.GET, routeUrl, responseListener, errorListener);
                 routeRequest.setShouldCache(false);
                 MySingletonUtil.getInstance(getActivity()).addToRequestQueue(routeRequest);
-            }else{
+            } else {
                 GGUtil.showAToast(getActivity(), "No GPS Information Available");
             }
         } else {
@@ -440,16 +477,17 @@ public class BusScreenFragment extends GGMainFragment {
         String routeUrl = url;
 
         String origin = GGGlobalValues.LAST_LOCATION.latitude + "," + GGGlobalValues.LAST_LOCATION.longitude;
-        String destination = lastStop.getStopLatitude() + "," + lastStop.getStopLongitude();
-        StringBuffer wayPoints = new StringBuffer();
-        Stops stops;
-        for (int i = 0; i < stopsList.size() - 1; i++) {
-            stops = stopsList.get(i);
-            wayPoints.append(stops.getStopLatitude()+","+stops.getStopLongitude()+"|");
-        }
-        routeUrl = routeUrl.replace("@ORIGIN@",origin);
-        routeUrl = routeUrl.replace("@DESTINATION@",destination);
-        routeUrl = routeUrl.replace("@WAY_POINTS@",wayPoints.toString());
+        Stops firstStop = stopsList.get(0);
+        String destination = firstStop.getStopLatitude() + "," + firstStop.getStopLongitude();
+//        StringBuffer wayPoints = new StringBuffer();
+//        Stops stops;
+//        for (int i = 0; i < stopsList.size() - 1; i++) {
+//            stops = stopsList.get(i);
+//            wayPoints.append(stops.getStopLatitude()+","+stops.getStopLongitude()+"|");
+//        }
+        routeUrl = routeUrl.replace("@ORIGIN@", origin);
+        routeUrl = routeUrl.replace("@DESTINATION@", destination);
+//        routeUrl = routeUrl.replace("@WAY_POINTS@",wayPoints.toString());
         return routeUrl;
     }
 
@@ -477,6 +515,7 @@ public class BusScreenFragment extends GGMainFragment {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                Log.i(TAG, "updateMyPosition method running");
                 busLocation = locationObject;
                 reaxiumDeviceLocation = new LatLng(locationObject.getLatitude(), locationObject.getLongitude());
                 updateBusMarkerPosition(reaxiumDeviceLocation);
@@ -498,13 +537,25 @@ public class BusScreenFragment extends GGMainFragment {
             MarkerAnimation.animateMarkerToGB(mBusMarker, busLocation, new LatLngInterpolator.Spherical());
         }
         mRouteMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mBusMarker.getPosition(), 16));
+        if (!BusScreenFragment.busPositionRouteAlreadyPainted) {
+            loadRouteInTheMap();
+            loadRadioMap();
+        }
         reloadNextStopInfo(busLocation);
     }
 
     private void reloadNextStopInfo(LatLng busLocation) {
-        Stops stops = getNextStopByDistance(busLocation);
+        Stops stops = getNextStopByRadio(busLocation);
+        if(stops == null){
+            stops = stopsList.get(activeStopOrder - 1);
+        }else{
+            if(stops.getStopOrder() != activeStopOrder ){
+                busStatusDAO.changeTheNextStop(stops.getStopOrder());
+            }
+        }
         activeStopOrder = stops.getStopOrder();
         stopInfo.setText("Next Stop: " + stops.getStopAddress());
+        Log.i(TAG, "Next Stop: " + stops.getStopName());
         if (stops.getUsers() != null) {
             studentsOnTheNextStop = stops.getUsers().size();
         } else {
@@ -526,30 +577,98 @@ public class BusScreenFragment extends GGMainFragment {
     }
 
 
-    private Stops getNextStopByDistance(LatLng reaxiumDeviceLocation) {
-        Stops lastStop = stopsList.get(stopsList.size() - 1);
-        LatLng lastStopLocation = new LatLng(Double.parseDouble(lastStop.getStopLatitude()), Double.parseDouble(lastStop.getStopLongitude()));
-        LatLng stopLocation = null;
+    private Stops getNextStopByRadio(LatLng reaxiumDeviceLocation) {
         Stops nextStop = null;
-        Boolean found = Boolean.FALSE;
-        for (Stops stops : stopsList) {
-            stopLocation = new LatLng(Double.parseDouble(stops.getStopLatitude()), Double.parseDouble(stops.getStopLongitude()));
-            if (!isFarThanMe(reaxiumDeviceLocation, lastStopLocation, stopLocation)) {
-                activeStopOrder = stops.getStopOrder();
-                nextStop = stops;
-                found = Boolean.TRUE;
-                break;
+        List<LatLng> radioDeParadas;
+        double distance = 0;
+            for (Stops paradasFijas : stopsList) {
+                radioDeParadas = radioMap.get(paradasFijas.getStopOrder());
+                for (LatLng radio: radioDeParadas){
+                     distance = DistanceCalculator.getDistance(reaxiumDeviceLocation.latitude,reaxiumDeviceLocation.longitude,radio.latitude,radio.longitude,"M");
+                    if(distance < 0.05){
+                        nextStop = paradasFijas;
+                        break;
+                    }
+                }
+                if(nextStop != null){
+                    break;
+                }
             }
+        if(nextStop != null){
+            Log.i(TAG,"Next Stop Found: "+nextStop.getStopName());
         }
-        if (!found) {
-            nextStop = lastStop;
-        }
-        if (stops.getStopId() != nextStop.getStopId()) {
-            busStatusDAO.changeTheNextStop(nextStop.getStopOrder());
-        }
-        stops = nextStop;
         return nextStop;
     }
+
+
+    private void loadRadioMap(){
+        radioMap = new android.support.v4.util.ArrayMap<>();
+        List<LatLng> radioDeParadas = null;
+        for (Stops paradasFijas : stopsList) {
+            radioDeParadas = new ArrayList<>();
+            for (LatLng posibleParada : indications) {
+                if(isTheRadioOfTheStop(paradasFijas,posibleParada)){
+                    radioDeParadas.add(posibleParada);
+                }
+            }
+            radioMap.put(paradasFijas.getStopOrder(),radioDeParadas);
+        }
+        Log.i(TAG,"RadioMap: ");
+        for(Map.Entry<Integer,List<LatLng>> radioMapObject :radioMap.entrySet()){
+            Log.i(TAG,"radioMapObject #: "+radioMapObject.getKey());
+            for (LatLng latLng: radioMapObject.getValue()){
+                Log.i(TAG,"Latitude: "+latLng.latitude+" - Longitude: "+latLng.longitude);
+            }
+        }
+    }
+
+    private Boolean isTheRadioOfTheStop(Stops paradasFijas,LatLng posibleParada){
+        Boolean isTheRadio = Boolean.FALSE;
+
+        Double fixedStopLatitude = Double.parseDouble(paradasFijas.getStopLatitude());
+        Double fixedStopLongitude = Double.parseDouble(paradasFijas.getStopLongitude());
+        Stops fixedNextStop= null;
+        try {
+             fixedNextStop = stopsList.get(paradasFijas.getStopOrder());
+        }catch(IndexOutOfBoundsException e){
+            fixedNextStop = null;
+        }
+
+        Double stopToTestLatitude = posibleParada.latitude;
+        Double stopToTestLongitude = posibleParada.longitude;
+        Double  nextStopLatitude = null;
+        Double  nextStopLongitude = null;
+        Double distance = DistanceCalculator.getDistance(stopToTestLatitude,stopToTestLongitude,fixedStopLatitude,fixedStopLongitude,"M");
+        Double nextStopDistance = null;
+        if(fixedNextStop != null){
+            nextStopLatitude =  Double.parseDouble(fixedNextStop.getStopLatitude());
+            nextStopLongitude =  Double.parseDouble(fixedNextStop.getStopLongitude());
+            nextStopDistance =  DistanceCalculator.getDistance(nextStopLatitude,nextStopLongitude,stopToTestLatitude,stopToTestLongitude,"M");
+        }
+
+        Log.i(TAG,"Parada: "+paradasFijas.getStopName());
+        Log.i(TAG,"Parada: Latitude: "+fixedStopLatitude);
+        Log.i(TAG,"Parada: Longitude: "+fixedStopLongitude);
+        Log.i(TAG,"Posible *: Latitude: "+stopToTestLatitude);
+        Log.i(TAG,"Posible *: Longitude: "+stopToTestLongitude);
+        Log.i(TAG,"NextStop *: Latitude: "+nextStopLatitude);
+        Log.i(TAG,"NextStop *: Longitude: "+nextStopLongitude);
+
+        Log.i(TAG,"distance: "+distance);
+        Log.i(TAG,"nextStopDistance: "+nextStopDistance);
+
+        if(distance <= 0.17 && (nextStopDistance != null && nextStopDistance >=0.17)){
+            isTheRadio =  Boolean.TRUE;
+
+        }else if(distance <= 0.17 && nextStopDistance== null){
+            isTheRadio =  Boolean.TRUE;
+        }
+
+        Log.i(TAG,"isTheRadio: "+isTheRadio);
+
+        return isTheRadio;
+    }
+
 
     private Boolean isFarThanMe(LatLng myLocation, LatLng lastStop, LatLng stopToCompare) {
         Boolean isFarThanMe = Boolean.FALSE;
@@ -645,6 +764,50 @@ public class BusScreenFragment extends GGMainFragment {
             Log.e(TAG, "", e);
         }
         return requestObject;
+    }
+
+    @Override
+    public void validateDocument(String documentCode) {
+        User user = reaxiumUsersDAO.getUserByDocumentCode(documentCode);
+        String trafficInfoResult = "";
+        String trafficInfo = "";
+        String userAccessType = "DocumentID";
+        String userAccessTypeID = "4";
+        if (user != null) {
+            SuccessfulAccessPlayerSingleton.getInstance(getActivity()).initRingTone();
+            trafficInfo = user.getFirstName() + " " + user.getFirstLastName() + ", @IN_OR_OUT@ #, at @Time@";
+            user.setAccessTime(GGUtil.getTimeFormatted(new Date()));
+            Long lastInsertedId;
+            String trafficTypeId;
+            AccessControl accessControl = accessControlDAO.getLastAccess("" + user.getUserId().longValue());
+
+            if (accessControl != null && accessControl.getAccessType().equalsIgnoreCase("IN")) {
+                studentsOnBoard = busStatusDAO.dropAUserOffTheBus(route.getRouteId());
+                trafficTypeId = "2";
+                trafficInfoResult = trafficInfo.replace("@IN_OR_OUT@", "Off the bus");
+                lastInsertedId = accessControlDAO.insertUserAccess(user.getUserId(), userAccessType, "OUT");
+                userOUTFoundDialog = new UserOUTFoundDialog(getActivity(), android.R.style.Theme_NoTitleBar_Fullscreen);
+                userOUTFoundDialog.updateUserInfo(user);
+                userOUTFoundDialog.show();
+                delayedUserOUTDialogDismiss();
+            } else {
+                studentsOnBoard = busStatusDAO.aboardAUserOnTheBus(route.getRouteId());
+                trafficTypeId = "1";
+                trafficInfoResult = trafficInfo.replace("@IN_OR_OUT@", "aboard the bus");
+                lastInsertedId = accessControlDAO.insertUserAccess(user.getUserId(), userAccessType, "IN");
+                userINFoundDialog = new UserINFoundDialog(getActivity(), android.R.style.Theme_NoTitleBar_Fullscreen);
+                userINFoundDialog.updateUserInfo(user);
+                userINFoundDialog.show();
+                delayedUserINDialogDismiss();
+            }
+
+            studentsOnBoardInput.setText("" + studentsOnBoard);
+            saveAccessInServer(lastInsertedId, user.getUserId(), trafficTypeId, getSharedPreferences().getLong(GGGlobalValues.DEVICE_ID), userAccessTypeID, trafficInfoResult);
+
+        } else {
+            FailureAccessPlayerSingleton.getInstance(getActivity()).initRingTone();
+            GGUtil.showAToast(getActivity(), "Invalid student id, not registered: " + documentCode);
+        }
     }
 
     private class AccessControlHandler extends ScannersActivityHandler {

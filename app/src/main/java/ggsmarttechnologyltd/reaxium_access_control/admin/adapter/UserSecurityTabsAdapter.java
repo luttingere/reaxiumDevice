@@ -29,13 +29,13 @@ public class UserSecurityTabsAdapter extends FragmentStatePagerAdapter {
         Fragment fragment = null;
         switch (position){
             case 0:
-                fragment = BiometricCaptureFragment.getInstance();
-                break;
-            case 1:
                 fragment = RFIDCaptureFragment.getInstance();
                 break;
-            default:
+            case 1:
                 fragment = BiometricCaptureFragment.getInstance();
+                break;
+            default:
+                fragment = RFIDCaptureFragment.getInstance();
                 break;
         }
         return fragment;

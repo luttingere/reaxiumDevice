@@ -28,7 +28,7 @@ public class InitScannersInAutoModeThread extends Thread {
 
     @Override
     public void run() {
-        showProgressDialog();
+//        showProgressDialog();
 //        try{
 //            if(GGUtil.startFingerScannerService(mContext, scannersHandler)){
 //                automaticFingerPrintValidationThread = new AutomaticFingerPrintValidationThread(App.fingerprintScanner, scannersHandler,mContext);
@@ -45,7 +45,7 @@ public class InitScannersInAutoModeThread extends Thread {
         }catch (Exception e){
             Log.e(TAG,"Card reader error:",e);
         }
-        dismissProgressDialog();
+        //dismissProgressDialog();
     }
 
     public void showProgressDialog(){

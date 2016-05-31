@@ -107,20 +107,30 @@ public class GGUtil {
 
     public static Boolean openCardReader(Context context, ScannersActivityHandler scannersActivityHandler) {
         Boolean isOk = Boolean.FALSE;
+        int retires = 3;
+        int intent = 0;
         int error;
-        try {
-            App.cardReader = ICCardReader.getInstance();
-            if ((error = App.cardReader.powerOn()) != ICCardReader.RESULT_OK) {
-                scannersActivityHandler.sendMessage(scannersActivityHandler.obtainMessage(ScannersActivityHandler.ERROR_ROUTINE, "the system fail turning on the card reader, error code: " + RFIDErrorMessage.getErrorMessage(error)));
+        while(intent < retires){
+            intent++;
+            try {
+                App.cardReader = ICCardReader.getInstance();
+                if ((error = App.cardReader.powerOn()) != ICCardReader.RESULT_OK) {
+                    scannersActivityHandler.sendMessage(scannersActivityHandler.obtainMessage(ScannersActivityHandler.ERROR_ROUTINE, "the system fail turning on the card reader, error code: " + RFIDErrorMessage.getErrorMessage(error)));
+                }
+                if ((error = App.cardReader.open()) != ICCardReader.RESULT_OK) {
+                    scannersActivityHandler.sendMessage(scannersActivityHandler.obtainMessage(ScannersActivityHandler.ERROR_ROUTINE, "the system fail opening the card reader, error code: " + RFIDErrorMessage.getErrorMessage(error)));
+                } else {
+                    isOk = Boolean.TRUE;
+                    intent = retires;
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error initializing the card reader", e);
+                if(intent == retires){
+                    scannersActivityHandler.sendMessage(scannersActivityHandler.obtainMessage(ScannersActivityHandler.ERROR_ROUTINE, "the system fail opening the card reader, error code: " + e.getMessage()));
+                }else{
+                    try {Thread.sleep(500);}catch (Exception e1){}
+                }
             }
-            if ((error = App.cardReader.open()) != ICCardReader.RESULT_OK) {
-                scannersActivityHandler.sendMessage(scannersActivityHandler.obtainMessage(ScannersActivityHandler.ERROR_ROUTINE, "the system fail opening the card reader, error code: " + RFIDErrorMessage.getErrorMessage(error)));
-            } else {
-                isOk = Boolean.TRUE;
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error initializing the card reader", e);
-            scannersActivityHandler.sendMessage(scannersActivityHandler.obtainMessage(ScannersActivityHandler.ERROR_ROUTINE, "the system fail opening the card reader, error code: " + e.getMessage()));
         }
         return isOk;
     }

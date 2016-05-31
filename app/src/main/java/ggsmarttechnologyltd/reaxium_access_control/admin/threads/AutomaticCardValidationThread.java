@@ -39,7 +39,10 @@ public class AutomaticCardValidationThread extends Thread {
         while (!stop) {
             try {
                 if (cardReadedSuccessfully) {
-                    sleep(3000);
+                    sleep(2000);
+                    if(stop){
+                        break;
+                    }
                     cardReadedSuccessfully = Boolean.FALSE;
                 }
                 securityObject = GGUtil.scanRFID(cardReader);

@@ -35,6 +35,9 @@ public class Routes extends AppBean {
     @SerializedName("route_type")
     private Integer routeType;
 
+    @SerializedName("overview_polyline")
+    private String routePolyLine;
+
     @SerializedName("stops")
     private List<Stops> stops;
 
@@ -108,5 +111,13 @@ public class Routes extends AppBean {
 
     public void setRouteType(Integer routeType) {
         this.routeType = routeType;
+    }
+
+    public String getRoutePolyLine() {
+        return routePolyLine;
+    }
+
+    public void setRoutePolyLine(String routePolyLine) {
+        this.routePolyLine = routePolyLine;
     }
 }

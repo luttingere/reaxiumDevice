@@ -158,7 +158,6 @@ public class AccessControlFragment extends GGMainFragment implements OnUserClick
             Collections.sort(listIN);
             Collections.sort(listOUT);
         }
-
     }
 
     @Override

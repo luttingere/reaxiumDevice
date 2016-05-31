@@ -83,6 +83,12 @@ public class DriverScreenFragment extends GGMainFragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        BusScreenFragment.busPositionRouteAlreadyPainted = Boolean.FALSE;
+    }
+
+    @Override
     public void clearAllViewComponents() {
 
     }

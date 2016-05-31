@@ -47,8 +47,8 @@ public class RFIDCaptureFragment extends GGMainFragment {
 
 
     private Button writeRFIDCard;
-    private TextView exampleText;
-    private ImageView checkImage;
+    private static TextView exampleText;
+    private static ImageView checkImage;
     public static RFIDCaptureHelper helper;
     private static User mSelectedUser;
     private Long cardId;
@@ -115,6 +115,7 @@ public class RFIDCaptureFragment extends GGMainFragment {
 
     private void configureRFID(){
         showProgressDialog("Configuring the RFID Card...");
+
         if(writeUserIdInTheCard()){
             hideProgressDialog();
             new AlertDialog.Builder(getActivity(), R.style.MyDialogTheme)
@@ -207,6 +208,8 @@ public class RFIDCaptureFragment extends GGMainFragment {
 
     public static void setUserSelected(User user) {
         mSelectedUser = user;
+        exampleText.setVisibility(View.VISIBLE);
+        checkImage.setVisibility(View.GONE);
     }
 
 

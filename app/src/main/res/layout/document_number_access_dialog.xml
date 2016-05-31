@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:background="@color/white"
+    android:layout_height="fill_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:background="@color/white"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:clickable="true"
+            android:id="@+id/close_container"
+            android:layout_alignParentRight="true"
+            android:padding="12dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp">
+
+            <ImageView
+                android:src="@drawable/close_icon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:layout_below="@+id/close_container"
+            android:id="@+id/allContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/reaxium_logo"
+                android:layout_width="170dp"
+                android:layout_height="120dp"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="50dp"
+                android:src="@drawable/logo_reaxium_signal" />
+
+            <RelativeLayout
+                android:id="@+id/fields_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/reaxium_logo"
+                android:layout_marginTop="60dp">
+
+                <RelativeLayout
+                    android:id="@+id/user_student_id_container"
+                    android:layout_width="450dp"
+                    android:layout_height="70dp"
+                    android:layout_centerHorizontal="true"
+                    android:background="@drawable/rounded_corners_yellow"
+                    android:clickable="false"
+                    android:padding="5dp">
+
+                    <ImageView
+                        android:id="@+id/login_image_icon"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/student_id_icon" />
+
+
+                    <EditText
+                        android:id="@+id/studen_id_input"
+                        android:layout_width="390dp"
+                        android:layout_height="match_parent"
+                        android:layout_toRightOf="@+id/login_image_icon"
+                        android:background="@android:color/transparent"
+                        android:digits="0123456789"
+                        android:gravity="center|left"
+                        android:hint="@string/student_id_hint"
+                        android:inputType="number"
+                        android:paddingLeft="15dp"
+                        android:textSize="25sp"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/black" />
+
+
+                </RelativeLayout>
+
+
+                <RelativeLayout
+                    android:id="@+id/validateDocumentCodeButton"
+                    android:layout_width="450dp"
+                    android:layout_height="70dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_below="@+id/user_student_id_container"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="30dp"
+                    android:background="@drawable/rounded_corners_orange"
+                    android:clickable="true"
+                    android:padding="5dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:clickable="false"
+                        android:gravity="center"
+                        android:imeOptions="actionNext"
+                        android:text="Validate"
+                        android:textColor="@color/black"
+                        android:textSize="25sp" />
+
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+            <View
+                android:layout_below="@+id/fields_container"
+                android:layout_width="match_parent"
+                android:layout_height="90dp"></View>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:background="@color/white"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:layout_below="@+id/allContainer">
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+</ScrollView>

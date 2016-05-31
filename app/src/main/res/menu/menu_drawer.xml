@@ -45,19 +45,19 @@
     </group>
 
 
-    <group
-        android:id="@+id/access_control_menu_container"
-        android:checkableBehavior="single"
-        android:menuCategory="container"
-        app:itemBackground="@android:color/black">
+    <!--<group-->
+        <!--android:id="@+id/access_control_menu_container"-->
+        <!--android:checkableBehavior="single"-->
+        <!--android:menuCategory="container"-->
+        <!--app:itemBackground="@android:color/black">-->
 
-        <item
-            android:id="@+id/action_access_control"
-            android:icon="@drawable/access_control_icon"
-            android:title="@string/menu_drawer_access_control" />
+        <!--<item-->
+            <!--android:id="@+id/action_access_control"-->
+            <!--android:icon="@drawable/access_control_icon"-->
+            <!--android:title="@string/menu_drawer_access_control" />-->
 
 
-    </group>
+    <!--</group>-->
 
 
     <group
@@ -74,18 +74,18 @@
 
     </group>
 
-    <group
-        android:id="@+id/nav_test"
-        android:checkableBehavior="single"
-        android:menuCategory="container"
-        app:itemBackground="@android:color/black">
+    <!--<group-->
+        <!--android:id="@+id/nav_test"-->
+        <!--android:checkableBehavior="single"-->
+        <!--android:menuCategory="container"-->
+        <!--app:itemBackground="@android:color/black">-->
 
-        <item
-            android:id="@+id/show_map"
-            android:icon="@drawable/test"
-            android:title="@string/menu_drawer_show_map" />
+        <!--<item-->
+            <!--android:id="@+id/show_map"-->
+            <!--android:icon="@drawable/test"-->
+            <!--android:title="@string/menu_drawer_show_map" />-->
 
-    </group>
+    <!--</group>-->
 
 
 </menu>

@@ -60,7 +60,8 @@ public class UserSecurityFragment extends GGMainFragment implements OnUserClickL
     private LinearLayoutManager mLinearLayoutManager;
     public ViewPager viewPager;
     private TabLayout tabLayout;
-    private int tabTitles[] = new int[]{R.string.user_security_panel_tab_fingerprint, R.string.user_security_panel_tab_rfid};
+    //private int tabTitles[] = new int[]{R.string.user_security_panel_tab_fingerprint, R.string.user_security_panel_tab_rfid};
+    private int tabTitles[] = new int[]{R.string.user_security_panel_tab_rfid,R.string.user_security_panel_tab_fingerprint};
     private UserSecurityTabsAdapter tabsAdapter;
     private UsersListAdapter mUsersListAdapter;
     private TextWatcher searchUserWatcher;
@@ -134,7 +135,7 @@ public class UserSecurityFragment extends GGMainFragment implements OnUserClickL
         viewPager = (ViewPager) view.findViewById(R.id.user_security_info_pager);
         tabsAdapter = new UserSecurityTabsAdapter(getChildFragmentManager(), getActivity(), tabTitles.length, tabTitles);
         viewPager.setAdapter(tabsAdapter);
-        viewPager.setOffscreenPageLimit(2);
+        viewPager.setOffscreenPageLimit(1);
         tabLayout = (TabLayout) view.findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
         viewPager.setCurrentItem(0);
@@ -171,7 +172,6 @@ public class UserSecurityFragment extends GGMainFragment implements OnUserClickL
         });
 
         //User list container
-
 
         //User security tabs container
 
@@ -228,7 +228,7 @@ public class UserSecurityFragment extends GGMainFragment implements OnUserClickL
             @Override
             public void onTextChanged(CharSequence text, int start, int before, int count) {
                 searchText = text.toString();
-                if (searchText.length() > 4) {
+                if (searchText.length() > 2) {
                     mGoButton.setVisibility(View.VISIBLE);
                 } else {
                     mGoButton.setVisibility(View.GONE);
@@ -311,6 +311,8 @@ public class UserSecurityFragment extends GGMainFragment implements OnUserClickL
         mUserSecurityInfoContainer.setVisibility(View.VISIBLE);
         mUserFullName.setText(user.getFirstName() + " " + user.getSecondName() + " " + user.getFirstLastName() + " " + user.getSecondLastName());
         mUserIDNumber.setText(user.getDocumentId());
+        mUserType.setText(user.getUserType().getUserTypeName());
+        mUserBusinessName.setText(user.getBusiness().getBusinessName());
         loadFingerPrintImage(user);
         RFIDCaptureFragment.setUserSelected(user);
         BiometricCaptureFragment.setUserSelected(user);

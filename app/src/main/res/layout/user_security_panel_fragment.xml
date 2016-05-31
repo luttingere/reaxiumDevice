@@ -124,7 +124,7 @@
             android:id="@+id/user_data_container"
             android:layout_marginTop="10dp"
             android:layout_width="match_parent"
-            android:layout_height="70dp"
+            android:layout_height="85dp"
             android:layout_toRightOf="@+id/photo_container">
 
             <RelativeLayout
@@ -189,7 +189,7 @@
             app:tabTextColor="@android:color/black"
             android:layout_gravity="center"
             app:tabMode="fixed"
-            android:layout_marginTop="10dp"/>
+            android:layout_marginTop="18dp"/>
 
         <View
             android:id="@+id/separator"

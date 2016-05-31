@@ -22,6 +22,9 @@ public class UserAccessData extends AppBean {
     @SerializedName("user_password")
     private String userPassword;
 
+    @SerializedName("document_id")
+    private String documentId;
+
     @SerializedName("user")
     private User user;
 
@@ -83,5 +86,13 @@ public class UserAccessData extends AppBean {
 
     public void setAccessType(AccessType accessType) {
         this.accessType = accessType;
+    }
+
+    public String getDocumentId() {
+        return documentId;
+    }
+
+    public void setDocumentId(String documentId) {
+        this.documentId = documentId;
     }
 }

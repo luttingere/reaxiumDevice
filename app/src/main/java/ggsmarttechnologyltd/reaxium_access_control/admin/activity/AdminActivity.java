@@ -13,28 +13,20 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.google.android.gms.iid.InstanceID;
 
 import ggsmarttechnologyltd.reaxium_access_control.GGMainActivity;
 import ggsmarttechnologyltd.reaxium_access_control.GGMainFragment;
 import ggsmarttechnologyltd.reaxium_access_control.R;
-import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.AccessControlFragment;
-import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.AddUserFragment;
 import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.AdminFragment;
 import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.ConfigureDeviceFragment;
-import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.ShowMapFragment;
 import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.UserPanelFragment;
 import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.UserSecurityFragment;
-import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.VerifyBiometricFragment;
+import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.VerifyRFIDFragment;
 import ggsmarttechnologyltd.reaxium_access_control.admin.threads.AutomaticFingerPrintValidationThread;
 import ggsmarttechnologyltd.reaxium_access_control.global.GGGlobalValues;
 import ggsmarttechnologyltd.reaxium_access_control.login.activity.LoginActivity;
-import ggsmarttechnologyltd.reaxium_access_control.service.SendLocationService;
 import ggsmarttechnologyltd.reaxium_access_control.service.SendLocationServiceDefault;
 import ggsmarttechnologyltd.reaxium_access_control.util.GGUtil;
 import ggsmarttechnologyltd.reaxium_access_control.util.SharedPreferenceUtil;
@@ -220,13 +212,13 @@ public class AdminActivity extends GGMainActivity {
                     mDrawerLayout.closeDrawer(GravityCompat.END);
                     break;
                 case R.id.action_verify_biometric:
-                    runMyFragment(new VerifyBiometricFragment(), null,menuItem.getItemId());
+                    runMyFragment(new VerifyRFIDFragment(), null,menuItem.getItemId());
                     mDrawerLayout.closeDrawer(GravityCompat.END);
                     break;
-                case R.id.action_access_control:
-                    runMyFragment(new AccessControlFragment(), null,menuItem.getItemId());
-                    mDrawerLayout.closeDrawer(GravityCompat.END);
-                    break;
+//                case R.id.action_access_control:
+//                    runMyFragment(new AccessControlFragment(), null,menuItem.getItemId());
+//                    mDrawerLayout.closeDrawer(GravityCompat.END);
+//                    break;
                 case R.id.action_logout:
                     AutomaticFingerPrintValidationThread.stopScanner();
                     sharedPreferenceUtil.removeValue(GGGlobalValues.USER_ID_IN_SESSION);
@@ -237,10 +229,10 @@ public class AdminActivity extends GGMainActivity {
                     startActivity(goToLoginPage);
                     finish();
                     break;
-                case R.id.show_map:
-                    runMyFragment(new ShowMapFragment(), null,menuItem.getItemId());
-                    mDrawerLayout.closeDrawer(GravityCompat.END);
-                    break;
+//                case R.id.show_map:
+//                    runMyFragment(new ShowMapFragment(), null,menuItem.getItemId());
+//                    mDrawerLayout.closeDrawer(GravityCompat.END);
+//                    break;
                 default:
                     break;
             }

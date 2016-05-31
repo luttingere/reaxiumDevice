@@ -69,12 +69,14 @@ public class GGGlobalValues {
     public static final String SYNCHRONIZE_DEVICE = "Device/synchronizeDeviceAccess";
     public static final String VALIDATE_ACCESS = "UserAccess/executeUserAndPasswordAccessInADevice";
     public static final String VALIDATE_ACCESS_WITH_RFID = "UserAccess/executeAnRFIDAccessInADevice";
+    public static final String VALIDATE_RFID_CARD = "RFID/validateRFIDCard";
     public static final String SAVE_A_USER = "Users/saveUserFromDevice";
     public static final String SAVE_ACCESS_IN_SERVER = "UserAccess/executeAnAccessOfAUser";
     public static final String EDIT_A_USER = "Users/editUserFromDevice";
     public static final String SEND_NOTIFICATIONS = "Alarm/sendNotification";
     public static final String GET_ROUTES = "Routes/deviceGetRoutes";
     public static final String NOTIFY_POSITION = "DeviceUpdateLocation/notifyLocation";
-    public static final String GET_POLYLINE_ROUTE = "https://maps.googleapis.com/maps/api/directions/json?origin=@ORIGIN@&destination=@DESTINATION@&waypoints=@WAY_POINTS@&key=AIzaSyBlSE61xW7a0B4P5SEPcDccdSWBtoRM4tw";
+//    public static final String GET_POLYLINE_ROUTE = "https://maps.googleapis.com/maps/api/directions/json?origin=@ORIGIN@&destination=@DESTINATION@&waypoints=@WAY_POINTS@&key=AIzaSyBlSE61xW7a0B4P5SEPcDccdSWBtoRM4tw";
+    public static final String GET_POLYLINE_ROUTE = "https://maps.googleapis.com/maps/api/directions/json?origin=@ORIGIN@&destination=@DESTINATION@&key=AIzaSyBlSE61xW7a0B4P5SEPcDccdSWBtoRM4tw";
 
 }
