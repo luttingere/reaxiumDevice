@@ -295,7 +295,7 @@ public class UserPanelFragment extends GGMainFragment implements OnUserClickList
             @Override
             public void onTextChanged(CharSequence text, int start, int before, int count) {
                 searchText = text.toString();
-                if (searchText.length() > 4) {
+                if (searchText.length() > 2) {
                     mGoButton.setVisibility(View.VISIBLE);
                 } else {
                     mGoButton.setVisibility(View.GONE);

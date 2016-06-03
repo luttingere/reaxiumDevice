@@ -41,23 +41,28 @@
             android:icon="@drawable/verify_user"
             android:title="@string/menu_drawer_verify_biometric" />
 
+        <item
+            android:id="@+id/send_location_option"
+            android:icon="@drawable/send_signal"
+            android:title="@string/menu_drawer_send_location" />
+
 
     </group>
 
 
-    <!--<group-->
-        <!--android:id="@+id/access_control_menu_container"-->
-        <!--android:checkableBehavior="single"-->
-        <!--android:menuCategory="container"-->
-        <!--app:itemBackground="@android:color/black">-->
+    <group
+        android:id="@+id/access_control_menu_container"
+        android:checkableBehavior="single"
+        android:menuCategory="container"
+        app:itemBackground="@android:color/black">
 
-        <!--<item-->
-            <!--android:id="@+id/action_access_control"-->
-            <!--android:icon="@drawable/access_control_icon"-->
-            <!--android:title="@string/menu_drawer_access_control" />-->
+        <item
+            android:id="@+id/action_access_control"
+            android:icon="@drawable/access_control_icon"
+            android:title="@string/menu_drawer_access_control" />
 
 
-    <!--</group>-->
+    </group>
 
 
     <group

@@ -39,6 +39,7 @@ import ggsmarttechnologyltd.reaxium_access_control.database.BiometricDAO;
 import ggsmarttechnologyltd.reaxium_access_control.database.ReaxiumUsersDAO;
 import ggsmarttechnologyltd.reaxium_access_control.global.APPEnvironment;
 import ggsmarttechnologyltd.reaxium_access_control.global.GGGlobalValues;
+import ggsmarttechnologyltd.reaxium_access_control.service.PushUtil;
 import ggsmarttechnologyltd.reaxium_access_control.util.GGUtil;
 import ggsmarttechnologyltd.reaxium_access_control.util.JsonObjectRequestUtil;
 import ggsmarttechnologyltd.reaxium_access_control.util.JsonUtil;
@@ -310,7 +311,7 @@ public class ConfigureDeviceFragment extends GGMainFragment {
                         Type responseType = new TypeToken<ApiResponse<ReaxiumDevice>>() {}.getType();
                         ApiResponse<ReaxiumDevice> apiResponse = JsonUtil.getEntityFromJSON(response, responseType);
                         if (apiResponse.getReaxiumResponse().getCode() == GGGlobalValues.SUCCESSFUL_API_RESPONSE_CODE) {
-                            mLockConfiguration.setImageResource(R.drawable.passwordlogin);
+                            lockOrUnlockConfiguration();
                             ReaxiumDevice device = apiResponse.getReaxiumResponse().getObject().get(0);
                             saveDeviceData(device);
                             GGUtil.showAToast(getActivity(), apiResponse.getReaxiumResponse().getMessage());
@@ -348,7 +349,8 @@ public class ConfigureDeviceFragment extends GGMainFragment {
             JSONObject reaxiumParameters = new JSONObject();
             JSONObject reaxiumDevice = new JSONObject();
             reaxiumDevice.put("device_id", mDeviceIdInput.getText().toString().trim());
-            reaxiumDevice.put("device_token", "temporal_device_token");
+            reaxiumDevice.put("device_token", PushUtil.getRegistrationId(getActivity()));
+            reaxiumDevice.put("device_serial", sharedPreferenceUtil.getString(GGGlobalValues.DEVICE_SERIAL));
             if(outOfSyncList != null && !outOfSyncList.isEmpty()){
                 JSONObject accessData = null;
                 JSONArray accessDataBulk = new JSONArray();

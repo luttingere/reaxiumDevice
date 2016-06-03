@@ -15,8 +15,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.google.android.gms.iid.InstanceID;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -31,6 +29,7 @@ import java.lang.reflect.Type;
 
 import ggsmarttechnologyltd.reaxium_access_control.R;
 import ggsmarttechnologyltd.reaxium_access_control.activity.MainActivity;
+import ggsmarttechnologyltd.reaxium_access_control.admin.activity.AdminActivity;
 import ggsmarttechnologyltd.reaxium_access_control.beans.ApiResponse;
 import ggsmarttechnologyltd.reaxium_access_control.beans.LocationObject;
 import ggsmarttechnologyltd.reaxium_access_control.global.APPEnvironment;
@@ -46,7 +45,7 @@ import ggsmarttechnologyltd.reaxium_access_control.util.SharedPreferenceUtil;
 /**
  * Created by Eduardo Luttinger on 05/02/2016.
  */
-public class SendLocationService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class AdminSendLocationService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     /**
      * tag for log proposals
@@ -97,7 +96,7 @@ public class SendLocationService extends Service implements GoogleApiClient.Conn
      * Initialize the broadcast manager
      */
     private void initBroadCast(){
-        mLocalBroadcastManager = LocalBroadcastManager.getInstance(SendLocationService.this);
+        mLocalBroadcastManager = LocalBroadcastManager.getInstance(AdminSendLocationService.this);
     }
 
     /**
@@ -182,7 +181,8 @@ public class SendLocationService extends Service implements GoogleApiClient.Conn
         locationObject.setLatitude(latitude);
         locationObject.setLongitude(longitude);
         notifyMyPositionInServer(latitude,longitude);
-        sendCustomBroadCast(locationObject, MainActivity.LOCATION_CHANGED);
+        GGUtil.showAShortToast(this,"Device Location sent successfully");
+     //   sendCustomBroadCast(locationObject, AdminActivity.LOCATION_CHANGED);
     }
 
     private void notifyMyPositionInServer(Double latitude, Double longitude){
@@ -193,14 +193,14 @@ public class SendLocationService extends Service implements GoogleApiClient.Conn
                     Type responseType = new TypeToken<ApiResponse<Object>>() {}.getType();
                     ApiResponse<Object> apiResponse = JsonUtil.getEntityFromJSON(response, responseType);
                     if (apiResponse.getReaxiumResponse().getCode() != GGGlobalValues.SUCCESSFUL_API_RESPONSE_CODE) {
-                        GGUtil.showAShortToast(SendLocationService.this, apiResponse.getReaxiumResponse().getMessage());
+                        GGUtil.showAShortToast(AdminSendLocationService.this, apiResponse.getReaxiumResponse().getMessage());
                     }
                 }
             };
             Response.ErrorListener errorListener = new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    GGUtil.showAShortToast(SendLocationService.this, "Bad connection with reaxium server");
+                    GGUtil.showAShortToast(AdminSendLocationService.this, "Bad connection with reaxium server");
                 }
             };
             Log.i(TAG,"SENDING DEVICE LOCATION");

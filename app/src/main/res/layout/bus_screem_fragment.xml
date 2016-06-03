@@ -196,12 +196,13 @@
                 android:clickable="false"
                 android:visibility="gone"
                 android:id="@+id/show_driver_option_container"
-                android:layout_width="450dp"
+                android:layout_width="550dp"
                 android:layout_height="100dp"
                 android:layout_alignParentRight="true"
                 android:background="@drawable/rounded_corners_gray_transparent"
                 android:orientation="horizontal"
                 android:padding="10dp">
+
 
                 <ImageView
                     android:clickable="true"
@@ -209,6 +210,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:src="@drawable/touchable_green_arrow" />
+
+                <Button
+                    android:text="END"
+                    android:textSize="35dp"
+                    android:id="@+id/end_route"
+                    android:layout_width="85dp"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/rounded_corners_orange_custom" />
 
 
                 <ImageView
@@ -236,6 +245,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:src="@drawable/car_crash_alarm_icon" />
+
 
 
             </LinearLayout>

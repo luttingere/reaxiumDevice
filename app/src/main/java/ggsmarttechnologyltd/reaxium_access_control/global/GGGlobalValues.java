@@ -74,6 +74,7 @@ public class GGGlobalValues {
     public static final String SAVE_ACCESS_IN_SERVER = "UserAccess/executeAnAccessOfAUser";
     public static final String EDIT_A_USER = "Users/editUserFromDevice";
     public static final String SEND_NOTIFICATIONS = "Alarm/sendNotification";
+    public static final String SEND_NEXT_STOP_NOTIFICATIONS = "Alarm/sendNextStopNotification";
     public static final String GET_ROUTES = "Routes/deviceGetRoutes";
     public static final String NOTIFY_POSITION = "DeviceUpdateLocation/notifyLocation";
 //    public static final String GET_POLYLINE_ROUTE = "https://maps.googleapis.com/maps/api/directions/json?origin=@ORIGIN@&destination=@DESTINATION@&waypoints=@WAY_POINTS@&key=AIzaSyBlSE61xW7a0B4P5SEPcDccdSWBtoRM4tw";

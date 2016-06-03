@@ -32,6 +32,7 @@ import ggsmarttechnologyltd.reaxium_access_control.admin.dialog.UserOUTFoundDial
 import ggsmarttechnologyltd.reaxium_access_control.admin.listeners.OnUserClickListener;
 import ggsmarttechnologyltd.reaxium_access_control.admin.threads.AutomaticCardValidationThread;
 import ggsmarttechnologyltd.reaxium_access_control.admin.threads.AutomaticFingerPrintValidationThread;
+import ggsmarttechnologyltd.reaxium_access_control.admin.threads.InitScannersInAutoModeDefaultThread;
 import ggsmarttechnologyltd.reaxium_access_control.admin.threads.InitScannersInAutoModeThread;
 import ggsmarttechnologyltd.reaxium_access_control.admin.threads.ScannersActivityHandler;
 import ggsmarttechnologyltd.reaxium_access_control.admin.threads.InitFingerPrintThread;
@@ -121,7 +122,7 @@ public class AccessControlFragment extends GGMainFragment implements OnUserClick
     public void onResume() {
         super.onResume();
         handler = new AccessControlHandler();
-        InitScannersInAutoModeThread initScannersInAutoModeThread = new InitScannersInAutoModeThread(getActivity(), handler);
+        InitScannersInAutoModeDefaultThread initScannersInAutoModeThread = new InitScannersInAutoModeDefaultThread(getActivity(), handler);
         initScannersInAutoModeThread.start();
         Log.i(TAG, "automatic detection has started");
     }
@@ -131,7 +132,6 @@ public class AccessControlFragment extends GGMainFragment implements OnUserClick
 //        AutomaticFingerPrintValidationThread.stopScanner();
 //        GGUtil.closeFingerPrint();
         AutomaticCardValidationThread.stopScanner();
-        GGUtil.closeCardReader();
         Log.i(TAG, "the scanners han bean turned off successfully");
         super.onPause();
     }

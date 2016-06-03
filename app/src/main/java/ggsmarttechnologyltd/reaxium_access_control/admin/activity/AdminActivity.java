@@ -1,10 +1,14 @@
 package ggsmarttechnologyltd.reaxium_access_control.admin.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
@@ -16,15 +20,23 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import ggsmarttechnologyltd.reaxium_access_control.GGMainActivity;
 import ggsmarttechnologyltd.reaxium_access_control.GGMainFragment;
 import ggsmarttechnologyltd.reaxium_access_control.R;
+import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.AccessControlFragment;
 import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.AdminFragment;
 import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.ConfigureDeviceFragment;
+import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.SendLocationFragment;
 import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.UserPanelFragment;
 import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.UserSecurityFragment;
 import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.VerifyRFIDFragment;
+import ggsmarttechnologyltd.reaxium_access_control.admin.threads.AutomaticCardValidationThread;
 import ggsmarttechnologyltd.reaxium_access_control.admin.threads.AutomaticFingerPrintValidationThread;
+import ggsmarttechnologyltd.reaxium_access_control.beans.LocationObject;
+import ggsmarttechnologyltd.reaxium_access_control.fragment.BusScreenFragment;
 import ggsmarttechnologyltd.reaxium_access_control.global.GGGlobalValues;
 import ggsmarttechnologyltd.reaxium_access_control.login.activity.LoginActivity;
 import ggsmarttechnologyltd.reaxium_access_control.service.SendLocationServiceDefault;
@@ -50,12 +62,47 @@ public class AdminActivity extends GGMainActivity {
      */
     private GGMainFragment mFragmentInScreen;
 
+
+    /**
+     * Manager of broadCast between this activity and any service
+     */
+    protected LocalBroadcastManager mLocalBroadcastManager;
+
     /**
      * back button
      */
     private LinearLayout navigationBack;
 
     private SharedPreferenceUtil sharedPreferenceUtil;
+
+    /**
+     * FILTER List
+     */
+    public static List<String> ACTIONS_LIST = new LinkedList<>();
+    /**
+     * Filters
+     */
+    public static final String LOCATION_CHANGED = "ADMIN_LOCATION_CHANGED";
+
+    /**
+     * Broad cast handler
+     */
+    protected BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.i(TAG,"Broad Cast received");
+            switch (intent.getAction()) {
+                case LOCATION_CHANGED:
+                    if(getMainFragment() instanceof SendLocationFragment){
+                        ((SendLocationFragment) getMainFragment()).locationSentSuccessfully();
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+
 
     @Override
     protected Integer getMainLayout() {
@@ -117,6 +164,26 @@ public class AdminActivity extends GGMainActivity {
         });
     }
 
+    /**
+     * attach to the activity the broadcast listener, so it can be notified if the receiver cancel the call
+     */
+    private void registerTheBroadCast() {
+        mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
+        IntentFilter mIntentFilter = new IntentFilter();
+        for (String actions : ACTIONS_LIST) {
+            mIntentFilter.addAction(actions);
+        }
+        mLocalBroadcastManager.registerReceiver(mBroadcastReceiver, mIntentFilter);
+        Log.i(TAG,"a broad cast was installed in this activity");
+    }
+
+    /**
+     * unattach broadcast
+     */
+    private void unregisterBroadCast(){
+        mLocalBroadcastManager.unregisterReceiver(mBroadcastReceiver);
+    }
+
     public void hideBackButton(){
         navigationBack.setVisibility(View.INVISIBLE);
     }
@@ -136,6 +203,7 @@ public class AdminActivity extends GGMainActivity {
     public void runMyFragment(GGMainFragment fragment, Bundle params,int drawerId) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         AutomaticFingerPrintValidationThread.stopScanner();
+        AutomaticCardValidationThread.stopScanner();
         fragment.setArguments(params);
         setToolBarTitle(fragment.getToolbarTitle());
         mMenuDrawer.getMenu().findItem(drawerId).setChecked(Boolean.TRUE);
@@ -146,7 +214,14 @@ public class AdminActivity extends GGMainActivity {
     @Override
     protected void onPostResume() {
         super.onPostResume();
+        registerTheBroadCast();
         //startNotificationService();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterBroadCast();
     }
 
     /**
@@ -215,10 +290,14 @@ public class AdminActivity extends GGMainActivity {
                     runMyFragment(new VerifyRFIDFragment(), null,menuItem.getItemId());
                     mDrawerLayout.closeDrawer(GravityCompat.END);
                     break;
-//                case R.id.action_access_control:
-//                    runMyFragment(new AccessControlFragment(), null,menuItem.getItemId());
-//                    mDrawerLayout.closeDrawer(GravityCompat.END);
-//                    break;
+                case R.id.action_access_control:
+                    runMyFragment(new AccessControlFragment(), null,menuItem.getItemId());
+                    mDrawerLayout.closeDrawer(GravityCompat.END);
+                    break;
+                case R.id.send_location_option:
+                    runMyFragment(new SendLocationFragment(), null,menuItem.getItemId());
+                    mDrawerLayout.closeDrawer(GravityCompat.END);
+                    break;
                 case R.id.action_logout:
                     AutomaticFingerPrintValidationThread.stopScanner();
                     sharedPreferenceUtil.removeValue(GGGlobalValues.USER_ID_IN_SESSION);

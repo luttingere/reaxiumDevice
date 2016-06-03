@@ -51,6 +51,7 @@
             android:screenOrientation="landscape"
             android:windowSoftInputMode="adjustPan" />
         <activity
+            android:noHistory="true"
             android:name=".admin.activity.AdminActivity"
             android:screenOrientation="landscape"
             android:windowSoftInputMode="adjustPan" />
@@ -61,6 +62,11 @@
         <!-- Services-->
         <service
             android:name=".service.SendLocationService"
+            android:enabled="true">
+        </service>
+
+        <service
+            android:name=".service.AdminSendLocationService"
             android:enabled="true">
         </service>
 

@@ -31,9 +31,10 @@
     <!-- Menu Drawer-->
     <string name="menu_drawer_home">Home</string>
     <string name="menu_drawer_configure_device">Configure Device</string>
-    <string name="menu_drawer_add_user">Add or Edit a User</string>
-    <string name="menu_drawer_add_security">Add User Access</string>
+    <string name="menu_drawer_add_user">Add/Edit Users</string>
+    <string name="menu_drawer_add_security">Add Access</string>
     <string name="menu_drawer_verify_biometric">Validate a RFID Card</string>
+    <string name="menu_drawer_send_location">Send Location</string>
     <string name="menu_drawer_access_control">Access Control</string>
     <string name="menu_drawer_logout">Log Out</string>
     <string name="menu_drawer_show_map">Show Map</string>
@@ -47,7 +48,7 @@
     <string name="admin_fragment_title">Reaxium Admin Console</string>
 
     <!-- User Security Panel-->
-    <string name="user_security_panel_title">Add User Access</string>
+    <string name="user_security_panel_title">Add Access</string>
     <string name="add_or_edit_a_user_title">Add or Edit Users</string>
     <string name="user_security_panel_tab_fingerprint">Biometric</string>
     <string name="user_security_panel_tab_rfid">RFID</string>
@@ -64,6 +65,9 @@
     <string name="reaxium_device_app_version">Application Version:</string>
     <string name="reaxium_device_status">Device Status:</string>
     <string name="reaxium_device_last_sync">Last Synchronization:</string>
+
+    <!--Send location screen-->
+    <string name="send_location_screen_title">Sending location</string>
 
     <!-- Validate biometric fragment-->
     <string name="validate_biometric_button">Scann Fingerprint</string>

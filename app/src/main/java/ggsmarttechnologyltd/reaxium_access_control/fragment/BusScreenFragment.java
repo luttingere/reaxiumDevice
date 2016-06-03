@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentManager;
 import android.util.ArrayMap;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -91,6 +92,7 @@ public class BusScreenFragment extends GGMainFragment implements OnValidateDocum
     private ImageView trafficAlarmButton;
     private ImageView carEngineFailureAlarmButton;
     private ImageView carCrashAlarmButton;
+    private Button endRouteButton;
     private float mRouteMapZoom = 16.0f;
     private LatLng reaxiumDeviceLocation;
     private GoogleMap mRouteMap;
@@ -240,6 +242,7 @@ public class BusScreenFragment extends GGMainFragment implements OnValidateDocum
         emergencyAlarmButton = (ImageView) view.findViewById(R.id.emergency_alarm);
         trafficAlarmButton = (ImageView) view.findViewById(R.id.traffic_alarm);
         carEngineFailureAlarmButton = (ImageView) view.findViewById(R.id.car_engine_failure_alarm);
+        endRouteButton = (Button) view.findViewById(R.id.end_route);
         carCrashAlarmButton = (ImageView) view.findViewById(R.id.car_crash_alarm);
         routeInfo = (TextView) view.findViewById(R.id.routeInformation);
         routeInfo.setText("Route: " + route.getRouteNumber() + ", " + route.getRouteName());
@@ -272,6 +275,29 @@ public class BusScreenFragment extends GGMainFragment implements OnValidateDocum
         }
     }
 
+    private void endTheRoute(){
+        new AlertDialog.Builder(getActivity())
+                .setTitle("End Route Confirmation")
+                .setMessage("¿Are you sure you want to end the Route?")
+                .setPositiveButton(R.string.YES, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        stopScanners();
+                        busStatusDAO.deleteAllValuesFromBusStatus();
+                        Bundle arguments = new Bundle();
+                        arguments.putSerializable("USER_VALUE", driverUser);
+                        GGUtil.goToScreen(getActivity(), arguments, MainActivity.class);
+                        getActivity().finish();
+                    }
+                }).setNegativeButton(R.string.NO, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        }).show();
+    }
+
     @Override
     protected void setViewsEvents() {
         mapFragment.getMapAsync(new OnMapReadyCallback() {
@@ -300,6 +326,15 @@ public class BusScreenFragment extends GGMainFragment implements OnValidateDocum
 
             }
         });
+
+        endRouteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                endTheRoute();
+            }
+        });
+
+
 
         emergencyAlarmButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -354,6 +389,58 @@ public class BusScreenFragment extends GGMainFragment implements OnValidateDocum
                 dialog.dismiss();
             }
         }).show();
+    }
+
+
+    private void sendNotification(int notificationType, List<Long> usersId, Long deviceId) {
+        if (GGUtil.isNetworkAvailable(getActivity())) {
+
+            //showProgressDialog("Sending the notification...");
+            Response.Listener<JSONObject> responseListener = new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    Type responseType = new TypeToken<ApiResponse<Object>>() {
+                    }.getType();
+                    ApiResponse<Object> apiResponse = JsonUtil.getEntityFromJSON(response, responseType);
+                    if (apiResponse.getReaxiumResponse().getCode() == GGGlobalValues.SUCCESSFUL_API_RESPONSE_CODE) {
+                        GGUtil.showAToast(getActivity(), "Next Stop Notification sent successfully");
+                    } else {
+                        GGUtil.showAToast(getActivity(), apiResponse.getReaxiumResponse().getMessage());
+                    }
+                    hideProgressDialog();
+                }
+            };
+            Response.ErrorListener errorListener = new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    //hideProgressDialog();
+                    GGUtil.showAToast(getActivity(), "There was an error sending the notifications, it is possible that you had a bad connection.");
+                }
+            };
+            JSONObject notificationServiceParams = new JSONObject();
+            try {
+                JSONObject reaxiumParameters = new JSONObject();
+                JSONObject notification = new JSONObject();
+                notification.put("device_id", deviceId);
+                notification.put("notification_type", notificationType);
+                notification.put("driver_name", sharedPreferenceUtil.getString(GGGlobalValues.USER_FULL_NAME_IN_SESSION));
+                JSONArray jsonArray = new JSONArray();
+                for (Long userId : usersId) {
+                    jsonArray.put(userId);
+                }
+                notification.put("users_id", jsonArray);
+                reaxiumParameters.put("Notification", notification);
+                notificationServiceParams.put("ReaxiumParameters", reaxiumParameters);
+            } catch (Exception e) {
+            }
+
+            JsonObjectRequestUtil routeRequest = new JsonObjectRequestUtil(Request.Method.POST, APPEnvironment.createURL(GGGlobalValues.SEND_NEXT_STOP_NOTIFICATIONS), notificationServiceParams, responseListener, errorListener);
+            routeRequest.setShouldCache(false);
+            MySingletonUtil.getInstance(getActivity()).addToRequestQueue(routeRequest);
+
+        } else {
+            GGUtil.showAToast(getActivity(), R.string.no_network_available);
+        }
     }
 
     private void sendAlarm(int notificationType, List<Long> usersId, Long deviceId) {
@@ -550,6 +637,11 @@ public class BusScreenFragment extends GGMainFragment implements OnValidateDocum
             stops = stopsList.get(activeStopOrder - 1);
         }else{
             if(stops.getStopOrder() != activeStopOrder ){
+                try {
+                    sendNextStopNotification(stops);
+                }catch (Exception e){
+                    Log.e(TAG,"Error sending a notification",e);
+                }
                 busStatusDAO.changeTheNextStop(stops.getStopOrder());
             }
         }
@@ -562,6 +654,15 @@ public class BusScreenFragment extends GGMainFragment implements OnValidateDocum
             studentsOnTheNextStop = 0;
         }
         studentOnTheNextStopInput.setText("" + studentsOnTheNextStop);
+    }
+
+
+    private void sendNextStopNotification(Stops stops){
+        List<Long> usersId = new ArrayList<>();
+        for (User user: stops.getUsers()){
+            usersId.add(user.getUserId());
+        }
+        sendNotification(5, usersId, sharedPreferenceUtil.getLong(GGGlobalValues.DEVICE_ID));
     }
 
     private void loadStopsInTheMap() {
