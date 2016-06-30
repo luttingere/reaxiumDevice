@@ -34,12 +34,9 @@ import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.UserPanelFragm
 import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.UserSecurityFragment;
 import ggsmarttechnologyltd.reaxium_access_control.admin.fragment.VerifyRFIDFragment;
 import ggsmarttechnologyltd.reaxium_access_control.admin.threads.AutomaticCardValidationThread;
-import ggsmarttechnologyltd.reaxium_access_control.admin.threads.AutomaticFingerPrintValidationThread;
-import ggsmarttechnologyltd.reaxium_access_control.beans.LocationObject;
-import ggsmarttechnologyltd.reaxium_access_control.fragment.BusScreenFragment;
 import ggsmarttechnologyltd.reaxium_access_control.global.GGGlobalValues;
 import ggsmarttechnologyltd.reaxium_access_control.login.activity.LoginActivity;
-import ggsmarttechnologyltd.reaxium_access_control.service.SendLocationServiceDefault;
+import ggsmarttechnologyltd.reaxium_access_control.service.AdminSendLocationService;
 import ggsmarttechnologyltd.reaxium_access_control.util.GGUtil;
 import ggsmarttechnologyltd.reaxium_access_control.util.SharedPreferenceUtil;
 
@@ -180,8 +177,10 @@ public class AdminActivity extends GGMainActivity {
     /**
      * unattach broadcast
      */
-    private void unregisterBroadCast(){
-        mLocalBroadcastManager.unregisterReceiver(mBroadcastReceiver);
+    public void unregisterBroadCast(){
+        if(mLocalBroadcastManager != null){
+            mLocalBroadcastManager.unregisterReceiver(mBroadcastReceiver);
+        }
     }
 
     public void hideBackButton(){
@@ -201,9 +200,8 @@ public class AdminActivity extends GGMainActivity {
     }
 
     public void runMyFragment(GGMainFragment fragment, Bundle params,int drawerId) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        AutomaticFingerPrintValidationThread.stopScanner();
         AutomaticCardValidationThread.stopScanner();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         fragment.setArguments(params);
         setToolBarTitle(fragment.getToolbarTitle());
         mMenuDrawer.getMenu().findItem(drawerId).setChecked(Boolean.TRUE);
@@ -218,18 +216,33 @@ public class AdminActivity extends GGMainActivity {
         //startNotificationService();
     }
 
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterBroadCast();
+        stopService();
+        Log.i(TAG,"broadcaster stopped successfully");
+    }
+
     @Override
     protected void onStop() {
         super.onStop();
-        unregisterBroadCast();
     }
 
     /**
      * Inicia el servicio de notificacion de ubicacion satelital
      */
-    private void startNotificationService(){
-        Intent servIntent = new Intent(this,SendLocationServiceDefault.class);
+    public void startNotificationService(){
+        Intent servIntent = new Intent(this,AdminSendLocationService.class);
         startService(servIntent);
+        Log.i(TAG,"Servicio de envio de ubicacion administrativa fue iniciado");
+    }
+
+    public void stopService(){
+        Intent servIntent = new Intent(this,AdminSendLocationService.class);
+        stopService(servIntent);
+        Log.i(TAG,"Servicio de envio de ubicacion administrativa fue detenido");
     }
 
     @Override
@@ -294,17 +307,19 @@ public class AdminActivity extends GGMainActivity {
                     runMyFragment(new AccessControlFragment(), null,menuItem.getItemId());
                     mDrawerLayout.closeDrawer(GravityCompat.END);
                     break;
-                case R.id.send_location_option:
-                    runMyFragment(new SendLocationFragment(), null,menuItem.getItemId());
-                    mDrawerLayout.closeDrawer(GravityCompat.END);
-                    break;
+//                case R.id.send_location_option:
+//                    runMyFragment(new SendLocationFragment(), null,menuItem.getItemId());
+//                    mDrawerLayout.closeDrawer(GravityCompat.END);
+//                    break;
                 case R.id.action_logout:
-                    AutomaticFingerPrintValidationThread.stopScanner();
+                    AutomaticCardValidationThread.stopScanner();
                     sharedPreferenceUtil.removeValue(GGGlobalValues.USER_ID_IN_SESSION);
                     sharedPreferenceUtil.removeValue(GGGlobalValues.USER_FULL_NAME_IN_SESSION);
                     sharedPreferenceUtil.removeValue(GGGlobalValues.USER_FULL_TYPE_IN_SESSION);
                     mDrawerLayout.closeDrawer(GravityCompat.END);
                     Intent goToLoginPage = new Intent(this, LoginActivity.class);
+                    goToLoginPage.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    goToLoginPage.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(goToLoginPage);
                     finish();
                     break;

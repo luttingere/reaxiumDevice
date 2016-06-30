@@ -122,6 +122,8 @@ public class AdminSendLocationService extends Service implements GoogleApiClient
      * stop location updates
      */
     private void stopLocationUpdates() {
+        googleConnector.getClient().unregisterConnectionCallbacks(this);
+        googleConnector.getClient().unregisterConnectionFailedListener(this);
         LocationServices.FusedLocationApi.removeLocationUpdates(googleConnector.getClient(), this);
     }
 
@@ -175,14 +177,14 @@ public class AdminSendLocationService extends Service implements GoogleApiClient
      * Envia la ubicacion al driver
      */
     private void notifyMyPosition(Double latitude, Double longitude) {
-        Log.i(TAG, "Notificando posicion: Latitude: "+latitude+" Longitude: "+longitude);
+        Log.i(TAG, "Notificando posicion Administrativa: Latitude: "+latitude+" Longitude: "+longitude);
         GGGlobalValues.LAST_LOCATION = new LatLng(latitude,longitude);
         LocationObject locationObject = new LocationObject();
         locationObject.setLatitude(latitude);
         locationObject.setLongitude(longitude);
         notifyMyPositionInServer(latitude,longitude);
-        GGUtil.showAShortToast(this,"Device Location sent successfully");
-     //   sendCustomBroadCast(locationObject, AdminActivity.LOCATION_CHANGED);
+        //GGUtil.showAShortToast(this,"Device Location sent successfully");
+        sendCustomBroadCast(locationObject, AdminActivity.LOCATION_CHANGED);
     }
 
     private void notifyMyPositionInServer(Double latitude, Double longitude){
@@ -203,7 +205,7 @@ public class AdminSendLocationService extends Service implements GoogleApiClient
                     GGUtil.showAShortToast(AdminSendLocationService.this, "Bad connection with reaxium server");
                 }
             };
-            Log.i(TAG,"SENDING DEVICE LOCATION");
+            Log.i(TAG,"SENDING DEVICE ADMINISTRATIVE LOCATION");
             JsonObjectRequestUtil jsonObjectRequest = new JsonObjectRequestUtil(Request.Method.POST, APPEnvironment.createURL(GGGlobalValues.NOTIFY_POSITION), loadNotifyPositionParameters(latitude,longitude), responseListener, errorListener);
             jsonObjectRequest.setShouldCache(false);
             MySingletonUtil.getInstance(this).addToRequestQueue(jsonObjectRequest);

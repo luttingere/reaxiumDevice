@@ -82,7 +82,7 @@ public class RFIDErrorMessage {
      * No IC card found
      */
     public static final int NO_CARD = -3000;
-    public static final String NO_CARD_MESSAGE = "no rfid card detected";
+    public static final String NO_CARD_MESSAGE = "In order to activate a card, please place it on the RFID reader and press the button Configure Card";
     /**
      * Card is not support
      */

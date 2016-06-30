@@ -272,14 +272,16 @@ public class LoginActivity extends GGMainActivity {
                                         if(apiResponse.getReaxiumResponse().getObject().get(0).getDeviceData() != null){
                                             DeviceData deviceData = apiResponse.getReaxiumResponse().getObject().get(0).getDeviceData();
                                             result = synchronizeController.synchronizeDevice(deviceData, outOfSyncList);
-                                        }
-                                        if(!result){
-                                            GGUtil.showAToast(LoginActivity.this, apiResponse.getReaxiumResponse().getMessage()+" Synchronize Failure error.");
+                                            if(!result){
+                                                GGUtil.showAToast(LoginActivity.this, apiResponse.getReaxiumResponse().getMessage()+", No routes or users configured in this device.");
+                                            }else{
+                                                GGUtil.showAToast(LoginActivity.this, apiResponse.getReaxiumResponse().getMessage());
+                                            }
+                                            goToDriverScreen(user);
                                         }else{
-                                            GGUtil.showAToast(LoginActivity.this, apiResponse.getReaxiumResponse().getMessage());
+                                            FailureAccessPlayerSingleton.getInstance(LoginActivity.this).initRingTone();
+                                            GGUtil.showAShortToast(LoginActivity.this, "No data configured in this device, Call Reaxium Support.");
                                         }
-                                        goToDriverScreen(user);
-
                                     } else {
                                         FailureAccessPlayerSingleton.getInstance(LoginActivity.this).initRingTone();
                                         GGUtil.showAShortToast(LoginActivity.this, "Invalid User");

@@ -34,17 +34,17 @@
         <item
             android:id="@+id/action_add_security_to_user"
             android:icon="@drawable/user_security_icon"
-            android:title="@string/user_security_panel_title" />
+            android:title="@string/menu_drawer_add_security" />
 
         <item
             android:id="@+id/action_verify_biometric"
             android:icon="@drawable/verify_user"
             android:title="@string/menu_drawer_verify_biometric" />
 
-        <item
-            android:id="@+id/send_location_option"
-            android:icon="@drawable/send_signal"
-            android:title="@string/menu_drawer_send_location" />
+        <!--<item-->
+            <!--android:id="@+id/send_location_option"-->
+            <!--android:icon="@drawable/send_signal"-->
+            <!--android:title="@string/menu_drawer_send_location" />-->
 
 
     </group>

@@ -64,6 +64,7 @@ public class SynchronizeController extends GGController {
                 Log.i(TAG, "lookup for biometrical access info and store it in the fingerprint scanner system");
                 storeBiometricInformation();
                 updateOutOfSyncAccess(outOfSyncAccess);
+                GGUtil.registerLastSynchronization(mContext);
             }
         } catch (Exception e) {
             Log.e(TAG,"",e);

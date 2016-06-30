@@ -9,6 +9,7 @@ import ggsmarttechnologyltd.reaxium_access_control.R;
  */
 public class GGGlobalValues {
 
+
     public static String TRACE_ID = "REAXIUM_DEVICE";
     public static final String STRING_DATE_PATTERN_WITH_TIMEZONE = "yyyy-MM-dd'T'hh:mm:ssZ";
     public static final String STRING_DATE_PATTERN = "yyyy-MM-dd hh:mm:ss";
@@ -18,6 +19,7 @@ public class GGGlobalValues {
     public static final Integer SUCCESSFUL_API_RESPONSE_CODE = 0;
     public static final String BION_DB_PATH = "/sdcard/fp.db";
     public static final Integer DEFAULT_DEVICE_ID = 1;
+    public static final String LAST_SYNCHRONIZATION_DATE = "LAST_SYNCHRONIZATION_DATE";
 
 
     //Device cache storage
@@ -70,6 +72,9 @@ public class GGGlobalValues {
     public static final String VALIDATE_ACCESS = "UserAccess/executeUserAndPasswordAccessInADevice";
     public static final String VALIDATE_ACCESS_WITH_RFID = "UserAccess/executeAnRFIDAccessInADevice";
     public static final String VALIDATE_RFID_CARD = "RFID/validateRFIDCard";
+    public static final String RESET_RFID_CARD = "RFID/resetAnRfidCardFromSystem";
+    public static final String LOOKUP_IF_IS_AN_AVAILABLE_RFID_CARD = "RFID/lookupIfIsAvailableRFIDCard";
+
     public static final String SAVE_A_USER = "Users/saveUserFromDevice";
     public static final String SAVE_ACCESS_IN_SERVER = "UserAccess/executeAnAccessOfAUser";
     public static final String EDIT_A_USER = "Users/editUserFromDevice";

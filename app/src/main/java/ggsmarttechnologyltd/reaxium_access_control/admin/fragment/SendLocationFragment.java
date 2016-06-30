@@ -61,16 +61,14 @@ public class SendLocationFragment extends GGMainFragment {
      * Inicia el servicio de notificacion de ubicacion satelital
      */
     private void startNotificationService(){
-        Intent servIntent = new Intent(getActivity(),AdminSendLocationService.class);
-        getActivity().startService(servIntent);
+        ((AdminActivity)getActivity()).startNotificationService();
     }
 
     /**
      * Detiene el proceso de envio de ubicacion
      */
     private void stopNotificationService(){
-        Intent servIntent = new Intent(getActivity(),AdminSendLocationService.class);
-        getActivity().stopService(servIntent);
+        ((AdminActivity)getActivity()).stopService();
     }
 
     @Override

@@ -8,6 +8,7 @@ import java.io.Serializable;
 public class APPEnvironment implements Serializable {
 
     private static final String DEVELOPMENT_URL = "http://54.200.133.84/reaxium/";
+    private static final String QA_URL = "http://54.200.133.84/reaxiumQA/";
     private static final String Environment = DEVELOPMENT_URL;
 
     public static String createURL(String serviceName){

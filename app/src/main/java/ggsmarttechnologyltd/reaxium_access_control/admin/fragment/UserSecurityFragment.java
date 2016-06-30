@@ -61,7 +61,8 @@ public class UserSecurityFragment extends GGMainFragment implements OnUserClickL
     public ViewPager viewPager;
     private TabLayout tabLayout;
     //private int tabTitles[] = new int[]{R.string.user_security_panel_tab_fingerprint, R.string.user_security_panel_tab_rfid};
-    private int tabTitles[] = new int[]{R.string.user_security_panel_tab_rfid,R.string.user_security_panel_tab_fingerprint};
+    //private int tabTitles[] = new int[]{R.string.user_security_panel_tab_rfid,R.string.user_security_panel_tab_fingerprint};
+    private int tabTitles[] = new int[]{R.string.user_security_panel_tab_rfid};
     private UserSecurityTabsAdapter tabsAdapter;
     private UsersListAdapter mUsersListAdapter;
     private TextWatcher searchUserWatcher;
@@ -301,8 +302,10 @@ public class UserSecurityFragment extends GGMainFragment implements OnUserClickL
     }
 
     private void clearUserList() {
-        mListUsers.clear();
-        mUsersListAdapter.refreshList(mListUsers);
+        if(mListUsers != null){
+            mListUsers.clear();
+            mUsersListAdapter.refreshList(mListUsers);
+        }
     }
 
     @Override
@@ -315,7 +318,7 @@ public class UserSecurityFragment extends GGMainFragment implements OnUserClickL
         mUserBusinessName.setText(user.getBusiness().getBusinessName());
         loadFingerPrintImage(user);
         RFIDCaptureFragment.setUserSelected(user);
-        BiometricCaptureFragment.setUserSelected(user);
+        //BiometricCaptureFragment.setUserSelected(user);
     }
 
     @Override

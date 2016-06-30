@@ -61,28 +61,26 @@ public class ReaxiumUsersDAO {
             database = dbHelper.getWritableDatabase();
             database.beginTransaction();
             for (UserAccessControl userAccessControl : userAccessControlList) {
-                insertValues = new ContentValues();
-                insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_ID, userAccessControl.getUserAccessData().getUserId());
-                insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_ACCESS_TYPE, userAccessControl.getUserAccessData().getAccessType().getAccessTypeName());
-                insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_NAME, userAccessControl.getUserAccessData().getUser().getFirstName());
-                insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_SECOND_NAME, userAccessControl.getUserAccessData().getUser().getSecondName());
-                insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_LAST_NAME, userAccessControl.getUserAccessData().getUser().getFirstLastName());
-                insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_SECOND_LAST_NAME, userAccessControl.getUserAccessData().getUser().getSecondLastName());
-                insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_BIRTH_DATE, userAccessControl.getUserAccessData().getUser().getBirthDate());
-                insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_BUSINESS_NAME, userAccessControl.getUserAccessData().getUser().getBusiness().getBusinessName());
-                insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_PHOTO, userAccessControl.getUserAccessData().getUser().getPhoto());
-                insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_DOCUMENT_ID, userAccessControl.getUserAccessData().getUser().getDocumentId());
-                insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_STATUS, userAccessControl.getUserAccessData().getUser().getStatus().getStatusName());
-                if(userAccessControl.getUserAccessData().getUser().getUserType() == null){
-                    insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_TYPE, GGGlobalValues.DEFAULT_USER_TYPE);
-                }else{
+                if(userAccessControl.getUserAccessData().getUser().getUserType() != null && userAccessControl.getUserAccessData().getUser().getUserType().getUserTypeName().equalsIgnoreCase("Student")){
+                    insertValues = new ContentValues();
+                    insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_ID, userAccessControl.getUserAccessData().getUserId());
+                    insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_ACCESS_TYPE, userAccessControl.getUserAccessData().getAccessType().getAccessTypeName());
+                    insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_NAME, userAccessControl.getUserAccessData().getUser().getFirstName());
+                    insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_SECOND_NAME, userAccessControl.getUserAccessData().getUser().getSecondName());
+                    insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_LAST_NAME, userAccessControl.getUserAccessData().getUser().getFirstLastName());
+                    insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_SECOND_LAST_NAME, userAccessControl.getUserAccessData().getUser().getSecondLastName());
+                    insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_BIRTH_DATE, userAccessControl.getUserAccessData().getUser().getBirthDate());
+                    insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_BUSINESS_NAME, userAccessControl.getUserAccessData().getUser().getBusiness().getBusinessName());
+                    insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_PHOTO, userAccessControl.getUserAccessData().getUser().getPhoto());
+                    insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_DOCUMENT_ID, userAccessControl.getUserAccessData().getUser().getDocumentId());
+                    insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_STATUS, userAccessControl.getUserAccessData().getUser().getStatus().getStatusName());
                     insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_TYPE, userAccessControl.getUserAccessData().getUser().getUserType().getUserTypeName());
+                    insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_DOCUMENT_CODE, userAccessControl.getUserAccessData().getDocumentId());
+                    insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_BIOMETRIC_CODE, userAccessControl.getUserAccessData().getBiometricCode());
+                    insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_RFID_CODE, userAccessControl.getUserAccessData().getRfidCode());
+                    insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_FINGERPRINT, userAccessControl.getUserAccessData().getUser().getFingerprint());
+                    database.insert(ReaxiumUsersContract.ReaxiumUsers.TABLE_NAME, null, insertValues);
                 }
-                insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_DOCUMENT_CODE, userAccessControl.getUserAccessData().getDocumentId());
-                insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_BIOMETRIC_CODE, userAccessControl.getUserAccessData().getBiometricCode());
-                insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_RFID_CODE, userAccessControl.getUserAccessData().getRfidCode());
-                insertValues.put(ReaxiumUsersContract.ReaxiumUsers.COLUMN_NAME_USER_FINGERPRINT, userAccessControl.getUserAccessData().getUser().getFingerprint());
-                database.insert(ReaxiumUsersContract.ReaxiumUsers.TABLE_NAME, null, insertValues);
             }
             succcess = Boolean.TRUE;
             Log.i(TAG, "Reaxium Users access data successfully stored in db");

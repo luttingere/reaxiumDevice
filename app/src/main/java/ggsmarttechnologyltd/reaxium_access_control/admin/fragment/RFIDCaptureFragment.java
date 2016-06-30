@@ -34,10 +34,12 @@ import ggsmarttechnologyltd.reaxium_access_control.beans.FingerPrint;
 import ggsmarttechnologyltd.reaxium_access_control.beans.User;
 import ggsmarttechnologyltd.reaxium_access_control.global.APPEnvironment;
 import ggsmarttechnologyltd.reaxium_access_control.global.GGGlobalValues;
+import ggsmarttechnologyltd.reaxium_access_control.util.FailureAccessPlayerSingleton;
 import ggsmarttechnologyltd.reaxium_access_control.util.GGUtil;
 import ggsmarttechnologyltd.reaxium_access_control.util.JsonObjectRequestUtil;
 import ggsmarttechnologyltd.reaxium_access_control.util.JsonUtil;
 import ggsmarttechnologyltd.reaxium_access_control.util.MySingletonUtil;
+import ggsmarttechnologyltd.reaxium_access_control.util.SuccessfulAccessPlayerSingleton;
 import ggsmarttechnologyltd.reaxium_access_control.util.TakeImagesUtil;
 
 /**
@@ -87,7 +89,7 @@ public class RFIDCaptureFragment extends GGMainFragment {
         writeRFIDCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                configureRFID();
+                writeUserIdInTheCard();
             }
         });
     }
@@ -113,60 +115,112 @@ public class RFIDCaptureFragment extends GGMainFragment {
     }
 
 
-    private void configureRFID(){
-        showProgressDialog("Configuring the RFID Card...");
 
-        if(writeUserIdInTheCard()){
-            hideProgressDialog();
-            new AlertDialog.Builder(getActivity(), R.style.MyDialogTheme)
-                    .setTitle("Device Access Association")
-                    .setMessage("The system will save the RFID information in the server, do you wanna also associate this user rfid to this device?")
-                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            associateRFIDToAUser(cardId,mSelectedUser.getUserId(),getSharedPreferences().getLong(GGGlobalValues.DEVICE_ID));
-                            dialog.dismiss();
-                        }
-                    })
-                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            associateRFIDToAUser(cardId,mSelectedUser.getUserId(),null);
-                            dialog.dismiss();
-                        }
-                    }).show();
+    private void writeUserIdInTheCard(){
+        Result res = App.cardReader.activate();
+        if(res.error == ICCardReader.RESULT_OK){
+            cardId = (Long) res.data;
+            validateAndWriteRFIDCard(""+cardId);
         }else{
-            hideProgressDialog();
+            FailureAccessPlayerSingleton.getInstance(getActivity()).initRingTone();
+            GGUtil.showAToast(getActivity(),RFIDErrorMessage.getErrorMessage(res.error));
         }
     }
 
-    private Boolean writeUserIdInTheCard(){
+    private Boolean justWriteTheCard(){
         Boolean isOk = Boolean.FALSE;
-        Result res = App.cardReader.activate();
-        int error;
-        if(res.error == ICCardReader.RESULT_OK){
-            cardId = (Long) res.data;
-            Log.i(TAG,"Crad reader number: "+cardId);
-            error = App.cardReader.validateKey(cardId, ICCardReader.KEY_A, GGGlobalValues.BYTE_BLOCK, new byte[] { (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff });
+        int error = App.cardReader.validateKey(cardId, ICCardReader.KEY_A, GGGlobalValues.BYTE_BLOCK, new byte[] { (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff });
+        if (error == ICCardReader.RESULT_OK) {
+            byte[] bytes = ByteBuffer.allocate(GGGlobalValues.BYTE_SIZE).putInt(mSelectedUser.getUserId().intValue()).array();
+            Log.i(TAG,"data to store: "+ Arrays.toString(bytes));
+            error = App.cardReader.write(GGGlobalValues.BYTE_BLOCK, bytes);
             if (error == ICCardReader.RESULT_OK) {
-                byte[] bytes = ByteBuffer.allocate(GGGlobalValues.BYTE_SIZE).putInt(mSelectedUser.getUserId().intValue()).array();
-                Log.i(TAG,"data to store: "+ Arrays.toString(bytes));
-                error = App.cardReader.write(GGGlobalValues.BYTE_BLOCK, bytes);
-                if (error == ICCardReader.RESULT_OK) {
-                    exampleText.setVisibility(View.GONE);
-                    checkImage.setVisibility(View.VISIBLE);
-                    isOk = Boolean.TRUE;
-                    GGUtil.showAToast(getActivity(),"Card successfully configured");
-                } else {
-                    GGUtil.showAToast(getActivity(),"System fail writing the rfid card, error code: "+ RFIDErrorMessage.getErrorMessage(error));
-                }
-            }else{
-                GGUtil.showAToast(getActivity(),"error in the validation of the rfdi card, error code: "+RFIDErrorMessage.getErrorMessage(error));
+                hideProgressDialog();
+                exampleText.setVisibility(View.GONE);
+                checkImage.setVisibility(View.VISIBLE);
+                isOk = Boolean.TRUE;
+                //GGUtil.showAToast(getActivity(),"Card successfully configured");
+            } else {
+                hideProgressDialog();
+                GGUtil.showAToast(getActivity(), RFIDErrorMessage.getErrorMessage(error));
             }
         }else{
-            GGUtil.showAToast(getActivity(),"error activating the rfdi card, error code: "+RFIDErrorMessage.getErrorMessage(res.error));
+            hideProgressDialog();
+            GGUtil.showAToast(getActivity(),RFIDErrorMessage.getErrorMessage(error));
         }
         return isOk;
+    }
+    private void validateAndWriteRFIDCard(String rfidCode) {
+        Log.i(TAG,"Card reader number: "+cardId);
+        if (GGUtil.isNetworkAvailable(getActivity())) {
+            Response.Listener<JSONObject> responseListener = new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    hideProgressDialog();
+                    Type responseType = new TypeToken<ApiResponse<User>>() {}.getType();
+                    ApiResponse<User> apiResponse = JsonUtil.getEntityFromJSON(response, responseType);
+                    if (apiResponse.getReaxiumResponse().getCode() == GGGlobalValues.SUCCESSFUL_API_RESPONSE_CODE) {
+                        changeProgressDialogMessage("writing...");
+                        if(justWriteTheCard()){
+
+                            SuccessfulAccessPlayerSingleton.getInstance(getActivity()).initRingTone();
+
+                            new AlertDialog.Builder(getActivity(), R.style.MyDialogTheme)
+                                    .setTitle("Device Access Association")
+                                    .setMessage("The system will save the RFID information in the server, do you wanna also associate this user rfid to this device?")
+                                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            associateRFIDToAUser(cardId,mSelectedUser.getUserId(),getSharedPreferences().getLong(GGGlobalValues.DEVICE_ID));
+                                            dialog.dismiss();
+                                        }
+                                    })
+                                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            associateRFIDToAUser(cardId,mSelectedUser.getUserId(),null);
+                                            dialog.dismiss();
+                                        }
+                                    }).show();
+
+                        }else{
+                            FailureAccessPlayerSingleton.getInstance(getActivity()).initRingTone();
+                        }
+                    } else {
+                        hideProgressDialog();
+                        FailureAccessPlayerSingleton.getInstance(getActivity()).initRingTone();
+                        GGUtil.showAToast(getActivity(), apiResponse.getReaxiumResponse().getMessage());
+                    }
+                }
+            };
+            Response.ErrorListener errorListener = new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    hideProgressDialog();
+                    GGUtil.showAToast(getActivity(), R.string.bad_connection_message);
+                }
+            };
+            showProgressDialog("Validating the RFID card number...");
+            JsonObjectRequestUtil jsonObjectRequest = new JsonObjectRequestUtil(Request.Method.POST, APPEnvironment.createURL(GGGlobalValues.LOOKUP_IF_IS_AN_AVAILABLE_RFID_CARD), loadValidateRFIDParams(rfidCode), responseListener, errorListener);
+            jsonObjectRequest.setShouldCache(false);
+            MySingletonUtil.getInstance(getActivity()).addToRequestQueue(jsonObjectRequest);
+        } else {
+            GGUtil.showAToast(getActivity(), R.string.no_network_available);
+        }
+    }
+
+    private JSONObject loadValidateRFIDParams(String rfidCode) {
+        JSONObject parameters = new JSONObject();
+        try {
+            JSONObject ReaxiumParameters = new JSONObject();
+            JSONObject RFIDValidation = new JSONObject();
+            RFIDValidation.put("rfid_code", rfidCode);
+            ReaxiumParameters.put("RFIDValidation", RFIDValidation);
+            parameters.put("ReaxiumParameters", ReaxiumParameters);
+        } catch (Exception e) {
+            Log.e(TAG, "", e);
+        }
+        return parameters;
     }
 
     private void associateRFIDToAUser(Long rfidCardNumber, Long userId, Long deviceId) {

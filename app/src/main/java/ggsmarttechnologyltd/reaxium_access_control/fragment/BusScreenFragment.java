@@ -2,11 +2,9 @@ package ggsmarttechnologyltd.reaxium_access_control.fragment;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
-import android.util.ArrayMap;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -26,6 +24,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.reflect.TypeToken;
 
@@ -35,6 +34,7 @@ import org.json.JSONObject;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -56,10 +56,8 @@ import ggsmarttechnologyltd.reaxium_access_control.beans.ApiResponse;
 import ggsmarttechnologyltd.reaxium_access_control.beans.AppBean;
 import ggsmarttechnologyltd.reaxium_access_control.beans.BusStatus;
 import ggsmarttechnologyltd.reaxium_access_control.beans.DirectionApiBean;
-import ggsmarttechnologyltd.reaxium_access_control.beans.DirectionRouteApiBean;
 import ggsmarttechnologyltd.reaxium_access_control.beans.FingerPrint;
 import ggsmarttechnologyltd.reaxium_access_control.beans.LocationObject;
-import ggsmarttechnologyltd.reaxium_access_control.beans.LoginObject;
 import ggsmarttechnologyltd.reaxium_access_control.beans.Routes;
 import ggsmarttechnologyltd.reaxium_access_control.beans.SecurityObject;
 import ggsmarttechnologyltd.reaxium_access_control.beans.Stops;
@@ -125,14 +123,17 @@ public class BusScreenFragment extends GGMainFragment implements OnValidateDocum
     private LocationObject busLocation;
     private int activeStopOrder = 1;
     private BusStatus busStatus;
-    private Stops stops;
+    private Stops stop;
     private Stops lastStop;
+    private Stops actualStop = new Stops();
     private SharedPreferenceUtil sharedPreferenceUtil;
     private List<Long> usersIDSOFTheRoute;
     public static Boolean busPositionRouteAlreadyPainted = Boolean.FALSE;
     private DocumentCodeAccessDialog documentCodeAccessDialog;
     private List<LatLng> indications;
     private Map<Integer,List<LatLng>> radioMap;
+    private Polyline mDriverPositionToTheStopPolyLine;
+
 
 
     @Override
@@ -181,10 +182,11 @@ public class BusScreenFragment extends GGMainFragment implements OnValidateDocum
     private void loadScreenValues() {
         stopsList = routeStopUsersDAO.getStopsOfARoute(route.getRouteId());
         usersIDSOFTheRoute = routeStopUsersDAO.getAllUsersIdOfARoute(route.getRouteId());
+        mergeUsersIDOfTheRouteWithTheUsersAboard();
         lastStop = stopsList.get(stopsList.size() - 1);
         usersAtStopList = stopsList.get(activeStopOrder - 1).getUsers();
-        stops = stopsList.get(activeStopOrder - 1);
-        stopInfo.setText("Next Stop: " + stops.getStopAddress());
+        stop = stopsList.get(activeStopOrder - 1);
+        stopInfo.setText("Next Stop: " + stop.getStopAddress());
         if (usersAtStopList != null) {
             studentsOnTheNextStop = usersAtStopList.size();
         } else {
@@ -193,6 +195,30 @@ public class BusScreenFragment extends GGMainFragment implements OnValidateDocum
         studentOnTheNextStopInput.setText("" + studentsOnTheNextStop);
         studentsOnBoardInput.setText("" + studentsOnBoard);
     }
+
+
+    private void mergeUsersIDOfTheRouteWithTheUsersAboard(){
+        Map<Long,Long> mergeMap = new HashMap<>();
+        if(usersIDSOFTheRoute != null){
+            for(Long userId: usersIDSOFTheRoute){
+                mergeMap.put(userId,userId);
+            }
+        }else {
+            usersIDSOFTheRoute = new ArrayList<>();
+        }
+        List<AccessControl> accessControlList = accessControlDAO.getAllAccessIN();
+        if(accessControlList != null){
+            for(AccessControl accessControl: accessControlList){
+                mergeMap.put(accessControl.getUserId(),accessControl.getUserId());
+            }
+        }
+        usersIDSOFTheRoute.clear();
+        for(Map.Entry<Long,Long> entry: mergeMap.entrySet()){
+            usersIDSOFTheRoute.add(entry.getKey());
+        }
+    }
+
+
 
     /**
      * retrieve all values from a restored state
@@ -257,8 +283,12 @@ public class BusScreenFragment extends GGMainFragment implements OnValidateDocum
      */
     private void initializeRoute() {
         String decodePoints = route.getRoutePolyLine();
-        List<LatLng> polyLine = PolyUtil.decodePoly(decodePoints);
-        indications = polyLine;
+        if(decodePoints != null && decodePoints.length() > 0){
+            List<LatLng> polyLine = PolyUtil.decodePoly(decodePoints);
+            indications = polyLine;
+        }else{
+            indications = new ArrayList<>();
+        }
         busStatus = busStatusDAO.getBusStatus();
         if (busStatus != null) {
             if (busStatus.getRouteId() != route.getRouteId()) {
@@ -528,7 +558,8 @@ public class BusScreenFragment extends GGMainFragment implements OnValidateDocum
                             for (LatLng location : polyLine) {
                                 polylineOptions.add(location);
                             }
-                            mRouteMap.addPolyline(polylineOptions);
+                            mDriverPositionToTheStopPolyLine = mRouteMap.addPolyline(polylineOptions);
+
                             BusScreenFragment.busPositionRouteAlreadyPainted = Boolean.TRUE;
                             Log.i(TAG, "Route drawed in the map");
                         } else {
@@ -567,10 +598,10 @@ public class BusScreenFragment extends GGMainFragment implements OnValidateDocum
         Stops firstStop = stopsList.get(0);
         String destination = firstStop.getStopLatitude() + "," + firstStop.getStopLongitude();
 //        StringBuffer wayPoints = new StringBuffer();
-//        Stops stops;
+//        Stops stop;
 //        for (int i = 0; i < stopsList.size() - 1; i++) {
-//            stops = stopsList.get(i);
-//            wayPoints.append(stops.getStopLatitude()+","+stops.getStopLongitude()+"|");
+//            stop = stopsList.get(i);
+//            wayPoints.append(stop.getStopLatitude()+","+stop.getStopLongitude()+"|");
 //        }
         routeUrl = routeUrl.replace("@ORIGIN@", origin);
         routeUrl = routeUrl.replace("@DESTINATION@", destination);
@@ -632,24 +663,24 @@ public class BusScreenFragment extends GGMainFragment implements OnValidateDocum
     }
 
     private void reloadNextStopInfo(LatLng busLocation) {
-        Stops stops = getNextStopByRadio(busLocation);
-        if(stops == null){
-            stops = stopsList.get(activeStopOrder - 1);
+        actualStop = getNextStopByRadio(busLocation);
+        if(actualStop == null){
+            actualStop = stopsList.get(activeStopOrder - 1);
         }else{
-            if(stops.getStopOrder() != activeStopOrder ){
+            if(actualStop.getStopOrder() != activeStopOrder ){
                 try {
-                    sendNextStopNotification(stops);
+                    sendNextStopNotification(actualStop);
                 }catch (Exception e){
                     Log.e(TAG,"Error sending a notification",e);
                 }
-                busStatusDAO.changeTheNextStop(stops.getStopOrder());
+                busStatusDAO.changeTheNextStop(actualStop.getStopOrder());
             }
         }
-        activeStopOrder = stops.getStopOrder();
-        stopInfo.setText("Next Stop: " + stops.getStopAddress());
-        Log.i(TAG, "Next Stop: " + stops.getStopName());
-        if (stops.getUsers() != null) {
-            studentsOnTheNextStop = stops.getUsers().size();
+        activeStopOrder = actualStop.getStopOrder();
+        stopInfo.setText("Next Stop: " + actualStop.getStopAddress());
+        Log.i(TAG, "Next Stop: " + actualStop.getStopName());
+        if (stop.getUsers() != null) {
+            studentsOnTheNextStop = actualStop.getUsers().size();
         } else {
             studentsOnTheNextStop = 0;
         }
@@ -696,6 +727,9 @@ public class BusScreenFragment extends GGMainFragment implements OnValidateDocum
                 }
             }
         if(nextStop != null){
+            if(mDriverPositionToTheStopPolyLine!= null){
+                mDriverPositionToTheStopPolyLine.remove();
+            }
             Log.i(TAG,"Next Stop Found: "+nextStop.getStopName());
         }
         return nextStop;
@@ -821,8 +855,7 @@ public class BusScreenFragment extends GGMainFragment implements OnValidateDocum
             Response.Listener<JSONObject> responseListener = new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    Type responseType = new TypeToken<ApiResponse<Object>>() {
-                    }.getType();
+                    Type responseType = new TypeToken<ApiResponse<Object>>() {}.getType();
                     ApiResponse<Object> apiResponse = JsonUtil.getEntityFromJSON(response, responseType);
                     if (apiResponse.getReaxiumResponse().getCode() == GGGlobalValues.SUCCESSFUL_API_RESPONSE_CODE) {
                         Integer result = accessControlDAO.markAsRegisteredInCloud(lastInsertedId);
@@ -931,6 +964,7 @@ public class BusScreenFragment extends GGMainFragment implements OnValidateDocum
             String userAccessType = "";
             String userAccessTypeID = "";
             String trafficInfo = "";
+            String deviceId  = GGUtil.getDeviceId(getActivity());
             if (securityObject.getCardId() == null) {
                 userAccessType = GGGlobalValues.BIOMETRIC;
                 userAccessTypeID = "2";
@@ -943,7 +977,7 @@ public class BusScreenFragment extends GGMainFragment implements OnValidateDocum
             String trafficInfoResult = "";
             if (user != null) {
                 SuccessfulAccessPlayerSingleton.getInstance(getActivity()).initRingTone();
-                trafficInfo = user.getFirstName() + " " + user.getFirstLastName() + ", @IN_OR_OUT@ #, at @Time@";
+                trafficInfo = user.getFirstName() + " " + user.getFirstLastName() + ", @IN_OR_OUT@, @Time@";
                 user.setAccessTime(GGUtil.getTimeFormatted(new Date()));
                 Long lastInsertedId = null;
                 String trafficTypeId = "1";
@@ -952,7 +986,7 @@ public class BusScreenFragment extends GGMainFragment implements OnValidateDocum
 
                     studentsOnBoard = busStatusDAO.dropAUserOffTheBus(route.getRouteId());
                     trafficTypeId = "2";
-                    trafficInfoResult = trafficInfo.replace("@IN_OR_OUT@", "Off the bus");
+                    trafficInfoResult = trafficInfo.replace("@IN_OR_OUT@", "has got off the bus / number "+deviceId+" at the stop "+actualStop.getStopNumber()+", Good Bye!");
                     lastInsertedId = accessControlDAO.insertUserAccess(user.getUserId(), userAccessType, "OUT");
                     userOUTFoundDialog = new UserOUTFoundDialog(getActivity(), android.R.style.Theme_NoTitleBar_Fullscreen);
                     userOUTFoundDialog.updateUserInfo(user);
@@ -963,7 +997,7 @@ public class BusScreenFragment extends GGMainFragment implements OnValidateDocum
 
                     studentsOnBoard = busStatusDAO.aboardAUserOnTheBus(route.getRouteId());
                     trafficTypeId = "1";
-                    trafficInfoResult = trafficInfo.replace("@IN_OR_OUT@", "aboard the bus");
+                    trafficInfoResult = trafficInfo.replace("@IN_OR_OUT@", "has got on the bus / number "+deviceId+" at the stop "+actualStop.getStopNumber()+", Welcome!");
                     lastInsertedId = accessControlDAO.insertUserAccess(user.getUserId(), userAccessType, "IN");
                     userINFoundDialog = new UserINFoundDialog(getActivity(), android.R.style.Theme_NoTitleBar_Fullscreen);
                     userINFoundDialog.updateUserInfo(user);

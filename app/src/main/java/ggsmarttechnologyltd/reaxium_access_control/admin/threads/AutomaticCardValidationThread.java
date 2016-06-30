@@ -32,6 +32,7 @@ public class AutomaticCardValidationThread extends Thread {
         this.scannersActivityHandler = scannersActivityHandler;
         this.mContext = context;
         stop = Boolean.FALSE;
+
     }
 
     @Override
@@ -39,11 +40,11 @@ public class AutomaticCardValidationThread extends Thread {
         while (!stop) {
             try {
                 if (cardReadedSuccessfully) {
-                    sleep(2000);
+                    sleep(1500);
+                    cardReadedSuccessfully = Boolean.FALSE;
                     if(stop){
                         break;
                     }
-                    cardReadedSuccessfully = Boolean.FALSE;
                 }
                 securityObject = GGUtil.scanRFID(cardReader);
                 if (securityObject != null) {

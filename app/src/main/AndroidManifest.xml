@@ -62,17 +62,12 @@
         <!-- Services-->
         <service
             android:name=".service.SendLocationService"
-            android:enabled="true">
+            android:exported="false">
         </service>
 
         <service
             android:name=".service.AdminSendLocationService"
-            android:enabled="true">
-        </service>
-
-        <service
-            android:name=".service.SendLocationServiceDefault"
-            android:enabled="true">
+            android:exported="false">
         </service>
 
         <!-- [ INIT ] All neccesary Receiver and service for Push Functionalities -->
@@ -112,9 +107,15 @@
 
         <!-- [ END ] All neccesary Receiver and service for Push Functionalities -->
 
+        <!--Developer-->
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyBtbQD6C9C1pca7SB9sClfwaqp5OVRVKyw" />
+
+        <!--Production-->
+        <!--<meta-data-->
+            <!--android:name="com.google.android.maps.v2.API_KEY"-->
+            <!--android:value="AIzaSyCB4fe8N5XlV_ddNsdq2ENJDm4jl4_jDtg" />-->
 
         <!--push notification-->
         <meta-data

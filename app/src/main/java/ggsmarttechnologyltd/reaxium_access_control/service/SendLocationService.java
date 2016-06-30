@@ -123,6 +123,8 @@ public class SendLocationService extends Service implements GoogleApiClient.Conn
      * stop location updates
      */
     private void stopLocationUpdates() {
+//        googleConnector.getClient().unregisterConnectionCallbacks(this);
+//        googleConnector.getClient().unregisterConnectionFailedListener(this);
         LocationServices.FusedLocationApi.removeLocationUpdates(googleConnector.getClient(), this);
     }
 
@@ -159,7 +161,8 @@ public class SendLocationService extends Service implements GoogleApiClient.Conn
     public void onDestroy() {
         stopLocationUpdates();
         googleConnector.getClient().disconnect();
-        Log.i(TAG,"Google Api Connection has been stopped");
+
+        Log.i(TAG,"Google Api Connection has been stopped******");
         super.onDestroy();
     }
 

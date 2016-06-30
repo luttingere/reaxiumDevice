@@ -24,6 +24,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import ggsmarttechnologyltd.reaxium_access_control.App;
 import ggsmarttechnologyltd.reaxium_access_control.GGMainFragment;
 import ggsmarttechnologyltd.reaxium_access_control.R;
 import ggsmarttechnologyltd.reaxium_access_control.admin.activity.AdminActivity;
@@ -65,6 +66,8 @@ public class ConfigureDeviceFragment extends GGMainFragment {
     private AccessControlDAO accessControlDAO;
     private List<AccessControl> accessControlList;
     private List<AccessControl> outOfSyncList;
+
+
 
 
 
@@ -116,6 +119,7 @@ public class ConfigureDeviceFragment extends GGMainFragment {
             @Override
             public void onClick(View v) {
                 lockOrUnlockConfiguration();
+                mDeviceIdInput.setText("" + sharedPreferenceUtil.getLong(GGGlobalValues.DEVICE_ID));
             }
         });
 
@@ -214,7 +218,8 @@ public class ConfigureDeviceFragment extends GGMainFragment {
                                                 }
                                             }).show();
                                 }
-
+                                GGUtil.registerLastSynchronization(getActivity());
+                                mLastSync.setText(GGUtil.getLastSynchronization(getActivity()));
                                 GGUtil.showAToast(getActivity(),"Device successfully synchronized");
 
                             } else {
@@ -265,12 +270,10 @@ public class ConfigureDeviceFragment extends GGMainFragment {
             mDeviceName.setText(sharedPreferenceUtil.getString(GGGlobalValues.DEVICE_NAME));
             mDeviceDescription.setText(sharedPreferenceUtil.getString(GGGlobalValues.DEVICE_DESCRIPTION));
             mDeviceStatus.setText(sharedPreferenceUtil.getString(GGGlobalValues.DEVICE_STATUS));
-            if (sharedPreferenceUtil.getString(GGGlobalValues.APPLICATION_NAME) != null) {
-                mApplicationName.setText(sharedPreferenceUtil.getString(GGGlobalValues.APPLICATION_NAME));
-                mApplicationVersion.setText(sharedPreferenceUtil.getString(GGGlobalValues.APPLICATION_VERSION));
-            }
-            if (sharedPreferenceUtil.getString(GGGlobalValues.LAST_SYNC) != null) {
-                mLastSync.setText(sharedPreferenceUtil.getString(GGGlobalValues.LAST_SYNC));
+            mApplicationName.setText(App.APP_NAME);
+            mApplicationVersion.setText(App.APP_VERSION);
+            if (sharedPreferenceUtil.getLong(GGGlobalValues.LAST_SYNCHRONIZATION_DATE) > 0) {
+                mLastSync.setText(GGUtil.getLastSynchronization(getActivity()));
             }
         }
     }

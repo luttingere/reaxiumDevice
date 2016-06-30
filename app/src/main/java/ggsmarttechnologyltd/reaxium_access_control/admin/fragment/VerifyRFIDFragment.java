@@ -1,5 +1,7 @@
 package ggsmarttechnologyltd.reaxium_access_control.admin.fragment;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.View;
@@ -54,6 +56,7 @@ public class VerifyRFIDFragment extends GGMainFragment {
     private TextView infoText;
     private ScannerValidationHandler handler;
 
+
     @Override
     public String getMyTag() {
         return VerifyRFIDFragment.class.getName();
@@ -75,6 +78,7 @@ public class VerifyRFIDFragment extends GGMainFragment {
             userInfoContainer.setVisibility(View.GONE);
             infoText.setVisibility(View.VISIBLE);
         } else {
+             AutomaticCardValidationThread.stopScanner();
             ((AdminActivity) getActivity()).runMyFragment(new AdminFragment(), null, R.id.action_menu_home);
         }
         return Boolean.TRUE;
@@ -109,13 +113,9 @@ public class VerifyRFIDFragment extends GGMainFragment {
 
     @Override
     public void onPause() {
-
 //        AutomaticFingerPrintValidationThread.stopScanner();
 //        GGUtil.closeFingerPrint();
-
         AutomaticCardValidationThread.stopScanner();
-        GGUtil.closeCardReader();
-
         Log.i(TAG, "the scanner has been turned off successfully");
         super.onPause();
     }
@@ -126,7 +126,8 @@ public class VerifyRFIDFragment extends GGMainFragment {
                 @Override
                 public void onResponse(JSONObject response) {
                     hideProgressDialog();
-                    Type responseType = new TypeToken<ApiResponse<User>>() {}.getType();
+                    Type responseType = new TypeToken<ApiResponse<User>>() {
+                    }.getType();
                     ApiResponse<User> apiResponse = JsonUtil.getEntityFromJSON(response, responseType);
                     if (apiResponse.getReaxiumResponse().getCode() == GGGlobalValues.SUCCESSFUL_API_RESPONSE_CODE) {
                         SuccessfulAccessPlayerSingleton.getInstance(getActivity()).initRingTone();
@@ -139,21 +140,65 @@ public class VerifyRFIDFragment extends GGMainFragment {
                             userBusinessName.setText(user.getBusiness().getBusinessName());
                         }
                         setUserPhoto(user);
+
                     } else {
                         FailureAccessPlayerSingleton.getInstance(getActivity()).initRingTone();
                         GGUtil.showAToast(getActivity(), apiResponse.getReaxiumResponse().getMessage());
                     }
+                    initScanner();
                 }
             };
             Response.ErrorListener errorListener = new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     hideProgressDialog();
+                    initScanner();
                     GGUtil.showAToast(getActivity(), R.string.bad_connection_message);
                 }
             };
             showProgressDialog("Looking for this card in our cloud...");
             JsonObjectRequestUtil jsonObjectRequest = new JsonObjectRequestUtil(Request.Method.POST, APPEnvironment.createURL(GGGlobalValues.VALIDATE_RFID_CARD), loadValidateRFIDParams(rfidCode), responseListener, errorListener);
+            jsonObjectRequest.setShouldCache(false);
+            MySingletonUtil.getInstance(getActivity()).addToRequestQueue(jsonObjectRequest);
+        } else {
+            GGUtil.showAToast(getActivity(), R.string.no_network_available);
+        }
+    }
+
+    private void initScanner() {
+        InitScannersInAutoModeThread initScannersInAutoModeThread = new InitScannersInAutoModeThread(getActivity(), handler);
+        initScannersInAutoModeThread.start();
+    }
+
+    private void resetRFIDCard(String rfidCode) {
+        if (GGUtil.isNetworkAvailable(getActivity())) {
+            Response.Listener<JSONObject> responseListener = new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    hideProgressDialog();
+                    Type responseType = new TypeToken<ApiResponse<User>>() {
+                    }.getType();
+                    ApiResponse<User> apiResponse = JsonUtil.getEntityFromJSON(response, responseType);
+                    if (apiResponse.getReaxiumResponse().getCode() != GGGlobalValues.SUCCESSFUL_API_RESPONSE_CODE) {
+                        FailureAccessPlayerSingleton.getInstance(getActivity()).initRingTone();
+                    } else {
+                        SuccessfulAccessPlayerSingleton.getInstance(getActivity()).initRingTone();
+                    }
+                    GGUtil.showAToast(getActivity(), apiResponse.getReaxiumResponse().getMessage());
+                    initScanner();
+                }
+
+            };
+            Response.ErrorListener errorListener = new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    hideProgressDialog();
+                    GGUtil.showAToast(getActivity(), R.string.bad_connection_message);
+                    initScanner();
+                }
+            };
+            showProgressDialog("Restoring the rfid card in server...");
+            JsonObjectRequestUtil jsonObjectRequest = new JsonObjectRequestUtil(Request.Method.POST, APPEnvironment.createURL(GGGlobalValues.RESET_RFID_CARD), loadValidateRFIDParams(rfidCode), responseListener, errorListener);
             jsonObjectRequest.setShouldCache(false);
             MySingletonUtil.getInstance(getActivity()).addToRequestQueue(jsonObjectRequest);
         } else {
@@ -195,8 +240,33 @@ public class VerifyRFIDFragment extends GGMainFragment {
 
         @Override
         protected void validateScannerResult(AppBean bean) {
-            SecurityObject securityObject = (SecurityObject) bean;
-            validateRFIDCard(""+securityObject.getCardId());
+            final SecurityObject securityObject = (SecurityObject) bean;
+            AutomaticCardValidationThread.stopScanner();
+            GGUtil.closeCardReader();
+            new AlertDialog.Builder(getActivity(), R.style.MyDialogTheme)
+                    .setTitle("RFID MANAGEMENT")
+                    .setMessage("Do you wanna check this RFID CARD or Reset it?")
+                    .setPositiveButton("Check", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            validateRFIDCard("" + securityObject.getCardId());
+                            dialog.dismiss();
+
+                        }
+                    })
+                    .setNegativeButton("Reset", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    resetRFIDCard("" + securityObject.getCardId());
+                                    dialog.dismiss();
+                                }
+                            }
+                    ).setOnCancelListener(new DialogInterface.OnCancelListener() {
+                         @Override
+                        public void onCancel(DialogInterface dialog) {
+                            initScanner();
+                        }
+            }).show();
         }
 
         @Override
@@ -219,6 +289,7 @@ public class VerifyRFIDFragment extends GGMainFragment {
                         userPhoto.setImageBitmap(bitmap);
                     }
                 }
+
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     userPhotoLoader.setVisibility(View.GONE);

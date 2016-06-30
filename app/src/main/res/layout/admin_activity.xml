@@ -65,7 +65,7 @@
 
     <android.support.design.widget.NavigationView
         android:id="@+id/nvView"
-        android:layout_width="wrap_content"
+        android:layout_width="400dp"
         android:layout_height="match_parent"
         android:layout_gravity="right"
         app:itemTextAppearance="@style/AppTheme"

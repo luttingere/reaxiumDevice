@@ -30,12 +30,12 @@
 
     <!-- Menu Drawer-->
     <string name="menu_drawer_home">Home</string>
-    <string name="menu_drawer_configure_device">Configure Device</string>
-    <string name="menu_drawer_add_user">Add/Edit Users</string>
-    <string name="menu_drawer_add_security">Add Access</string>
-    <string name="menu_drawer_verify_biometric">Validate a RFID Card</string>
+    <string name="menu_drawer_configure_device">Device Management</string>
+    <string name="menu_drawer_add_user">Users Management</string>
+    <string name="menu_drawer_add_security">Access Management</string>
+    <string name="menu_drawer_verify_biometric">Validate a RFID</string>
     <string name="menu_drawer_send_location">Send Location</string>
-    <string name="menu_drawer_access_control">Access Control</string>
+    <string name="menu_drawer_access_control">Access History</string>
     <string name="menu_drawer_logout">Log Out</string>
     <string name="menu_drawer_show_map">Show Map</string>
 
@@ -48,15 +48,15 @@
     <string name="admin_fragment_title">Reaxium Admin Console</string>
 
     <!-- User Security Panel-->
-    <string name="user_security_panel_title">Add Access</string>
-    <string name="add_or_edit_a_user_title">Add or Edit Users</string>
+    <string name="user_security_panel_title">Access Management</string>
+    <string name="add_or_edit_a_user_title">Users Management</string>
     <string name="user_security_panel_tab_fingerprint">Biometric</string>
     <string name="user_security_panel_tab_rfid">RFID</string>
     <string name="search_user">Find</string>
 
     <!-- device configuration-->
     <string name="empty_device_id">Please type a device id</string>
-    <string name="device_configuration_device_id">Place A Device ID...</string>
+    <string name="device_configuration_device_id">Enter a Device ID</string>
     <string name="device_configuration_button_name">Configure</string>
     <string name="synchronize_device">Synchronize Device</string>
     <string name="reaxium_device_name">Device Name:</string>

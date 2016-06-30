@@ -39,6 +39,7 @@ public class GGUtil {
 
     private static final String TAG = GGGlobalValues.TRACE_ID;
     private static final SimpleDateFormat time_format = new SimpleDateFormat("hh:mm a");
+    private static final SimpleDateFormat date_format = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
 
     /**
      * Navigate to any screen in the app
@@ -64,6 +65,15 @@ public class GGUtil {
         return time_format.format(date);
     }
 
+
+    public static String  getDeviceId(Context context){
+        SharedPreferenceUtil sharedPreferenceUtil = SharedPreferenceUtil.getInstance(context);
+        String deviceId = "";
+        if(sharedPreferenceUtil.getLong(GGGlobalValues.DEVICE_ID)> 0){
+            deviceId = String.valueOf(sharedPreferenceUtil.getLong(GGGlobalValues.DEVICE_ID));
+        };
+        return deviceId;
+    }
 
     /**
      * Init the finger scanner
@@ -115,15 +125,16 @@ public class GGUtil {
             try {
                 App.cardReader = ICCardReader.getInstance();
                 if ((error = App.cardReader.powerOn()) != ICCardReader.RESULT_OK) {
-                    scannersActivityHandler.sendMessage(scannersActivityHandler.obtainMessage(ScannersActivityHandler.ERROR_ROUTINE, "the system fail turning on the card reader, error code: " + RFIDErrorMessage.getErrorMessage(error)));
+                 //   scannersActivityHandler.sendMessage(scannersActivityHandler.obtainMessage(ScannersActivityHandler.ERROR_ROUTINE, "the system fail turning on the card reader, error code: " + RFIDErrorMessage.getErrorMessage(error)));
                 }
                 if ((error = App.cardReader.open()) != ICCardReader.RESULT_OK) {
-                    scannersActivityHandler.sendMessage(scannersActivityHandler.obtainMessage(ScannersActivityHandler.ERROR_ROUTINE, "the system fail opening the card reader, error code: " + RFIDErrorMessage.getErrorMessage(error)));
+                    //scannersActivityHandler.sendMessage(scannersActivityHandler.obtainMessage(ScannersActivityHandler.ERROR_ROUTINE, "the system fail opening the card reader, error code: " + RFIDErrorMessage.getErrorMessage(error)));
                 } else {
                     isOk = Boolean.TRUE;
                     intent = retires;
                 }
             } catch (Exception e) {
+                closeCardReader();
                 Log.e(TAG, "Error initializing the card reader", e);
                 if(intent == retires){
                     scannersActivityHandler.sendMessage(scannersActivityHandler.obtainMessage(ScannersActivityHandler.ERROR_ROUTINE, "the system fail opening the card reader, error code: " + e.getMessage()));
@@ -174,6 +185,32 @@ public class GGUtil {
             securityObject.setErrorMessage(RFIDErrorMessage.getErrorMessage(res.error));
         }
         return securityObject;
+    }
+
+
+    /**
+     *
+     * @param context
+     */
+    public static void registerLastSynchronization(Context context){
+        SharedPreferenceUtil sharedPreferenceUtil = SharedPreferenceUtil.getInstance(context);
+        sharedPreferenceUtil.save(GGGlobalValues.LAST_SYNCHRONIZATION_DATE, new Date().getTime());
+    }
+
+    /**
+     *
+     * @param context
+     * @return
+     */
+    public static String getLastSynchronization(Context context){
+        String lastSynchronization = "";
+        SharedPreferenceUtil sharedPreferenceUtil = SharedPreferenceUtil.getInstance(context);
+        Long timeLong = sharedPreferenceUtil.getLong(GGGlobalValues.LAST_SYNCHRONIZATION_DATE);
+        if(timeLong > 0){
+            Date lastSynchronizationDate = new Date(timeLong);
+            lastSynchronization  = date_format.format(lastSynchronizationDate);
+        }
+        return lastSynchronization;
     }
 
     /**

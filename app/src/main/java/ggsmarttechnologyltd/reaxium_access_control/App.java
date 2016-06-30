@@ -31,6 +31,8 @@ import io.fabric.sdk.android.Fabric;
  */
 public class App extends MultiDexApplication implements Application.ActivityLifecycleCallbacks {
 
+    public static final String APP_NAME = "Reaxium School Bus Solution";
+    public static final String APP_VERSION = "2.0 QA";
     private static final String TAG  = GGGlobalValues.TRACE_ID;
     private static Context mContext;
     private boolean isDevelopment = Boolean.TRUE;

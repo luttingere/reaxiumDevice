@@ -93,6 +93,7 @@ public class AccessControlFragment extends GGMainFragment implements OnUserClick
 
     @Override
     public Boolean onBackPressed() {
+        AutomaticCardValidationThread.stopScanner();
         ((AdminActivity) getActivity()).runMyFragment(new AdminFragment(), null, R.id.action_menu_home);
         return Boolean.TRUE;
     }
@@ -324,13 +325,13 @@ public class AccessControlFragment extends GGMainFragment implements OnUserClick
             String trafficInfoResult = "";
             if (user != null) {
                 SuccessfulAccessPlayerSingleton.getInstance(getActivity()).initRingTone();
-                trafficInfo = user.getFirstName()+" "+user.getFirstLastName()+", @IN_OR_OUT@ #, at @Time@";
+                trafficInfo = user.getFirstName()+" "+user.getFirstLastName()+", @IN_OR_OUT@, @Time@";
                 user.setAccessTime(timeFormat.format(new Date()));
                 Long lastInsertedId = null;
                 String trafficTypeId = "1";
                 if (findAndRemoveUserFromList(listIN, user)) {
                     trafficTypeId = "2";
-                    trafficInfoResult = trafficInfo.replace("@IN_OR_OUT@","Off the bus");
+                    trafficInfoResult = trafficInfo.replace("@IN_OR_OUT@","has got off the system #");
                     lastInsertedId = accessControlDAO.insertUserAccess(user.getUserId(), userAccessType, LIST_OUT_NAME);
                     userOUTFoundDialog = new UserOUTFoundDialog(getActivity(), android.R.style.Theme_NoTitleBar_Fullscreen);
                     userOUTFoundDialog.updateUserInfo(user);
@@ -340,7 +341,7 @@ public class AccessControlFragment extends GGMainFragment implements OnUserClick
                     Collections.sort(listOUT);
                 } else if (findAndRemoveUserFromList(listOUT, user)) {
                     trafficTypeId = "1";
-                    trafficInfoResult = trafficInfo.replace("@IN_OR_OUT@","aboard the bus");
+                    trafficInfoResult = trafficInfo.replace("@IN_OR_OUT@","has got in the system #");
                     lastInsertedId = accessControlDAO.insertUserAccess(user.getUserId(), userAccessType, LIST_IN_NAME);
                     userINFoundDialog = new UserINFoundDialog(getActivity(), android.R.style.Theme_NoTitleBar_Fullscreen);
                     userINFoundDialog.updateUserInfo(user);

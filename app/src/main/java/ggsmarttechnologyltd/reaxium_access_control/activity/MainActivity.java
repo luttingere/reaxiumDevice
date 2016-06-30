@@ -140,13 +140,22 @@ public class MainActivity extends GGMainActivity {
     }
 
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopNotificationService();
+        unregisterBroadCast();
+        Log.i(TAG,"Servicio de Ubicacion detenido");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 
     @Override
     protected void onStop() {
         super.onStop();
-        stopNotificationService();
-        unregisterBroadCast();
-        Log.i(TAG,"Servicio de Ubicacion detenido");
     }
 
     public void hideBackButton(){
@@ -213,7 +222,6 @@ public class MainActivity extends GGMainActivity {
         if (!menuItem.isChecked()) {
             switch (menuItem.getItemId()) {
                 case R.id.action_logout:
-                    //AutomaticFingerPrintValidationThread.stopScanner();
                     AutomaticCardValidationThread.stopScanner();
                     sharedPreferenceUtil.removeValue(GGGlobalValues.USER_ID_IN_SESSION);
                     sharedPreferenceUtil.removeValue(GGGlobalValues.USER_FULL_NAME_IN_SESSION);
@@ -221,6 +229,7 @@ public class MainActivity extends GGMainActivity {
                     mDrawerLayout.closeDrawer(GravityCompat.END);
                     Intent goToLoginPage = new Intent(this, LoginActivity.class);
                     goToLoginPage.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    goToLoginPage.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(goToLoginPage);
                     finish();
                     break;
