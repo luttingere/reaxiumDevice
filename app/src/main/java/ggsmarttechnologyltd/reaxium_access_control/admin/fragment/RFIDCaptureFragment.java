@@ -122,6 +122,7 @@ public class RFIDCaptureFragment extends GGMainFragment {
             cardId = (Long) res.data;
             validateAndWriteRFIDCard(""+cardId);
         }else{
+            showErrorWrite();
             FailureAccessPlayerSingleton.getInstance(getActivity()).initRingTone();
             GGUtil.showAToast(getActivity(),RFIDErrorMessage.getErrorMessage(res.error));
         }
@@ -136,20 +137,38 @@ public class RFIDCaptureFragment extends GGMainFragment {
             error = App.cardReader.write(GGGlobalValues.BYTE_BLOCK, bytes);
             if (error == ICCardReader.RESULT_OK) {
                 hideProgressDialog();
-                exampleText.setVisibility(View.GONE);
-                checkImage.setVisibility(View.VISIBLE);
+                showSuccessFulWrite();
                 isOk = Boolean.TRUE;
                 //GGUtil.showAToast(getActivity(),"Card successfully configured");
             } else {
+
                 hideProgressDialog();
                 GGUtil.showAToast(getActivity(), RFIDErrorMessage.getErrorMessage(error));
             }
         }else{
+
             hideProgressDialog();
             GGUtil.showAToast(getActivity(),RFIDErrorMessage.getErrorMessage(error));
         }
         return isOk;
     }
+
+
+    private void showSuccessFulWrite(){
+        exampleText.setVisibility(View.GONE);
+        checkImage.setImageResource(R.drawable.check_green_icon);
+        checkImage.setVisibility(View.VISIBLE);
+    }
+
+    private void showErrorWrite(){
+        exampleText.setVisibility(View.GONE);
+        checkImage.setImageResource(R.drawable.error_signal);
+        checkImage.setVisibility(View.VISIBLE);
+    }
+
+
+
+
     private void validateAndWriteRFIDCard(String rfidCode) {
         Log.i(TAG,"Card reader number: "+cardId);
         if (GGUtil.isNetworkAvailable(getActivity())) {
@@ -184,9 +203,11 @@ public class RFIDCaptureFragment extends GGMainFragment {
                                     }).show();
 
                         }else{
+                            showErrorWrite();
                             FailureAccessPlayerSingleton.getInstance(getActivity()).initRingTone();
                         }
                     } else {
+                        showErrorWrite();
                         hideProgressDialog();
                         FailureAccessPlayerSingleton.getInstance(getActivity()).initRingTone();
                         GGUtil.showAToast(getActivity(), apiResponse.getReaxiumResponse().getMessage());

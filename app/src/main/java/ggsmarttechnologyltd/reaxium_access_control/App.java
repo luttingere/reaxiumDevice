@@ -11,6 +11,7 @@ import android.support.multidex.MultiDexApplication;
 import android.util.Log;
 
 
+import cn.com.aratek.dev.Terminal;
 import cn.com.aratek.fp.Bione;
 import cn.com.aratek.iccard.ICCardReader;
 
@@ -76,8 +77,8 @@ public class App extends MultiDexApplication implements Application.ActivityLife
     }
 
     private void registerDeviceSerialNumber(){
-        Log.i(TAG,"Device Serial Number:"+ Build.SERIAL);
-        sharedPreferenceUtil.saveString(GGGlobalValues.DEVICE_SERIAL,Build.SERIAL);
+        Log.i(TAG,"Device Serial Number:"+ Terminal.getSN());
+        sharedPreferenceUtil.saveString(GGGlobalValues.DEVICE_SERIAL,Terminal.getSN());
     }
 
     private void logUser() {
